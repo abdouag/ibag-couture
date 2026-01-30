@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
 import SearchBar from "@/components/SearchBar";
 import MiniCart from "@/components/MiniCart";
@@ -14,12 +15,18 @@ type User = {
 };
 
 export default function Header() {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const { totalItems, setIsCartOpen, isHydrated } = useCart();
+
+  // Ne pas afficher le header client sur les pages admin
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

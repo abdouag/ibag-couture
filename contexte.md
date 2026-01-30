@@ -248,6 +248,18 @@ backend/
 - **Fichiers modifies** : app/page.tsx, app/collections/page.tsx, app/produits/[slug]/page.tsx
 - **Impact** : Build Vercel passe sans erreur. Homepage passe de statique a dynamique.
 
+### [2025-01-30] — Separation layouts client / admin
+- **Type** : UI / Architecture
+- **Description** : Le header client (logo, recherche, panier) s'affichait sur les pages /admin. Ajout d'un guard `usePathname()` dans Header.tsx qui retourne `null` si la route commence par `/admin`. L'admin conserve son propre layout dedie (sidebar + header admin).
+- **Fichiers modifies** : components/Header.tsx
+- **Regle** : toute future page admin doit etre sous `/admin/*`. Le header client ne s'affiche jamais sur ces routes.
+
+### [2025-01-30] — CORS production + seed admin
+- **Type** : Backend / Config
+- **Description** : Ajout des origines CORS de production (ibagcouture.com, vercel.app) dans le fallback du config backend. Creation du script `scripts/seedAdmin.js` pour generer le premier compte admin sur MongoDB Atlas.
+- **Fichiers modifies** : backend/config/index.js
+- **Fichiers crees** : backend/scripts/seedAdmin.js
+
 ---
 
 ## 7. Regles Finales
