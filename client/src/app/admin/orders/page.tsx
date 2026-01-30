@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -44,7 +44,7 @@ type Order = {
   isGuest?: boolean;
 };
 
-const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: JSX.Element }> = {
+const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: ReactNode }> = {
   pending: {
     label: "En attente",
     color: "text-yellow-700",
