@@ -34,7 +34,7 @@ async function uploadToCloudinary(imageBuffer, filename) {
         public_id: filename,
         format: 'png',
         transformation: [
-          { width: 1024, height: 1024, crop: 'limit', quality: 'auto' },
+          { width: 1024, height: 1536, crop: 'limit', quality: 'auto' },
         ],
       },
       (error, result) => {
@@ -160,10 +160,11 @@ Regles:
         const refBuffer = Buffer.from(await refResponse.arrayBuffer());
         const refFile = new File([refBuffer], 'reference.png', { type: 'image/png' });
 
+        const fullBodyRules = 'Full body photo, head to toe visible, no cropping, no zoom, no close-up, centered framing, entire garment fully visible, feet included, realistic proportions.';
         const refPrompts = [
-          `Professional fashion photography. Show this EXACT same garment in a full front view on a model or mannequin. Same outfit, same fabric, same color palette, same embroidery pattern, same design details. No redesign, no creative variation. Studio setting, neutral background, soft professional lighting. High-end fashion photography. No text, no watermark.`,
-          `Professional fashion photography. Show this EXACT same garment from a three-quarter angle, slight turn to show movement and draping. Same outfit, same fabric, same color palette, same embroidery pattern, same design details. No redesign, no creative variation. Studio setting, neutral background, soft professional lighting. No text, no watermark.`,
-          `Professional close-up detail photograph of this EXACT same garment. Focus on the fabric texture, embroidery details, stitching craftsmanship, and material quality. Same fabric, same color, same pattern. No redesign. Macro photography style, studio lighting. No text, no watermark.`,
+          `Professional fashion e-commerce photography. Show this EXACT same garment on a model, front view facing camera. ${fullBodyRules} Same outfit, same fabric, same color palette, same embroidery pattern, same design details. No redesign, no creative variation. Studio setting, neutral background, soft professional lighting. High-end African couture. No text, no watermark.`,
+          `Professional fashion e-commerce photography. Show this EXACT same garment on a model, three-quarter angle, slight turn to show movement and draping. ${fullBodyRules} Same outfit, same fabric, same color palette, same embroidery pattern, same design details. No redesign, no creative variation. Studio setting, neutral background, soft professional lighting. High-end African couture. No text, no watermark.`,
+          `Professional close-up detail photograph of this EXACT same garment. Focus on the fabric texture, embroidery details, stitching craftsmanship, and material quality. Same fabric, same color, same pattern. No redesign. Macro photography style, studio lighting. Centered framing, no cropping. No text, no watermark.`,
         ];
 
         const imageResults = await Promise.allSettled(
@@ -175,7 +176,7 @@ Regles:
               image: refFile,
               prompt,
               n: 1,
-              size: '1024x1024',
+              size: index === 2 ? '1024x1024' : '1024x1536',
             });
 
             const imageData = response.data[0]?.b64_json;
@@ -211,12 +212,13 @@ Regles:
         // ── Free generation: text-only prompts ──
         console.log('[AI] Generation de 3 images (libre, sans reference)...');
 
-        const baseImagePrompt = `Professional fashion photography of an elegant African haute couture garment: ${productName}. Category: ${catLabel}. Style: luxury African fashion house, artisanal craftsmanship. Studio setting with neutral background, soft professional lighting, high-end fashion photography. Square format 1:1. No text, no watermark, no logos.`;
+        const fullBodyRules = 'Full body photo, head to toe visible, no cropping, no zoom, no close-up, centered framing, entire garment fully visible, feet included, realistic proportions.';
+        const baseImagePrompt = `Professional fashion e-commerce photography of an elegant African haute couture garment: ${productName}. Category: ${catLabel}. Style: luxury African fashion house, artisanal craftsmanship, high-end African couture. Studio setting with neutral background, soft professional lighting. No text, no watermark, no logos.`;
 
         const imagePrompts = [
-          `${baseImagePrompt} Full front view on a mannequin or model, showing the complete garment silhouette and draping.`,
-          `${baseImagePrompt} Three-quarter angle view showing movement and flow of the fabric, emphasizing the garment's construction and fit.`,
-          `${baseImagePrompt} Close-up detail shot focusing on fabric texture, embroidery details, stitching craftsmanship, and material quality.`,
+          `${baseImagePrompt} Front view on a model facing camera. ${fullBodyRules}`,
+          `${baseImagePrompt} Three-quarter angle view on a model, slight turn showing movement and draping. ${fullBodyRules}`,
+          `${baseImagePrompt} Close-up detail shot focusing on fabric texture, embroidery details, stitching craftsmanship, and material quality. Centered framing, no cropping. No text, no watermark.`,
         ];
 
         const imageResults = await Promise.allSettled(
@@ -227,7 +229,7 @@ Regles:
               model: 'gpt-image-1',
               prompt,
               n: 1,
-              size: '1024x1024',
+              size: index === 2 ? '1024x1024' : '1024x1536',
             });
 
             const imageData = response.data[0]?.b64_json;

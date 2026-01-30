@@ -293,7 +293,7 @@ export default function AIProductModal({
                   <div className="grid grid-cols-3 gap-3">
                     {result.images.map((url, i) => (
                       <div key={i} className="relative group">
-                        <div className="aspect-square rounded-lg overflow-hidden bg-stone-100 border border-stone-200">
+                        <div className={`${i === 2 ? "aspect-square" : "aspect-[2/3]"} rounded-lg overflow-hidden bg-stone-100 border border-stone-200`}>
                           <img
                             src={url}
                             alt={IMAGE_LABELS[i] || `Image ${i + 1}`}
