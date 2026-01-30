@@ -277,6 +277,16 @@ backend/
 - **Impact frontend** : aucun changement necessaire — les helpers `getFullUrl`/`getImageUrl` detectent deja les URLs absolues via `url.startsWith("http")`
 - **Variables Render** : `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` a configurer dans le dashboard Render
 
+### [2025-01-30] — Fix upload Cloudinary en production
+- **Type** : Backend / Debug
+- **Cause** : L'upload echouait en production avec "Une erreur interne est survenue". Les erreurs Cloudinary (credentials manquantes/invalides) etaient des `Error` bruts, pas des `AppError`. Le `errorHandler.js` en production masquait le vrai message pour les erreurs non-operationnelles.
+- **Correctifs** :
+  1. **upload.routes.js** : creation d'un helper `handleUploadError()` qui detecte les erreurs Cloudinary specifiques (cloud_name manquant, API key invalide, signature invalide) et les wrappe en `AppError` avec un message clair. Ajout de logs `[UPLOAD]` avant/apres chaque upload.
+  2. **upload.routes.js** : verification des env vars au demarrage avec warning console.
+  3. **errorHandler.js** : en production, les erreurs non-operationnelles affichent maintenant `err.message` (au lieu du generique) et loguent le stack complet.
+- **Fichiers modifies** : backend/routes/upload.routes.js, backend/middleware/errorHandler.js
+- **Regle** : toute erreur backend doit etre wrappee en `AppError` pour que le message atteigne le frontend. Ne jamais passer un `Error` brut a `next()`.
+
 ### [2025-01-30] — CORS production + seed admin
 - **Type** : Backend / Config
 - **Description** : Ajout des origines CORS de production (ibagcouture.com, vercel.app) dans le fallback du config backend. Creation du script `scripts/seedAdmin.js` pour generer le premier compte admin sur MongoDB Atlas.

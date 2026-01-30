@@ -34,12 +34,12 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // Programming or unknown errors
-  console.error('ERROR:', err);
+  // Programming or unknown errors — log full details for debugging
+  console.error('UNHANDLED ERROR:', err.message, err.stack);
   return res.status(500).json({
     success: false,
     status: 'error',
-    message: 'Une erreur interne est survenue',
+    message: err.message || 'Une erreur interne est survenue',
   });
 };
 
