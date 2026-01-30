@@ -37,8 +37,10 @@ export default async function CollectionsPage({ searchParams }: Props) {
   let allProducts: Product[] = [];
   try {
     const res = await fetch(`${API_URL}/api/products`, { cache: "no-store" });
-    const data: ApiResponse = await res.json();
-    allProducts = data.data || [];
+    if (res.ok) {
+      const data: ApiResponse = await res.json();
+      allProducts = data?.data || [];
+    }
   } catch {
     // API not available
   }
@@ -176,7 +178,6 @@ export default async function CollectionsPage({ searchParams }: Props) {
                             })()}
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            onError={(e) => { e.currentTarget.style.display = "none"; }}
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center text-stone-400 group-hover:scale-110 transition-transform duration-700">

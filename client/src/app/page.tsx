@@ -28,8 +28,10 @@ export default async function Home() {
     const res = await fetch(`${API_URL}/api/products`, {
       cache: "no-store",
     });
-    const data: ApiResponse = await res.json();
-    products = data.data || [];
+    if (res.ok) {
+      const data: ApiResponse = await res.json();
+      products = data?.data || [];
+    }
   } catch {
     // API not available (build time or server down) — render empty
   }
@@ -171,7 +173,6 @@ export default async function Home() {
                           })()}
                           alt={product.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                          onError={(e) => { e.currentTarget.style.display = "none"; }}
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-stone-400 group-hover:scale-110 transition-transform duration-700">

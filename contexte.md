@@ -287,6 +287,19 @@ backend/
 - **Fichiers modifies** : backend/routes/upload.routes.js, backend/middleware/errorHandler.js
 - **Regle** : toute erreur backend doit etre wrappee en `AppError` pour que le message atteigne le frontend. Ne jamais passer un `Error` brut a `next()`.
 
+### [2025-01-30] — Fix crash SSR Vercel ("server-side exception")
+- **Type** : Frontend / SSR
+- **Cause** : 2 problemes identifie :
+  1. **`onError` dans server components** : les pages `page.tsx` (accueil) et `collections/page.tsx` sont des server components (pas de `"use client"`). Les event handlers (`onError`) sur les elements HTML ne peuvent pas etre serialises en RSC — cela provoque une exception SSR a chaque requete.
+  2. **`produits/[slug]/page.tsx`** : `product` pouvait etre `undefined` si l'API retournait un 404 ou `{ success: false }` sans lever d'exception. Le `catch` ne capturait que les erreurs reseau, pas les reponses erreur. Acces a `product.basePrice`, `product.name` etc. sans null check = `TypeError`.
+- **Correctifs** :
+  1. Retrait de `onError` des `<img>` dans les server components (`page.tsx`, `collections/page.tsx`). Les images ont deja un fallback visuel (fond gradient + SVG placeholder).
+  2. Ajout de `res.ok` check avant `res.json()` sur toutes les pages SSR (page.tsx, collections, produits/[slug]).
+  3. `produits/[slug]/page.tsx` : `product` type passe a `Product | null`, verification explicite `if (!product) notFound()` apres le fetch.
+  4. `generateMetadata` : ajout de `res.ok` et `data?.data?.name` checks.
+- **Fichiers modifies** : app/page.tsx, app/collections/page.tsx, app/produits/[slug]/page.tsx
+- **Regle SSR** : ne JAMAIS mettre d'event handlers (`onError`, `onClick`, etc.) sur des elements HTML dans un server component. Utiliser un client component wrapper si necessaire. Toujours verifier `res.ok` avant `res.json()`.
+
 ### [2025-01-30] — CORS production + seed admin
 - **Type** : Backend / Config
 - **Description** : Ajout des origines CORS de production (ibagcouture.com, vercel.app) dans le fallback du config backend. Creation du script `scripts/seedAdmin.js` pour generer le premier compte admin sur MongoDB Atlas.

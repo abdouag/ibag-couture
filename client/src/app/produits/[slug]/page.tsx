@@ -42,7 +42,9 @@ export async function generateMetadata({ params }: Props) {
 
   try {
     const res = await fetch(`${API_URL}/api/products/${slug}`, { cache: "no-store" });
+    if (!res.ok) return { title: "Produit | Ibag Couture" };
     const data: ApiResponse = await res.json();
+    if (!data?.data?.name) return { title: "Produit | Ibag Couture" };
     return {
       title: `${data.data.name} | Ibag Couture`,
       description: data.data.description || `Découvrez ${data.data.name}, création sur mesure par Ibag Couture.`,
@@ -57,13 +59,19 @@ export async function generateMetadata({ params }: Props) {
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
 
-  let product: Product;
+  let product: Product | null = null;
 
   try {
     const res = await fetch(`${API_URL}/api/products/${slug}`, { cache: "no-store" });
-    const data: ApiResponse = await res.json();
-    product = data.data;
+    if (res.ok) {
+      const data: ApiResponse = await res.json();
+      product = data?.data || null;
+    }
   } catch {
+    // API unreachable
+  }
+
+  if (!product) {
     notFound();
   }
 
