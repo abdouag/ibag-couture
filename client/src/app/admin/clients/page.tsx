@@ -197,7 +197,9 @@ export default function ClientsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-medium text-stone-900 truncate">{client.fullName}</h3>
+                    <Link href={`/admin/clients/${client._id}`} className="font-medium text-stone-900 truncate hover:text-amber-700 transition-colors">
+                      {client.fullName}
+                    </Link>
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                       client.clientType === "sur_place"
                         ? "bg-amber-100 text-amber-700"

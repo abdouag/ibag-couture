@@ -77,6 +77,7 @@ const getPageTitle = (pathname: string): string => {
   if (pathname === "/admin/clients") return "Clients & Mesures";
   if (pathname === "/admin/clients/new") return "Nouveau client";
   if (pathname.match(/\/admin\/clients\/.*\/edit/)) return "Modifier le client";
+  if (pathname.match(/\/admin\/clients\/[^/]+$/) && pathname !== "/admin/clients/new") return "Fiche client";
   if (pathname === "/admin/workshop") return "Suivi Atelier";
   if (pathname === "/admin/finances") return "Finance";
   return "Administration";
