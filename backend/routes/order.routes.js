@@ -1,0 +1,28 @@
+const express = require('express');
+const router = express.Router();
+
+const {
+  createOrder,
+  getAllOrders,
+  getOrderById,
+  updateOrderStatus,
+  updateAdminNotes,
+} = require('../controllers/order.controller');
+const { protect, adminOnly } = require('../middleware/auth');
+
+// POST /api/orders - Créer une commande (public)
+router.post('/', createOrder);
+
+// GET /api/orders - Liste des commandes (admin)
+router.get('/', protect, adminOnly, getAllOrders);
+
+// GET /api/orders/:id - Détail d'une commande (admin)
+router.get('/:id', protect, adminOnly, getOrderById);
+
+// PATCH /api/orders/:id/status - Mettre à jour le statut (admin uniquement)
+router.patch('/:id/status', protect, adminOnly, updateOrderStatus);
+
+// PATCH /api/orders/:id/notes - Mettre à jour les notes internes (admin)
+router.patch('/:id/notes', protect, adminOnly, updateAdminNotes);
+
+module.exports = router;
