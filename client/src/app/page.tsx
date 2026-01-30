@@ -39,7 +39,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-stone-50">
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center justify-center pt-20">
+      <section className="relative min-h-[75vh] md:min-h-[80vh] flex items-center justify-center pt-16">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0" style={{
@@ -47,30 +47,30 @@ export default async function Home() {
           }} />
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <p className="text-amber-700 text-sm tracking-[0.3em] uppercase mb-6 font-medium">
+        <div className="relative z-10 max-w-4xl mx-auto px-5 text-center">
+          <p className="text-amber-700 text-xs sm:text-sm tracking-[0.3em] uppercase mb-4 font-medium">
             Maison de Couture
           </p>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-stone-900 leading-tight mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-serif text-stone-900 leading-tight mb-5 md:mb-6">
             La couture sur mesure,
             <br />
             <span className="italic font-light">pensée pour vous</span>
           </h1>
-          <p className="text-stone-600 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+          <p className="text-stone-600 text-base md:text-lg max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed">
             Découvrez l&apos;excellence de la haute couture africaine.
             Chaque pièce est confectionnée à la main, selon vos mesures exactes,
             pour sublimer votre élégance.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="#collections"
-              className="inline-block bg-stone-900 text-white px-10 py-4 text-sm tracking-[0.2em] uppercase hover:bg-stone-800 hover:shadow-lg transition-all duration-300"
+              className="inline-block bg-stone-900 text-white px-8 sm:px-10 py-3.5 sm:py-4 text-xs sm:text-sm tracking-[0.2em] uppercase hover:bg-stone-800 hover:shadow-lg transition-all duration-300 font-medium"
             >
               Voir nos créations
             </a>
             <a
               href="#apropos"
-              className="inline-block border border-stone-400 text-stone-700 px-10 py-4 text-sm tracking-[0.2em] uppercase hover:bg-stone-100 transition-all duration-300"
+              className="inline-block border border-stone-400 text-stone-700 px-8 sm:px-10 py-3.5 sm:py-4 text-xs sm:text-sm tracking-[0.2em] uppercase hover:bg-stone-100 transition-all duration-300"
             >
               Notre histoire
             </a>
@@ -78,7 +78,7 @@ export default async function Home() {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+        <div className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
           <svg className="w-6 h-6 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
@@ -86,7 +86,7 @@ export default async function Home() {
       </section>
 
       {/* About Section */}
-      <section id="apropos" className="py-24 md:py-32 bg-white">
+      <section id="apropos" className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
             {/* Text - Desktop: left, Mobile: below image */}
@@ -140,13 +140,13 @@ export default async function Home() {
       </section>
 
       {/* Collections Section */}
-      <section id="collections" className="py-24 md:py-32 bg-stone-100">
+      <section id="collections" className="py-16 md:py-24 bg-stone-100">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="text-amber-700 text-sm tracking-[0.3em] uppercase mb-4">
+          <div className="text-center mb-10 md:mb-14">
+            <p className="text-amber-700 text-xs sm:text-sm tracking-[0.3em] uppercase mb-3">
               Nos Créations
             </p>
-            <h2 className="text-3xl md:text-4xl font-serif text-stone-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-stone-900">
               Collections en vedette
             </h2>
           </div>
@@ -224,7 +224,7 @@ export default async function Home() {
             </div>
           )}
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-10">
             <Link
               href="/collections"
               className="inline-block border border-stone-900 text-stone-900 px-10 py-4 text-sm tracking-[0.2em] uppercase hover:bg-stone-900 hover:text-white transition-all duration-300"
@@ -236,13 +236,13 @@ export default async function Home() {
       </section>
 
       {/* Advantages Section */}
-      <section className="py-24 md:py-32 bg-stone-900 text-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="text-amber-500 text-sm tracking-[0.3em] uppercase mb-4">
+      <section className="py-16 md:py-24 bg-stone-900 text-white">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6">
+          <div className="text-center mb-10 md:mb-14">
+            <p className="text-amber-500 text-xs sm:text-sm tracking-[0.3em] uppercase mb-3">
               Pourquoi nous choisir
             </p>
-            <h2 className="text-3xl md:text-4xl font-serif">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif">
               L&apos;excellence à chaque étape
             </h2>
           </div>
@@ -308,12 +308,12 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 md:py-32 bg-amber-50">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-6">
+      <section className="py-16 md:py-24 bg-amber-50">
+        <div className="max-w-3xl mx-auto px-5 sm:px-6 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-stone-900 mb-4">
             Prêt à créer votre pièce unique ?
           </h2>
-          <p className="text-stone-600 mb-10 leading-relaxed">
+          <p className="text-stone-600 mb-8 leading-relaxed">
             Parlons de votre projet. Nos artisans sont à votre écoute
             pour donner vie à vos envies.
           </p>

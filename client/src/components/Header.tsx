@@ -70,9 +70,9 @@ export default function Header() {
       >
         {/* Main header row */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16 md:h-18">
+          <div className="flex items-center justify-between h-14 md:h-16">
             {/* Left: Burger (mobile) + Logo */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {/* Mobile Burger */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -80,11 +80,11 @@ export default function Header() {
                 aria-label="Menu"
               >
                 {isMenuOpen ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 )}
@@ -95,18 +95,18 @@ export default function Header() {
                 <img
                   src="/logo.png"
                   alt="Ibag Couture"
-                  className="h-10 md:h-14 w-auto object-contain"
+                  className="h-9 md:h-11 w-auto object-contain"
                 />
               </Link>
             </div>
 
             {/* Center: Search (desktop only) */}
-            <div className="hidden md:block flex-1 max-w-lg mx-8">
+            <div className="hidden md:block flex-1 max-w-md mx-6">
               <SearchBar />
             </div>
 
             {/* Right: Nav (desktop) + Icons */}
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               {/* Desktop Nav */}
               <nav className="hidden lg:flex items-center gap-6 mr-4">
                 <Link
@@ -137,7 +137,7 @@ export default function Header() {
                     className="p-2 text-stone-600 hover:text-stone-900 transition-colors relative"
                     aria-label="Mon compte"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                   </button>
@@ -147,7 +147,7 @@ export default function Header() {
                     className="p-2 text-stone-600 hover:text-stone-900 transition-colors"
                     aria-label="Connexion"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                   </Link>
@@ -213,11 +213,11 @@ export default function Header() {
                 className="p-2 text-stone-600 hover:text-stone-900 transition-colors relative"
                 aria-label="Panier"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                 </svg>
                 {isHydrated && totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-amber-700 text-white text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px] h-[18px]">
+                  <span className="absolute -top-0.5 -right-0.5 bg-amber-700 text-white text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px] h-[18px]">
                     {totalItems > 9 ? "9+" : totalItems}
                   </span>
                 )}
@@ -226,7 +226,7 @@ export default function Header() {
           </div>
 
           {/* Mobile Search Row */}
-          <div className="md:hidden pb-3">
+          <div className="md:hidden pb-2">
             <SearchBar isMobile />
           </div>
         </div>

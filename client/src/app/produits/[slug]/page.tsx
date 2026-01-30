@@ -83,7 +83,7 @@ export default async function ProductPage({ params }: Props) {
   return (
     <main className="min-h-screen bg-stone-50">
       {/* Breadcrumb */}
-      <div className="pt-20 md:pt-24 pb-4 bg-white border-b border-stone-200">
+      <div className="pt-16 md:pt-20 pb-3 bg-white border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-sm text-stone-400">
             <Link href="/" className="hover:text-stone-900 transition-colors">
@@ -104,9 +104,9 @@ export default async function ProductPage({ params }: Props) {
       </div>
 
       {/* Product Section */}
-      <section className="py-8 md:py-16 lg:py-20">
+      <section className="py-6 md:py-10 lg:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 xl:gap-24">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 xl:gap-16">
 
             {/* Image Gallery */}
             <ProductGallery
@@ -117,8 +117,8 @@ export default async function ProductPage({ params }: Props) {
             />
 
             {/* Product Info - Enhanced */}
-            <div className="lg:py-4">
-              <div className="sticky top-24 md:top-28 space-y-6 md:space-y-8">
+            <div className="lg:py-2">
+              <div className="sticky top-16 md:top-20 space-y-5 md:space-y-6">
 
                 {/* Title Section */}
                 <div>
@@ -131,7 +131,7 @@ export default async function ProductPage({ params }: Props) {
                 </div>
 
                 {/* Price Section - Enhanced */}
-                <div className="bg-white rounded-sm p-5 md:p-6 border border-stone-200 shadow-sm">
+                <div className="bg-white rounded-sm p-4 md:p-5 border border-stone-200 shadow-sm">
                   <div className="flex items-baseline justify-between mb-1">
                     <span className="text-stone-500 text-sm">Prix de base</span>
                     <span className="text-xs text-stone-400 tracking-wide uppercase">FCFA</span>
@@ -318,9 +318,9 @@ export default async function ProductPage({ params }: Props) {
       </section>
 
       {/* Info Section - Enhanced */}
-      <section className="py-16 md:py-20 bg-white border-t border-stone-200">
+      <section className="py-12 md:py-16 bg-white border-t border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <p className="text-amber-700 text-xs tracking-[0.3em] uppercase mb-3 font-medium">Notre processus</p>
             <h2 className="text-2xl md:text-3xl font-serif text-stone-900">Comment ca marche ?</h2>
           </div>
@@ -345,7 +345,7 @@ export default async function ProductPage({ params }: Props) {
       </section>
 
       {/* Measurements Guide - only for sur-mesure products */}
-      {product.isCustomAvailable && <section className="py-16 bg-stone-100">
+      {product.isCustomAvailable && <section className="py-12 bg-stone-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="bg-white rounded-sm p-8 md:p-12 shadow-sm">
             <div className="text-center mb-8">
@@ -367,16 +367,16 @@ export default async function ProductPage({ params }: Props) {
       </section>}
 
       {/* Contact CTA */}
-      <section className="py-16 md:py-20 bg-stone-900 text-white">
+      <section className="py-12 md:py-16 bg-stone-900 text-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-2xl md:text-3xl font-serif mb-4">Besoin d&apos;aide ?</h2>
-          <p className="text-stone-400 mb-8 leading-relaxed">
+          <h2 className="text-2xl md:text-3xl font-serif mb-3">Besoin d&apos;aide ?</h2>
+          <p className="text-stone-400 mb-6 leading-relaxed">
             Notre equipe est disponible pour vous accompagner dans votre commande
             et repondre a toutes vos questions.
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-3 border border-white text-white px-8 py-4 text-sm tracking-[0.15em] uppercase hover:bg-white hover:text-stone-900 transition-all duration-300"
+            className="inline-flex items-center gap-3 border border-white text-white px-8 py-3.5 text-sm tracking-[0.15em] uppercase font-medium hover:bg-white hover:text-stone-900 transition-all duration-300"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />

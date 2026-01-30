@@ -63,8 +63,8 @@ export default async function CollectionsPage({ searchParams }: Props) {
   return (
     <main className="min-h-screen bg-stone-50">
       {/* Hero Introduction */}
-      <section className="pt-24 md:pt-32 pb-16 md:pb-20 bg-white border-b border-stone-200">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="pt-20 md:pt-24 pb-10 md:pb-14 bg-white border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-stone-400 mb-8">
             <Link href="/" className="hover:text-stone-900 transition-colors">
@@ -93,7 +93,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
       </section>
 
       {/* Filters */}
-      <section className="py-6 bg-white/95 backdrop-blur-sm border-b border-stone-200 sticky top-[72px] md:top-[88px] z-40">
+      <section className="py-5 bg-white/95 backdrop-blur-sm border-b border-stone-200 sticky top-[56px] md:top-[64px] z-40">
         <div className="max-w-7xl mx-auto px-6">
           <Suspense fallback={
             <div className="flex items-center gap-2">
@@ -108,8 +108,8 @@ export default async function CollectionsPage({ searchParams }: Props) {
       </section>
 
       {/* Products Grid */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-10 md:py-14">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6">
           {products.length === 0 ? (
             <div className="text-center py-20">
               <div className="w-20 h-20 mx-auto mb-6 border border-stone-300 rounded-full flex items-center justify-center">
@@ -153,7 +153,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
             </div>
           ) : (
             <>
-              <p className="text-sm text-stone-500 mb-8">
+              <p className="text-sm text-stone-500 mb-6">
                 {products.length} création{products.length > 1 ? "s" : ""} disponible{products.length > 1 ? "s" : ""}
                 {activeCategory !== "tous" && (
                   <span> dans <span className="font-medium text-stone-700">{activeCategory}</span></span>
@@ -243,18 +243,18 @@ export default async function CollectionsPage({ searchParams }: Props) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-stone-900 text-white">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-2xl md:text-3xl font-serif mb-4">
+      <section className="py-14 md:py-16 bg-stone-900 text-white">
+        <div className="max-w-3xl mx-auto px-5 sm:px-6 text-center">
+          <h2 className="text-2xl md:text-3xl font-serif mb-3">
             Vous ne trouvez pas ce que vous cherchez ?
           </h2>
-          <p className="text-stone-400 mb-8 leading-relaxed">
+          <p className="text-stone-400 mb-6 leading-relaxed">
             Nos artisans peuvent créer une pièce unique selon vos envies.
             Contactez-nous pour une création personnalisée.
           </p>
           <Link
             href="/contact"
-            className="inline-block border border-white text-white px-10 py-4 text-sm tracking-[0.2em] uppercase hover:bg-white hover:text-stone-900 transition-all duration-300"
+            className="inline-block border border-white text-white px-8 py-3.5 text-sm tracking-[0.15em] uppercase font-medium hover:bg-white hover:text-stone-900 transition-all duration-300"
           >
             Nous contacter
           </Link>
