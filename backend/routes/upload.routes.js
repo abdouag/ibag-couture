@@ -1,29 +1,20 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary');
 const { protect, adminOnly } = require('../middleware/auth');
 const { AppError } = require('../middleware/errorHandler');
 
 const router = express.Router();
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, '..', 'uploads', 'products');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
+// Configure Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'ibag-couture/products',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 1200, height: 1500, crop: 'limit', quality: 'auto' }],
   },
-  filename: (req, file, cb) => {
-    // Generate unique filename: timestamp-randomstring.extension
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `product-${uniqueSuffix}${ext}`);
-  }
 });
 
 // File filter - only accept images
@@ -37,7 +28,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer
+// Configure multer with Cloudinary storage
 const upload = multer({
   storage,
   fileFilter,
@@ -69,8 +60,8 @@ router.post(
       return next(new AppError('Aucun fichier fourni', 400));
     }
 
-    // Return the path to the uploaded file
-    const imageUrl = `/uploads/products/${req.file.filename}`;
+    // Cloudinary returns the full URL in req.file.path
+    const imageUrl = req.file.path;
 
     res.status(201).json({
       success: true,
@@ -113,7 +104,7 @@ router.post(
 
     const uploaded = req.files.map((file) => ({
       filename: file.filename,
-      url: `/uploads/products/${file.filename}`,
+      url: file.path, // Cloudinary full URL
       size: file.size,
       mimetype: file.mimetype,
     }));
@@ -126,36 +117,36 @@ router.post(
   }
 );
 
-// DELETE /api/uploads/product/:filename - Delete a product image
+// DELETE /api/uploads/product/:filename - Delete a product image from Cloudinary
 router.delete(
   '/product/:filename',
   protect,
   adminOnly,
-  (req, res, next) => {
-    const { filename } = req.params;
-    const filePath = path.join(uploadsDir, filename);
+  async (req, res, next) => {
+    try {
+      const { filename } = req.params;
 
-    // Security: prevent directory traversal
-    if (filename.includes('..') || filename.includes('/')) {
-      return next(new AppError('Nom de fichier invalide', 400));
-    }
+      // Security: prevent directory traversal
+      if (filename.includes('..') || filename.includes('/')) {
+        return next(new AppError('Nom de fichier invalide', 400));
+      }
 
-    // Check if file exists
-    if (!fs.existsSync(filePath)) {
-      return next(new AppError('Fichier non trouve', 404));
-    }
+      // Cloudinary public_id is folder/filename (without extension)
+      const publicId = `ibag-couture/products/${filename}`;
 
-    // Delete the file
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        return next(new AppError('Erreur lors de la suppression', 500));
+      const result = await cloudinary.uploader.destroy(publicId);
+
+      if (result.result === 'not found') {
+        return next(new AppError('Fichier non trouve', 404));
       }
 
       res.json({
         success: true,
         message: 'Image supprimee avec succes'
       });
-    });
+    } catch (err) {
+      return next(new AppError('Erreur lors de la suppression', 500));
+    }
   }
 );
 

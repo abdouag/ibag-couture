@@ -31,7 +31,7 @@
 | Backend | Express.js | 5.x |
 | Base de donnees | MongoDB (Mongoose) | Mongoose 9.x |
 | Auth | JWT custom (jsonwebtoken + bcryptjs) | - |
-| Upload fichiers | Multer | 2.x |
+| Upload fichiers | Multer + Cloudinary | 2.x / 1.x |
 | Securite | Helmet, CORS, express-validator | - |
 | Dev | nodemon, ESLint | - |
 
@@ -263,6 +263,19 @@ backend/
 - **Fichiers modifies** : next.config.ts, components/ProductGallery.tsx, app/page.tsx, app/collections/page.tsx, app/commander/[slug]/page.tsx, components/MiniCart.tsx, components/SearchBar.tsx
 - **Regle** : toute nouvelle image produit doit utiliser `onError` pour un fallback propre. Les images en grille utilisent `object-cover`, l'image principale en detail utilise `object-contain`.
 - **Note** : Render a un filesystem ephemere — les images uploadees sont perdues au redeploy. Une solution de stockage persistant (S3/Cloudinary) sera necessaire en production.
+
+### [2025-01-30] — Migration Cloudinary (stockage images persistant)
+- **Type** : Backend / Config / Infra
+- **Description** : Remplacement du stockage local Multer (filesystem ephemere Render) par Cloudinary. Les images sont desormais stockees sur le CDN Cloudinary et ne sont plus perdues au redeploy.
+  1. **config/cloudinary.js** (cree) : configuration du SDK Cloudinary v2
+  2. **routes/upload.routes.js** : `multer.diskStorage` remplace par `CloudinaryStorage`. Les URLs retournees sont maintenant des URLs absolues Cloudinary (`https://res.cloudinary.com/...`). La suppression utilise `cloudinary.uploader.destroy()`.
+  3. **next.config.ts** : ajout de `res.cloudinary.com` dans `remotePatterns`
+  4. **.env.example** : ajout des variables `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- **Fichiers crees** : backend/config/cloudinary.js
+- **Fichiers modifies** : backend/routes/upload.routes.js, client/next.config.ts, backend/.env.example
+- **Dependencies ajoutees** : `cloudinary`, `multer-storage-cloudinary`
+- **Impact frontend** : aucun changement necessaire — les helpers `getFullUrl`/`getImageUrl` detectent deja les URLs absolues via `url.startsWith("http")`
+- **Variables Render** : `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` a configurer dans le dashboard Render
 
 ### [2025-01-30] — CORS production + seed admin
 - **Type** : Backend / Config
