@@ -1,6 +1,7 @@
 const OpenAI = require('openai');
 const cloudinary = require('../config/cloudinary');
 const { AppError } = require('../middleware');
+const { generateSecondaryImagesFromReference } = require('../services/geminiImageGenerator');
 
 // Rate limiting: track requests per day
 const dailyRequestLog = new Map(); // key: date string, value: count
@@ -44,6 +45,26 @@ async function uploadToCloudinary(imageBuffer, filename) {
     );
     stream.end(imageBuffer);
   });
+}
+
+/**
+ * Build Cloudinary crop/zoom URLs from a reference image URL.
+ * Returns [secondaryUrl, detailUrl] or null if the URL is not a valid Cloudinary URL.
+ */
+function buildCloudinaryCrops(referenceImageUrl) {
+  const cloudinaryMatch = referenceImageUrl.match(
+    /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(?:[^/]+\/)*(.*?)(?:\.[a-z]+)?$/i
+  );
+
+  if (!cloudinaryMatch) return null;
+
+  const cloudinaryBase = cloudinaryMatch[1];
+  const publicId = cloudinaryMatch[2];
+
+  const secondaryUrl = `${cloudinaryBase}w_1024,h_1536,c_fill,g_auto,q_auto/${publicId}`;
+  const detailUrl = `${cloudinaryBase}w_1024,h_1024,c_crop,g_center,z_2.0,q_auto/${publicId}`;
+
+  return [secondaryUrl, detailUrl];
 }
 
 /**
@@ -133,6 +154,7 @@ Regles:
       description: textResult.description || '',
       imageSuggestion: textResult.imageSuggestion || '',
       images: [],
+      provider: null,
     };
 
     // Step 2: Generate images if requested
@@ -148,34 +170,57 @@ Regles:
       const labels = ['principale', 'secondaire', 'detail'];
 
       if (referenceImageUrl) {
-        // ── Reference-based: Cloudinary crop/zoom of the original image ──
-        // No AI generation — pure image transformations from the real photo.
+        // ── Reference-based image generation ──
         // The admin's original image stays as mainImage (never replaced).
-        console.log(`[AI] Creation de 2 variantes Cloudinary depuis: ${referenceImageUrl}`);
+        // Strategy: Try Gemini AI first, fallback to Cloudinary crop/zoom.
 
-        // Extract public_id and base URL from the Cloudinary URL
-        // URL format: https://res.cloudinary.com/CLOUD/image/upload/TRANSFORMS/PUBLIC_ID
-        const cloudinaryMatch = referenceImageUrl.match(
-          /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(?:[^/]+\/)*(.*?)(?:\.[a-z]+)?$/i
-        );
+        if (process.env.GEMINI_API_KEY) {
+          // ── Primary: Gemini image-to-image generation ──
+          // LIMITATION: Gemini regenerates pixels. It cannot guarantee
+          // pixel-level fidelity to the reference. Results may vary.
+          console.log(`[AI][GEMINI] Generation via Gemini depuis: ${referenceImageUrl}`);
 
-        if (!cloudinaryMatch) {
-          console.error('[AI] URL Cloudinary invalide:', referenceImageUrl);
-          return next(new AppError('L\'image de reference doit etre une URL Cloudinary valide.', 400));
+          try {
+            const geminiResult = await generateSecondaryImagesFromReference({
+              referenceImageUrl,
+              productName: textResult.name || name || `vetement ${catLabel}`,
+              category: catLabel,
+            });
+
+            responseData.images = geminiResult.images;
+            responseData.referenceUsed = true;
+            responseData.provider = geminiResult.provider;
+            console.log(`[AI][GEMINI] success - ${geminiResult.images.length} images Gemini generees`);
+          } catch (geminiErr) {
+            // Gemini failed — fallback to Cloudinary crop/zoom
+            console.error(`[AI][GEMINI] failure - ${geminiErr.message}`);
+            console.log('[AI] Fallback vers Cloudinary crop/zoom...');
+
+            const cloudinaryImages = buildCloudinaryCrops(referenceImageUrl);
+            if (cloudinaryImages) {
+              responseData.images = cloudinaryImages;
+              responseData.referenceUsed = true;
+              responseData.provider = 'cloudinary';
+              console.log('[AI] 2 variantes Cloudinary creees (fallback)');
+            } else {
+              console.error('[AI] URL Cloudinary invalide, aucune image de secours');
+            }
+          }
+        } else {
+          // ── Fallback: Cloudinary crop/zoom (no AI) ──
+          console.log(`[AI] GEMINI_API_KEY absente. Fallback Cloudinary crop/zoom depuis: ${referenceImageUrl}`);
+
+          const cloudinaryImages = buildCloudinaryCrops(referenceImageUrl);
+          if (cloudinaryImages) {
+            responseData.images = cloudinaryImages;
+            responseData.referenceUsed = true;
+            responseData.provider = 'cloudinary';
+            console.log('[AI] 2 variantes Cloudinary creees (crop + detail)');
+          } else {
+            console.error('[AI] URL Cloudinary invalide:', referenceImageUrl);
+            return next(new AppError('L\'image de reference doit etre une URL Cloudinary valide.', 400));
+          }
         }
-
-        const cloudinaryBase = cloudinaryMatch[1]; // https://res.cloudinary.com/CLOUD/image/upload/
-        const publicId = cloudinaryMatch[2]; // ibag-couture/products/filename
-
-        // Image 1: Secondary view — slightly different crop (upper body focus, vertical)
-        const secondaryUrl = `${cloudinaryBase}w_1024,h_1536,c_fill,g_auto,q_auto/${publicId}`;
-
-        // Image 2: Detail — center crop zoom on fabric/embroidery
-        const detailUrl = `${cloudinaryBase}w_1024,h_1024,c_crop,g_center,z_2.0,q_auto/${publicId}`;
-
-        responseData.images = [secondaryUrl, detailUrl];
-        responseData.referenceUsed = true;
-        console.log(`[AI] 2 variantes Cloudinary creees (crop + detail)`);
 
       } else {
         // ── Free generation: text-only prompts ──

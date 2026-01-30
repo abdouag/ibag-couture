@@ -10,6 +10,7 @@ type AIResult = {
   imageSuggestion: string;
   images: string[];
   referenceUsed?: boolean;
+  provider?: 'gemini' | 'cloudinary' | null;
 };
 
 type AIProductModalProps = {
@@ -23,7 +24,8 @@ type AIProductModalProps = {
 };
 
 const FREE_IMAGE_LABELS = ["Image principale", "Image secondaire", "Detail (tissu/broderie)"];
-const REF_IMAGE_LABELS = ["Vue recadree", "Detail (tissu/broderie)"];
+const REF_GEMINI_LABELS = ["Vue secondaire (IA)", "Detail tissu (IA)"];
+const REF_CLOUDINARY_LABELS = ["Vue recadree", "Detail (zoom)"];
 
 export default function AIProductModal({
   currentName,
@@ -111,7 +113,9 @@ export default function AIProductModal({
   };
 
   const hasImages = result && result.images.length > 0;
-  const imageLabels = result?.referenceUsed ? REF_IMAGE_LABELS : FREE_IMAGE_LABELS;
+  const imageLabels = result?.referenceUsed
+    ? (result.provider === 'gemini' ? REF_GEMINI_LABELS : REF_CLOUDINARY_LABELS)
+    : FREE_IMAGE_LABELS;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -171,7 +175,7 @@ export default function AIProductModal({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-green-900">Image de reference detectee</p>
-                    <p className="text-xs text-green-700 mt-0.5">L&apos;image principale reste inchangee. 2 recadrages seront crees automatiquement.</p>
+                    <p className="text-xs text-green-700 mt-0.5">L&apos;image principale reste inchangee. 2 variantes seront generees par IA (Gemini).</p>
                   </div>
                 </div>
               )}
@@ -180,11 +184,11 @@ export default function AIProductModal({
               <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-xl">
                 <div>
                   <p className="text-sm font-medium text-stone-900">
-                    {hasReference ? "Creer 2 recadrages automatiques" : "Generer aussi 3 images IA"}
+                    {hasReference ? "Generer 2 variantes IA (Gemini)" : "Generer aussi 3 images IA"}
                   </p>
                   <p className="text-xs text-stone-500 mt-0.5">
                     {hasReference
-                      ? "Recadrages de votre photo originale (instantane)"
+                      ? "Variantes generees par IA depuis votre photo"
                       : "Images studio professionnelles (plus long, ~30s)"}
                   </p>
                 </div>
@@ -207,7 +211,7 @@ export default function AIProductModal({
                 </svg>
                 {withImages
                   ? hasReference
-                    ? "Generer texte + 2 recadrages"
+                    ? "Generer texte + 2 variantes IA"
                     : "Generer texte + 3 images"
                   : "Generer le texte"}
               </button>
@@ -291,11 +295,17 @@ export default function AIProductModal({
                     <div>
                       <label className="text-sm font-semibold text-stone-900">
                         {result.referenceUsed
-                          ? `Recadrages photo (${result.images.length})`
+                          ? result.provider === 'gemini'
+                            ? `Variantes Gemini (${result.images.length})`
+                            : `Recadrages photo (${result.images.length})`
                           : `Images generees (${result.images.length})`}
                       </label>
                       {result.referenceUsed && (
-                        <p className="text-xs text-green-600 mt-0.5">Recadrages de votre photo originale — image principale inchangee</p>
+                        <p className="text-xs text-green-600 mt-0.5">
+                          {result.provider === 'gemini'
+                            ? "Generees par IA Gemini depuis votre photo — image principale inchangee"
+                            : "Recadrages de votre photo originale — image principale inchangee"}
+                        </p>
                       )}
                     </div>
                     <label className="flex items-center gap-2 cursor-pointer">
