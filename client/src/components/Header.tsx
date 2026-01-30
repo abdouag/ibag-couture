@@ -23,12 +23,11 @@ export default function Header() {
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const { totalItems, setIsCartOpen, isHydrated } = useCart();
 
-  // Ne pas afficher le header client sur les pages admin
-  if (pathname.startsWith("/admin")) {
-    return null;
-  }
+  const isAdmin = pathname.startsWith("/admin");
 
   useEffect(() => {
+    if (isAdmin) return;
+
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -51,7 +50,7 @@ export default function Header() {
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isAdmin]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -60,6 +59,11 @@ export default function Header() {
     setIsAccountMenuOpen(false);
     window.location.href = "/";
   };
+
+  // Ne pas afficher le header client sur les pages admin
+  if (isAdmin) {
+    return null;
+  }
 
   return (
     <>
