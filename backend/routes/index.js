@@ -10,6 +10,7 @@ const clientRoutes = require('./client.routes');
 const paymentRoutes = require('./payment.routes');
 const financeRoutes = require('./finance.routes');
 const exportRoutes = require('./export.routes');
+const aiRoutes = require('./ai.routes');
 
 // API Info
 router.get('/', (req, res) => {
@@ -37,5 +38,6 @@ router.use('/clients', clientRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/finances', financeRoutes);
 router.use('/exports', exportRoutes);
+router.use('/admin/ai', aiRoutes);
 
 module.exports = router;
