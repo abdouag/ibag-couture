@@ -24,8 +24,16 @@ type ApiResponse = {
 };
 
 export const metadata = {
-  title: "Collections | Ibag Couture",
-  description: "Découvrez nos collections de haute couture africaine sur mesure.",
+  title: "Collections — Haute Couture Africaine",
+  description:
+    "Explorez nos collections de haute couture africaine sur mesure : robes, costumes, tenues traditionnelles et modernes. Confection artisanale selon vos mesures.",
+  alternates: { canonical: "/collections" },
+  openGraph: {
+    title: "Collections | Ibag Couture",
+    description:
+      "Robes, costumes et créations sur mesure alliant traditions africaines et élégance contemporaine. Parcourez nos collections homme, femme, traditionnel et moderne.",
+    url: "/collections",
+  },
 };
 
 type Props = {

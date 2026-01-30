@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Allow: /collections
+Allow: /produits/
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /account
+Disallow: /account/
+Disallow: /login
+Disallow: /register
+Disallow: /commander/
+Disallow: /api/
+
+Sitemap: https://ibagcouture.com/sitemap.xml

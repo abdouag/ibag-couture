@@ -1,8 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
 import Footer from "@/components/Footer";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Ibag Couture | Haute Couture Africaine Sur Mesure",
+  description:
+    "Découvrez Ibag Couture, maison de haute couture africaine. Robes, costumes et tenues traditionnelles confectionnés sur mesure par nos artisans. Livraison Afrique & Europe.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Ibag Couture | Haute Couture Africaine Sur Mesure",
+    description:
+      "Maison de couture africaine sur mesure. Chaque pièce est confectionnée à la main, selon vos mesures exactes, pour sublimer votre élégance.",
+    url: "/",
+  },
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -36,8 +50,31 @@ export default async function Home() {
     // API not available (build time or server down) — render empty
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ClothingStore",
+    name: "Ibag Couture",
+    description:
+      "Maison de haute couture africaine sur mesure. Robes, costumes et tenues traditionnelles confectionnés artisanalement.",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://ibagcouture.com",
+    logo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://ibagcouture.com"}/logo.png`,
+    priceRange: "$$",
+    makesOffer: {
+      "@type": "Offer",
+      itemOffered: {
+        "@type": "Service",
+        name: "Couture sur mesure",
+        description: "Confection artisanale de vêtements sur mesure alliant traditions africaines et élégance contemporaine.",
+      },
+    },
+  };
+
   return (
     <main className="min-h-screen bg-stone-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero Section */}
       <section className="relative min-h-[75vh] md:min-h-[80vh] flex items-center justify-center pt-16">
         {/* Background Pattern */}

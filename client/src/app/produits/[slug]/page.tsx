@@ -42,16 +42,43 @@ export async function generateMetadata({ params }: Props) {
 
   try {
     const res = await fetch(`${API_URL}/api/products/${slug}`, { cache: "no-store" });
-    if (!res.ok) return { title: "Produit | Ibag Couture" };
+    if (!res.ok) return { title: "Produit — Ibag Couture" };
     const data: ApiResponse = await res.json();
-    if (!data?.data?.name) return { title: "Produit | Ibag Couture" };
+    const product = data?.data;
+    if (!product?.name) return { title: "Produit — Ibag Couture" };
+
+    const description =
+      product.description ||
+      `Découvrez ${product.name}, création sur mesure par Ibag Couture. Confection artisanale, haute couture africaine.`;
+
+    const imageUrl = product.mainImage || (product.images && product.images.length > 0 ? product.images[0] : null);
+    const ogImage = imageUrl
+      ? imageUrl.startsWith("http") ? imageUrl : `${API_URL}${imageUrl}`
+      : undefined;
+
     return {
-      title: `${data.data.name} | Ibag Couture`,
-      description: data.data.description || `Découvrez ${data.data.name}, création sur mesure par Ibag Couture.`,
+      title: `${product.name} — Création Sur Mesure`,
+      description,
+      alternates: { canonical: `/produits/${slug}` },
+      openGraph: {
+        title: `${product.name} | Ibag Couture`,
+        description,
+        url: `/produits/${slug}`,
+        type: "website",
+        ...(ogImage && {
+          images: [{ url: ogImage, alt: `${product.name} — Ibag Couture` }],
+        }),
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${product.name} | Ibag Couture`,
+        description,
+        ...(ogImage && { images: [ogImage] }),
+      },
     };
   } catch {
     return {
-      title: "Produit | Ibag Couture",
+      title: "Produit — Ibag Couture",
     };
   }
 }
@@ -80,8 +107,38 @@ export default async function ProductPage({ params }: Props) {
     product.basePrice
   ) || product.basePrice;
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ibagcouture.com";
+  const imageUrl = product.mainImage || (product.images && product.images.length > 0 ? product.images[0] : null);
+  const ogImage = imageUrl
+    ? imageUrl.startsWith("http") ? imageUrl : `${API_URL}${imageUrl}`
+    : undefined;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description || `${product.name}, création sur mesure par Ibag Couture.`,
+    ...(ogImage && { image: ogImage }),
+    brand: {
+      "@type": "Brand",
+      name: "Ibag Couture",
+    },
+    offers: {
+      "@type": "Offer",
+      url: `${siteUrl}/produits/${product.slug}`,
+      priceCurrency: "XOF",
+      price: product.basePrice,
+      availability: "https://schema.org/InStock",
+    },
+    category: product.category,
+  };
+
   return (
     <main className="min-h-screen bg-stone-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <div className="pt-16 md:pt-20 pb-3 bg-white border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
