@@ -623,6 +623,8 @@ export default function EditProductPage() {
               ...prev,
               ...(result.name ? { name: result.name } : {}),
               ...(result.description ? { description: result.description } : {}),
+              ...(result.mainImage ? { mainImage: result.mainImage } : {}),
+              ...(result.images ? { images: [...prev.images, ...result.images] } : {}),
             }));
             setShowAI(false);
           }}

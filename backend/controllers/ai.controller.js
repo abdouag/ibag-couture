@@ -1,4 +1,5 @@
 const OpenAI = require('openai');
+const cloudinary = require('../config/cloudinary');
 const { AppError } = require('../middleware');
 
 // Rate limiting: track requests per day
@@ -23,7 +24,30 @@ function checkRateLimit() {
 }
 
 /**
- * @desc    Generer des suggestions produit via IA
+ * Upload a base64 image buffer to Cloudinary
+ */
+async function uploadToCloudinary(imageBuffer, filename) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'ibag/products/ai',
+        public_id: filename,
+        format: 'png',
+        transformation: [
+          { width: 1024, height: 1024, crop: 'limit', quality: 'auto' },
+        ],
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+    stream.end(imageBuffer);
+  });
+}
+
+/**
+ * @desc    Generer des suggestions produit via IA (texte + images)
  * @route   POST /api/admin/ai/generate-product
  */
 const generateProduct = async (req, res, next) => {
@@ -36,7 +60,7 @@ const generateProduct = async (req, res, next) => {
       return next(new AppError('Limite quotidienne de requetes IA atteinte (50/jour). Reessayez demain.', 429));
     }
 
-    const { name, category, basePrice, isCustomAvailable } = req.body;
+    const { name, category, basePrice, isCustomAvailable, generateImages } = req.body;
 
     if (!category) {
       return next(new AppError('La categorie est requise pour generer des suggestions.', 400));
@@ -54,7 +78,7 @@ const generateProduct = async (req, res, next) => {
     const priceInfo = basePrice ? `Prix de base: ${basePrice} FCFA.` : '';
     const nameInfo = name ? `Nom actuel: "${name}".` : '';
 
-    const prompt = `Tu es le directeur artistique d'Ibag Couture, une maison de couture africaine haut de gamme specialisee dans le sur-mesure et l'artisanat textile.
+    const textPrompt = `Tu es le directeur artistique d'Ibag Couture, une maison de couture africaine haut de gamme specialisee dans le sur-mesure et l'artisanat textile.
 
 Genere une fiche produit professionnelle pour un vetement avec ces caracteristiques:
 - Categorie: ${catLabel}
@@ -78,11 +102,12 @@ Regles:
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    console.log(`[AI] Requete generate-product - categorie: ${category}, type: ${typeLabel}, nom: ${name || 'non fourni'}`);
+    console.log(`[AI] Requete generate-product - categorie: ${category}, type: ${typeLabel}, nom: ${name || 'non fourni'}, images: ${generateImages ? 'oui' : 'non'}`);
 
+    // Step 1: Generate text content
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: textPrompt }],
       temperature: 0.7,
       max_tokens: 1000,
       response_format: { type: 'json_object' },
@@ -93,24 +118,88 @@ Regles:
       return next(new AppError('Reponse IA vide. Reessayez.', 500));
     }
 
-    let result;
+    let textResult;
     try {
-      result = JSON.parse(content);
+      textResult = JSON.parse(content);
     } catch {
       console.error('[AI] Erreur parsing JSON:', content);
       return next(new AppError('Format de reponse IA invalide. Reessayez.', 500));
     }
 
-    console.log(`[AI] Reponse OK - nom suggere: "${result.name}"`);
+    console.log(`[AI] Texte OK - nom suggere: "${textResult.name}"`);
+
+    const responseData = {
+      name: textResult.name || '',
+      description: textResult.description || '',
+      imageSuggestion: textResult.imageSuggestion || '',
+      images: [],
+    };
+
+    // Step 2: Generate images if requested
+    if (generateImages) {
+      console.log('[AI] Generation de 3 images...');
+
+      const productName = textResult.name || name || `vetement ${catLabel}`;
+      const baseImagePrompt = `Professional fashion photography of an elegant African haute couture garment: ${productName}. Category: ${catLabel}. Style: luxury African fashion house, artisanal craftsmanship. Studio setting with neutral background, soft professional lighting, high-end fashion photography. Square format 1:1. No text, no watermark, no logos.`;
+
+      const imagePrompts = [
+        `${baseImagePrompt} Full front view on a mannequin or model, showing the complete garment silhouette and draping.`,
+        `${baseImagePrompt} Three-quarter angle view showing movement and flow of the fabric, emphasizing the garment's construction and fit.`,
+        `${baseImagePrompt} Close-up detail shot focusing on fabric texture, embroidery details, stitching craftsmanship, and material quality.`,
+      ];
+
+      const timestamp = Date.now();
+      const slug = (textResult.name || name || category)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 40);
+
+      const imageResults = await Promise.allSettled(
+        imagePrompts.map(async (prompt, index) => {
+          const labels = ['principale', 'secondaire', 'detail'];
+          console.log(`[AI] Generation image ${index + 1}/3 (${labels[index]})...`);
+
+          const response = await openai.images.generate({
+            model: 'gpt-image-1',
+            prompt,
+            n: 1,
+            size: '1024x1024',
+          });
+
+          const imageData = response.data[0]?.b64_json;
+          if (!imageData) {
+            throw new Error(`Pas de donnees image pour l'image ${index + 1}`);
+          }
+
+          const imageBuffer = Buffer.from(imageData, 'base64');
+          const filename = `${slug}-${labels[index]}-${timestamp}`;
+
+          console.log(`[AI] Upload Cloudinary image ${index + 1}...`);
+          const url = await uploadToCloudinary(imageBuffer, filename);
+          console.log(`[AI] Image ${index + 1} uploadee: ${url}`);
+
+          return url;
+        })
+      );
+
+      const successfulImages = [];
+      for (const result of imageResults) {
+        if (result.status === 'fulfilled') {
+          successfulImages.push(result.value);
+        } else {
+          console.error('[AI] Erreur image:', result.reason?.message || result.reason);
+        }
+      }
+
+      responseData.images = successfulImages;
+      console.log(`[AI] ${successfulImages.length}/3 images generees avec succes`);
+    }
 
     res.status(200).json({
       success: true,
       message: 'Suggestions generees avec succes',
-      data: {
-        name: result.name || '',
-        description: result.description || '',
-        imageSuggestion: result.imageSuggestion || '',
-      },
+      data: responseData,
     });
   } catch (error) {
     console.error('[AI] Erreur:', error.message);

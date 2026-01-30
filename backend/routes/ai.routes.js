@@ -20,6 +20,9 @@ const generateValidation = [
   body('isCustomAvailable')
     .optional()
     .isBoolean().withMessage('isCustomAvailable doit etre un booleen'),
+  body('generateImages')
+    .optional()
+    .isBoolean().withMessage('generateImages doit etre un booleen'),
 ];
 
 // Toutes les routes sont protegees (admin only)

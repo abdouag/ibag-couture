@@ -8,6 +8,7 @@ type AIResult = {
   name: string;
   description: string;
   imageSuggestion: string;
+  images: string[];
 };
 
 type AIProductModalProps = {
@@ -15,9 +16,11 @@ type AIProductModalProps = {
   currentCategory: string;
   currentPrice: string;
   isCustomAvailable: boolean;
-  onApply: (result: { name?: string; description?: string }) => void;
+  onApply: (result: { name?: string; description?: string; mainImage?: string; images?: string[] }) => void;
   onClose: () => void;
 };
+
+const IMAGE_LABELS = ["Image principale", "Image secondaire", "Detail (tissu/broderie)"];
 
 export default function AIProductModal({
   currentName,
@@ -28,10 +31,13 @@ export default function AIProductModal({
   onClose,
 }: AIProductModalProps) {
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AIResult | null>(null);
   const [applyName, setApplyName] = useState(true);
   const [applyDescription, setApplyDescription] = useState(true);
+  const [applyImages, setApplyImages] = useState(true);
+  const [withImages, setWithImages] = useState(true);
 
   const categoryLabels: Record<string, string> = {
     homme: "Homme",
@@ -44,6 +50,7 @@ export default function AIProductModal({
     setLoading(true);
     setError(null);
     setResult(null);
+    setLoadingStep(withImages ? "Generation du texte..." : "Generation en cours...");
 
     try {
       const token = localStorage.getItem("token");
@@ -58,6 +65,7 @@ export default function AIProductModal({
           category: currentCategory,
           basePrice: currentPrice ? Number(currentPrice) : undefined,
           isCustomAvailable,
+          generateImages: withImages,
         }),
       });
 
@@ -73,16 +81,23 @@ export default function AIProductModal({
       setError("Erreur de connexion au serveur");
     } finally {
       setLoading(false);
+      setLoadingStep("");
     }
   };
 
   const handleApply = () => {
     if (!result) return;
-    onApply({
-      name: applyName ? result.name : undefined,
-      description: applyDescription ? result.description : undefined,
-    });
+    const applied: { name?: string; description?: string; mainImage?: string; images?: string[] } = {};
+    if (applyName) applied.name = result.name;
+    if (applyDescription) applied.description = result.description;
+    if (applyImages && result.images.length > 0) {
+      applied.mainImage = result.images[0];
+      applied.images = result.images.slice(1);
+    }
+    onApply(applied);
   };
+
+  const hasImages = result && result.images.length > 0;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -97,7 +112,7 @@ export default function AIProductModal({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-stone-900">Assistant IA</h2>
-              <p className="text-sm text-stone-500">Generation de fiche produit</p>
+              <p className="text-sm text-stone-500">Generation de fiche produit complète</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-lg transition-colors">
@@ -133,23 +148,52 @@ export default function AIProductModal({
 
           {/* Generate button */}
           {!result && !loading && (
-            <button
-              onClick={generate}
-              disabled={!currentCategory}
-              className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold hover:from-amber-600 hover:to-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-              </svg>
-              Generer des suggestions
-            </button>
+            <div className="space-y-3">
+              {/* Toggle images */}
+              <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                <div>
+                  <p className="text-sm font-medium text-stone-900">Generer aussi 3 images IA</p>
+                  <p className="text-xs text-stone-500 mt-0.5">Images studio professionnelles (plus long, ~30s)</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWithImages(!withImages)}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${withImages ? "bg-amber-500" : "bg-stone-300"}`}
+                >
+                  <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${withImages ? "translate-x-5" : "translate-x-0"}`} />
+                </button>
+              </div>
+
+              <button
+                onClick={generate}
+                disabled={!currentCategory}
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold hover:from-amber-600 hover:to-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                </svg>
+                {withImages ? "Generer texte + 3 images" : "Generer le texte"}
+              </button>
+            </div>
           )}
 
           {/* Loading */}
           {loading && (
-            <div className="flex flex-col items-center py-8 gap-3">
-              <div className="w-10 h-10 border-3 border-amber-200 border-t-amber-500 rounded-full animate-spin" />
-              <p className="text-sm text-stone-500">L&apos;IA genere des suggestions...</p>
+            <div className="flex flex-col items-center py-10 gap-4">
+              <div className="relative">
+                <div className="w-14 h-14 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-stone-700">{loadingStep}</p>
+                {withImages && (
+                  <p className="text-xs text-stone-400 mt-1">La generation d&apos;images peut prendre 30-60 secondes</p>
+                )}
+              </div>
             </div>
           )}
 
@@ -203,13 +247,47 @@ export default function AIProductModal({
                 <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line">{result.description}</p>
               </div>
 
-              {/* Image suggestion */}
-              <div className="border border-amber-200 bg-amber-50 rounded-xl p-4">
-                <label className="text-sm font-semibold text-amber-900 block mb-2">
-                  Suggestion photo (reference)
-                </label>
-                <p className="text-sm text-amber-800 leading-relaxed">{result.imageSuggestion}</p>
-              </div>
+              {/* Generated Images */}
+              {hasImages ? (
+                <div className="border border-stone-200 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-semibold text-stone-900">
+                      Images generees ({result.images.length})
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={applyImages}
+                        onChange={(e) => setApplyImages(e.target.checked)}
+                        className="w-4 h-4 rounded border-stone-300 text-amber-500 focus:ring-amber-500"
+                      />
+                      <span className="text-xs text-stone-500">Appliquer</span>
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {result.images.map((url, i) => (
+                      <div key={i} className="relative group">
+                        <div className="aspect-square rounded-lg overflow-hidden bg-stone-100 border border-stone-200">
+                          <img
+                            src={url}
+                            alt={IMAGE_LABELS[i] || `Image ${i + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <p className="text-xs text-stone-500 text-center mt-1.5">{IMAGE_LABELS[i] || `Image ${i + 1}`}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Image suggestion text (when no images generated) */
+                <div className="border border-amber-200 bg-amber-50 rounded-xl p-4">
+                  <label className="text-sm font-semibold text-amber-900 block mb-2">
+                    Suggestion photo (reference)
+                  </label>
+                  <p className="text-sm text-amber-800 leading-relaxed">{result.imageSuggestion}</p>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
@@ -221,7 +299,7 @@ export default function AIProductModal({
                 </button>
                 <button
                   onClick={handleApply}
-                  disabled={!applyName && !applyDescription}
+                  disabled={!applyName && !applyDescription && !(applyImages && hasImages)}
                   className="flex-1 py-2.5 bg-stone-900 text-white rounded-xl text-sm font-semibold hover:bg-stone-800 transition-colors disabled:opacity-50"
                 >
                   Appliquer la selection
