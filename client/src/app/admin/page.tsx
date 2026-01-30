@@ -25,6 +25,12 @@ type RecentOrder = {
   createdAt: string;
 };
 
+type FinanceSummary = {
+  totalRevenue: number;
+  totalCollected: number;
+  totalRemaining: number;
+};
+
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: "En attente", color: "bg-yellow-100 text-yellow-700" },
   in_production: { label: "En confection", color: "bg-purple-100 text-purple-700" },
@@ -44,6 +50,7 @@ export default function AdminDashboard() {
   });
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [finance, setFinance] = useState<FinanceSummary | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +66,19 @@ export default function AdminDashboard() {
         // Fetch products
         const productsRes = await fetch(`${API_URL}/api/products?limit=1000`);
         const productsData = await productsRes.json();
+
+        // Fetch finance summary
+        try {
+          const finRes = await fetch(`${API_URL}/api/finances/summary`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (finRes.ok) {
+            const finData = await finRes.json();
+            setFinance(finData.data);
+          }
+        } catch {
+          // Finance API may not be available
+        }
 
         if (ordersData.success && ordersData.data) {
           const orders = ordersData.data;
@@ -197,8 +217,8 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Second Row: Revenue + Products */}
-      <div className="grid sm:grid-cols-2 gap-4 mb-8">
+      {/* Second Row: Finance + Products */}
+      <div className="grid sm:grid-cols-3 gap-4 mb-8">
         {/* Revenue Card */}
         <div className="bg-gradient-to-br from-stone-900 to-stone-800 rounded-xl p-6 text-white">
           <div className="flex items-start justify-between mb-4">
@@ -209,7 +229,7 @@ export default function AdminDashboard() {
                   <span className="inline-block w-24 h-8 bg-stone-700 animate-pulse rounded" />
                 ) : (
                   <>
-                    {stats.totalRevenue.toLocaleString("fr-FR")}
+                    {(finance?.totalRevenue ?? stats.totalRevenue).toLocaleString("fr-FR")}
                     <span className="text-base font-normal text-stone-400 ml-1">FCFA</span>
                   </>
                 )}
@@ -221,7 +241,36 @@ export default function AdminDashboard() {
               </svg>
             </div>
           </div>
-          <p className="text-stone-400 text-sm">Commandes livrees uniquement</p>
+          <Link href="/admin/finances" className="text-stone-400 text-sm hover:text-white transition-colors">
+            Voir les finances &rarr;
+          </Link>
+        </div>
+
+        {/* Collected Card */}
+        <div className="bg-white rounded-xl border border-stone-200 p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <p className="text-stone-500 text-sm font-medium mb-1">Total encaiss&#233;</p>
+              <p className="text-2xl sm:text-3xl font-bold text-green-600">
+                {loading || !finance ? (
+                  <span className="inline-block w-20 h-8 bg-stone-100 animate-pulse rounded" />
+                ) : (
+                  <>
+                    {finance.totalCollected.toLocaleString("fr-FR")}
+                    <span className="text-base font-normal text-stone-400 ml-1">FCFA</span>
+                  </>
+                )}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-stone-400 text-sm">
+            {finance ? `${finance.totalRemaining.toLocaleString("fr-FR")} FCFA restant` : "\u2014"}
+          </p>
         </div>
 
         {/* Products Card */}
@@ -332,6 +381,24 @@ export default function AdminDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                 </svg>
                 <span className="font-medium text-sm">Voir le catalogue</span>
+              </Link>
+              <Link
+                href="/admin/clients/new"
+                className="flex items-center gap-3 p-3 border border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50 transition-colors"
+              >
+                <svg className="w-5 h-5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                </svg>
+                <span className="font-medium text-sm">Nouveau client</span>
+              </Link>
+              <Link
+                href="/admin/workshop"
+                className="flex items-center gap-3 p-3 border border-stone-200 text-stone-700 rounded-lg hover:bg-stone-50 transition-colors"
+              >
+                <svg className="w-5 h-5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.42 15.17l-5.384 5.383a1.5 1.5 0 01-2.121 0l-.353-.354a1.5 1.5 0 010-2.121l5.384-5.383m2.474 2.474L15.96 11.63a3 3 0 000-4.243l-3.536-3.536a3 3 0 00-4.243 0L4.646 7.387a3 3 0 000 4.243l3.536 3.536a3 3 0 004.243 0zm0 0l2.474-2.474" />
+                </svg>
+                <span className="font-medium text-sm">Suivi atelier</span>
               </Link>
             </div>
           </div>

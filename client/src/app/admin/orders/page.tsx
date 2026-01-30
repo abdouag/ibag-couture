@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, type ReactNode } from "react";
+import PaymentModal from "@/components/admin/PaymentModal";
+import PaymentHistory from "@/components/admin/PaymentHistory";
+import ExportModal from "@/components/admin/ExportModal";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -38,6 +41,8 @@ type Order = {
   basePrice: number;
   optionsPrice: number;
   totalPrice: number;
+  amountPaid: number;
+  client?: { _id: string; fullName: string };
   status: string;
   paymentStatus: string;
   createdAt: string;
@@ -102,9 +107,11 @@ export default function AdminOrdersPage() {
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [updatingPayment, setUpdatingPayment] = useState<string | null>(null);
   const [adminNotesInput, setAdminNotesInput] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentRefreshKey, setPaymentRefreshKey] = useState(0);
+  const [showExport, setShowExport] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -185,49 +192,6 @@ export default function AdminOrdersPage() {
       });
     } finally {
       setUpdatingStatus(null);
-    }
-  };
-
-  const updatePaymentStatus = async (orderId: string, newPaymentStatus: string) => {
-    const currentOrder = orders.find((o) => o._id === orderId);
-    if (currentOrder?.paymentStatus === newPaymentStatus) return;
-
-    setUpdatingPayment(newPaymentStatus);
-    setStatusMessage(null);
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ paymentStatus: newPaymentStatus }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Erreur");
-
-      setOrders((prev) =>
-        prev.map((order) =>
-          order._id === orderId ? { ...order, paymentStatus: newPaymentStatus } : order
-        )
-      );
-      if (selectedOrder && selectedOrder._id === orderId) {
-        setSelectedOrder({ ...selectedOrder, paymentStatus: newPaymentStatus });
-      }
-
-      const labels: Record<string, string> = { unpaid: "Non paye", paid: "Paye", refunded: "Rembourse" };
-      setStatusMessage({ type: "success", text: `Paiement : ${labels[newPaymentStatus] || newPaymentStatus}` });
-      setTimeout(() => setStatusMessage(null), 3000);
-    } catch (error) {
-      setStatusMessage({
-        type: "error",
-        text: error instanceof Error ? error.message : "Erreur",
-      });
-    } finally {
-      setUpdatingPayment(null);
     }
   };
 
@@ -331,8 +295,17 @@ export default function AdminOrdersPage() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-6">
+      <div className="flex items-center justify-between mb-6">
         <p className="text-stone-500 text-sm">{orders.length} commandes au total</p>
+        <button
+          onClick={() => setShowExport(true)}
+          className="inline-flex items-center gap-2 bg-stone-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Exporter
+        </button>
       </div>
 
       {/* Filters */}
@@ -438,12 +411,14 @@ export default function AdminOrdersPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        {order.paymentStatus === "paid" ? (
-                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">Paye</span>
-                        ) : order.paymentStatus === "refunded" ? (
-                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-stone-200 text-stone-600">Rembourse</span>
+                        {order.paymentStatus === "paye" || order.paymentStatus === "paid" ? (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">Payé</span>
+                        ) : order.paymentStatus === "acompte" ? (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">Acompte</span>
+                        ) : order.paymentStatus === "rembourse" || order.paymentStatus === "refunded" ? (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-stone-200 text-stone-600">Remboursé</span>
                         ) : (
-                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-600">Non paye</span>
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-600">Non payé</span>
                         )}
                         <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${config.bgColor} ${config.color}`}>
                           {config.label}
@@ -581,41 +556,27 @@ export default function AdminOrdersPage() {
                   )}
                 </div>
 
-                {/* Payment Status */}
-                <div className="bg-stone-50 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-stone-700 mb-3">
-                    Statut de paiement
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {([
-                      { value: "unpaid", label: "Non paye", color: "text-red-700", bgColor: "bg-red-100", ring: "ring-red-400" },
-                      { value: "paid", label: "Paye", color: "text-green-700", bgColor: "bg-green-100", ring: "ring-green-400" },
-                      { value: "refunded", label: "Rembourse", color: "text-stone-700", bgColor: "bg-stone-200", ring: "ring-stone-400" },
-                    ] as const).map((ps) => {
-                      const isActive = selectedOrder.paymentStatus === ps.value;
-                      const isUpdating = updatingPayment === ps.value;
-                      return (
-                        <button
-                          key={ps.value}
-                          onClick={() => updatePaymentStatus(selectedOrder._id, ps.value)}
-                          disabled={updatingPayment !== null}
-                          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all disabled:cursor-not-allowed ${
-                            isActive
-                              ? `${ps.bgColor} ${ps.color} ring-2 ring-offset-2 ${ps.ring}`
-                              : updatingPayment !== null && !isUpdating
-                              ? "bg-stone-100 text-stone-400 border border-stone-200"
-                              : "bg-white text-stone-600 border border-stone-200 hover:border-stone-400 hover:shadow-sm"
-                          }`}
-                        >
-                          {isUpdating ? (
-                            <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
-                          ) : (
-                            <div className={`w-2 h-2 rounded-full ${ps.value === "unpaid" ? "bg-red-500" : ps.value === "paid" ? "bg-green-500" : "bg-stone-400"}`} />
-                          )}
-                          {ps.label}
-                        </button>
-                      );
-                    })}
+                {/* Paiements */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-stone-900 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                      </svg>
+                      Paiements
+                    </h3>
+                    <button
+                      onClick={() => setShowPaymentModal(true)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700 transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Ajouter un paiement
+                    </button>
+                  </div>
+                  <div className="bg-white border border-stone-200 rounded-xl p-4">
+                    <PaymentHistory orderId={selectedOrder._id} refreshKey={paymentRefreshKey} />
                   </div>
                 </div>
 
@@ -850,6 +811,27 @@ export default function AdminOrdersPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && selectedOrder && (
+        <PaymentModal
+          orderId={selectedOrder._id}
+          totalPrice={selectedOrder.totalPrice}
+          amountPaid={selectedOrder.amountPaid || 0}
+          clientId={selectedOrder.client?._id}
+          onClose={() => setShowPaymentModal(false)}
+          onSuccess={() => {
+            setShowPaymentModal(false);
+            setPaymentRefreshKey((k) => k + 1);
+            fetchOrders();
+          }}
+        />
+      )}
+
+      {/* Export Modal */}
+      {showExport && (
+        <ExportModal exportType="orders" onClose={() => setShowExport(false)} />
       )}
     </div>
   );

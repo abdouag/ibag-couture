@@ -175,7 +175,8 @@ const getOrderById = async (req, res, next) => {
 
 // Statuts valides pour les commandes
 const VALID_STATUSES = ['pending', 'in_production', 'ready', 'delivered', 'cancelled'];
-const VALID_PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded'];
+const VALID_PAYMENT_STATUSES = ['non_paye', 'acompte', 'paye', 'rembourse', 'unpaid', 'paid', 'refunded'];
+const VALID_WORKSHOP_STATUSES = ['en_attente', 'en_cours', 'retouche', 'pret', 'livre'];
 
 // Messages de notification par statut (pour implementation future)
 const STATUS_NOTIFICATIONS = {
@@ -320,10 +321,88 @@ const updateAdminNotes = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Mettre à jour les informations atelier d'une commande
+ * @route   PATCH /api/orders/:id/workshop
+ */
+const updateWorkshopInfo = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { assignedTailor, productionStartDate, expectedDeliveryDate, workshopStatus } = req.body;
+
+    if (workshopStatus && !VALID_WORKSHOP_STATUSES.includes(workshopStatus)) {
+      return next(new AppError(`Statut atelier invalide: ${workshopStatus}`, 400));
+    }
+
+    const updateData = {};
+    if (assignedTailor !== undefined) updateData.assignedTailor = assignedTailor;
+    if (productionStartDate !== undefined) updateData.productionStartDate = productionStartDate;
+    if (expectedDeliveryDate !== undefined) updateData.expectedDeliveryDate = expectedDeliveryDate;
+    if (workshopStatus) updateData.workshopStatus = workshopStatus;
+
+    const order = await Order.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    }).populate('product', 'name slug category productionTime');
+
+    if (!order) {
+      return next(new AppError('Commande non trouvée', 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Informations atelier mises à jour',
+      data: order,
+    });
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return next(new AppError('ID de commande invalide', 400));
+    }
+    next(error);
+  }
+};
+
+/**
+ * @desc    Vue atelier — commandes actives avec infos atelier
+ * @route   GET /api/orders/workshop
+ */
+const getWorkshopOrders = async (req, res, next) => {
+  try {
+    const {
+      workshopStatus,
+      assignedTailor,
+      sort = 'expectedDeliveryDate',
+    } = req.query;
+
+    const filter = {
+      status: { $nin: ['delivered', 'cancelled'] },
+    };
+
+    if (workshopStatus) filter.workshopStatus = workshopStatus;
+    if (assignedTailor) filter.assignedTailor = { $regex: assignedTailor, $options: 'i' };
+
+    const orders = await Order.find(filter)
+      .populate('product', 'name slug category productionTime')
+      .populate('client', 'fullName phone')
+      .sort(sort)
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      data: orders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
   updateOrderStatus,
   updateAdminNotes,
+  updateWorkshopInfo,
+  getWorkshopOrders,
 };

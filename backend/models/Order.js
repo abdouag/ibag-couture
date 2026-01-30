@@ -115,10 +115,33 @@ const orderSchema = new mongoose.Schema({
   paymentStatus: {
     type: String,
     enum: {
-      values: ['unpaid', 'paid', 'refunded'],
+      values: ['non_paye', 'acompte', 'paye', 'rembourse', 'unpaid', 'paid', 'refunded'],
       message: 'Statut de paiement invalide: {VALUE}',
     },
-    default: 'unpaid',
+    default: 'non_paye',
+  },
+  client: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Client',
+  },
+  assignedTailor: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Le nom du couturier ne peut pas dépasser 100 caractères'],
+  },
+  productionStartDate: {
+    type: Date,
+  },
+  expectedDeliveryDate: {
+    type: Date,
+  },
+  workshopStatus: {
+    type: String,
+    enum: {
+      values: ['en_attente', 'en_cours', 'retouche', 'pret', 'livre'],
+      message: 'Statut atelier invalide: {VALUE}',
+    },
+    default: 'en_attente',
   },
   notes: {
     type: String,
@@ -175,6 +198,9 @@ orderSchema.index({ 'customer.email': 1 });
 orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ size: 1 });
 orderSchema.index({ orderNumber: 1 });
+orderSchema.index({ client: 1 });
+orderSchema.index({ workshopStatus: 1 });
+orderSchema.index({ expectedDeliveryDate: 1 });
 
 const Order = mongoose.model('Order', orderSchema);
 
