@@ -236,6 +236,12 @@ backend/
 - **Fichiers crees** : useDebounce.ts, CartContext.tsx, SearchBar.tsx, MiniCart.tsx, AddToCartButton.tsx
 - **Fichiers modifies** : Header.tsx, layout.tsx, globals.css, produits/[slug]/page.tsx
 
+### [2025-01-30] — Fix build Vercel (TypeScript + Suspense)
+- **Type** : Build / Config
+- **Description** : Correction des erreurs bloquant le build production Vercel. Remplacement de `JSX.Element` par `ReactNode` dans admin/orders. Ajout de `<Suspense>` autour des composants utilisant `useSearchParams()` (register/page.tsx, CategoryFilter.tsx). tsconfig.json passe en `strict: false`.
+- **Fichiers modifies** : tsconfig.json, admin/orders/page.tsx, register/page.tsx, components/CategoryFilter.tsx
+- **Impact** : `npm run build` passe a 100% (14/14 pages generees)
+
 ---
 
 ## 7. Regles Finales

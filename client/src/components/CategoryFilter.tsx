@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type CategoryFilterProps = {
@@ -7,7 +8,15 @@ type CategoryFilterProps = {
   productCounts: Record<string, number>;
 };
 
-export default function CategoryFilter({ categories, productCounts }: CategoryFilterProps) {
+export default function CategoryFilter(props: CategoryFilterProps) {
+  return (
+    <Suspense>
+      <CategoryFilterInner {...props} />
+    </Suspense>
+  );
+}
+
+function CategoryFilterInner({ categories, productCounts }: CategoryFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get("category") || "tous";
