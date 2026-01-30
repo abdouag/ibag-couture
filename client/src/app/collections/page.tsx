@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { api } from "@/lib/api";
 import Footer from "@/components/Footer";
 import CategoryFilter from "@/components/CategoryFilter";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 type Product = {
   _id: string;
@@ -33,8 +34,14 @@ type Props = {
 
 export default async function CollectionsPage({ searchParams }: Props) {
   const { category } = await searchParams;
-  const res: ApiResponse = await api("/api/products");
-  const allProducts: Product[] = res.data || [];
+  let allProducts: Product[] = [];
+  try {
+    const res = await fetch(`${API_URL}/api/products`, { cache: "no-store" });
+    const data: ApiResponse = await res.json();
+    allProducts = data.data || [];
+  } catch {
+    // API not available
+  }
 
   const activeCategory = category || "tous";
   const products = activeCategory === "tous"

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { api } from "@/lib/api";
 import Footer from "@/components/Footer";
 import ProductGallery from "@/components/ProductGallery";
 import AddToCartButton from "@/components/AddToCartButton";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 type Option = {
   name: string;
@@ -40,10 +41,11 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
 
   try {
-    const res: ApiResponse = await api(`/api/products/${slug}`);
+    const res = await fetch(`${API_URL}/api/products/${slug}`, { cache: "no-store" });
+    const data: ApiResponse = await res.json();
     return {
-      title: `${res.data.name} | Ibag Couture`,
-      description: res.data.description || `Découvrez ${res.data.name}, création sur mesure par Ibag Couture.`,
+      title: `${data.data.name} | Ibag Couture`,
+      description: data.data.description || `Découvrez ${data.data.name}, création sur mesure par Ibag Couture.`,
     };
   } catch {
     return {
@@ -58,8 +60,9 @@ export default async function ProductPage({ params }: Props) {
   let product: Product;
 
   try {
-    const res: ApiResponse = await api(`/api/products/${slug}`);
-    product = res.data;
+    const res = await fetch(`${API_URL}/api/products/${slug}`, { cache: "no-store" });
+    const data: ApiResponse = await res.json();
+    product = data.data;
   } catch {
     notFound();
   }

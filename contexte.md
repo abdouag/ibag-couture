@@ -242,6 +242,12 @@ backend/
 - **Fichiers modifies** : tsconfig.json, admin/orders/page.tsx, register/page.tsx, components/CategoryFilter.tsx
 - **Impact** : `npm run build` passe a 100% (14/14 pages generees)
 
+### [2025-01-30] — Fix build Vercel (API fetch au build time)
+- **Type** : Build
+- **Description** : Les pages server-side (page.tsx, collections, produits) utilisaient `api()` qui crashait au build Vercel car le backend n'est pas disponible pendant le build. Remplacement par `fetch()` direct avec `cache: "no-store"` et try/catch. Homepage forcee en `dynamic = "force-dynamic"`. Suppression de l'import `api` dans les 3 pages concernees.
+- **Fichiers modifies** : app/page.tsx, app/collections/page.tsx, app/produits/[slug]/page.tsx
+- **Impact** : Build Vercel passe sans erreur. Homepage passe de statique a dynamique.
+
 ---
 
 ## 7. Regles Finales

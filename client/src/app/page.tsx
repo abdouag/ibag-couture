@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { api } from "@/lib/api";
 import Footer from "@/components/Footer";
+
+export const dynamic = "force-dynamic";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 type Product = {
   _id: string;
@@ -20,8 +23,16 @@ type ApiResponse = {
 };
 
 export default async function Home() {
-  const res: ApiResponse = await api("/api/products");
-  const products: Product[] = res.data || [];
+  let products: Product[] = [];
+  try {
+    const res = await fetch(`${API_URL}/api/products`, {
+      cache: "no-store",
+    });
+    const data: ApiResponse = await res.json();
+    products = data.data || [];
+  } catch {
+    // API not available (build time or server down) — render empty
+  }
 
   return (
     <main className="min-h-screen bg-stone-50">
