@@ -148,69 +148,34 @@ Regles:
       const labels = ['principale', 'secondaire', 'detail'];
 
       if (referenceImageUrl) {
-        // ── Reference-based: generate 2 supplementary images only ──
-        // The admin's original image stays as mainImage (never replaced)
-        console.log(`[AI] Generation de 2 images supplementaires avec reference: ${referenceImageUrl}`);
+        // ── Reference-based: Cloudinary crop/zoom of the original image ──
+        // No AI generation — pure image transformations from the real photo.
+        // The admin's original image stays as mainImage (never replaced).
+        console.log(`[AI] Creation de 2 variantes Cloudinary depuis: ${referenceImageUrl}`);
 
-        // Download the reference image from Cloudinary
-        const refResponse = await fetch(referenceImageUrl);
-        if (!refResponse.ok) {
-          console.error(`[AI] Echec telechargement image reference: ${refResponse.status}`);
-          return next(new AppError('Impossible de telecharger l\'image de reference.', 400));
-        }
-        const refBuffer = Buffer.from(await refResponse.arrayBuffer());
-        const refFile = new File([refBuffer], 'reference.png', { type: 'image/png' });
-
-        const photoRealism = 'Photorealistic, natural imperfections, real fabric texture, camera-like lighting, not stylized, not illustration, not AI-generated looking. Ultra-realistic photography, looks like a real camera photo.';
-        const fidelityRules = 'Strictly based on the provided reference image. Same outfit, same fabric, same color, same cut, same proportions, same embroidery pattern, same design details, same model silhouette. No redesign, no style change, no artistic interpretation, no creative variation.';
-        const fullBodyRules = 'Full body photo, head to toe visible, no cropping, no zoom, no close-up, centered framing, entire garment fully visible, feet included, realistic proportions.';
-
-        const refLabels = ['secondaire', 'detail'];
-        const refPrompts = [
-          `Realistic studio fashion photo of this EXACT same garment, three-quarter angle view, slight turn to show movement and draping of the fabric. ${fullBodyRules} ${fidelityRules} ${photoRealism} Professional e-commerce fashion shoot, neutral background, natural studio lighting. No text, no watermark.`,
-          `Professional close-up detail photograph of this EXACT same garment. Focus on the fabric texture, embroidery details, stitching craftsmanship, and material quality. Same fabric, same color, same pattern. No redesign. ${photoRealism} Macro photography style, natural studio lighting. Centered framing, no cropping. No text, no watermark.`,
-        ];
-
-        const imageResults = await Promise.allSettled(
-          refPrompts.map(async (prompt, index) => {
-            console.log(`[AI] Generation image ${index + 1}/2 (${refLabels[index]}) avec reference...`);
-
-            const response = await openai.images.edit({
-              model: 'gpt-image-1',
-              image: refFile,
-              prompt,
-              n: 1,
-              size: index === 0 ? '1024x1536' : '1024x1024',
-            });
-
-            const imageData = response.data[0]?.b64_json;
-            if (!imageData) {
-              throw new Error(`Pas de donnees image pour l'image ${index + 1}`);
-            }
-
-            const imageBuffer = Buffer.from(imageData, 'base64');
-            const filename = `${slug}-ref-${refLabels[index]}-${timestamp}`;
-
-            console.log(`[AI] Upload Cloudinary image ${index + 1}...`);
-            const url = await uploadToCloudinary(imageBuffer, filename);
-            console.log(`[AI] Image ${index + 1} uploadee: ${url}`);
-
-            return url;
-          })
+        // Extract public_id and base URL from the Cloudinary URL
+        // URL format: https://res.cloudinary.com/CLOUD/image/upload/TRANSFORMS/PUBLIC_ID
+        const cloudinaryMatch = referenceImageUrl.match(
+          /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(?:[^/]+\/)*(.*?)(?:\.[a-z]+)?$/i
         );
 
-        const successfulImages = [];
-        for (const result of imageResults) {
-          if (result.status === 'fulfilled') {
-            successfulImages.push(result.value);
-          } else {
-            console.error('[AI] Erreur image:', result.reason?.message || result.reason);
-          }
+        if (!cloudinaryMatch) {
+          console.error('[AI] URL Cloudinary invalide:', referenceImageUrl);
+          return next(new AppError('L\'image de reference doit etre une URL Cloudinary valide.', 400));
         }
 
-        responseData.images = successfulImages;
+        const cloudinaryBase = cloudinaryMatch[1]; // https://res.cloudinary.com/CLOUD/image/upload/
+        const publicId = cloudinaryMatch[2]; // ibag-couture/products/filename
+
+        // Image 1: Secondary view — slightly different crop (upper body focus, vertical)
+        const secondaryUrl = `${cloudinaryBase}w_1024,h_1536,c_fill,g_auto,q_auto/${publicId}`;
+
+        // Image 2: Detail — center crop zoom on fabric/embroidery
+        const detailUrl = `${cloudinaryBase}w_1024,h_1024,c_crop,g_center,z_2.0,q_auto/${publicId}`;
+
+        responseData.images = [secondaryUrl, detailUrl];
         responseData.referenceUsed = true;
-        console.log(`[AI] ${successfulImages.length}/2 images (reference) generees avec succes`);
+        console.log(`[AI] 2 variantes Cloudinary creees (crop + detail)`);
 
       } else {
         // ── Free generation: text-only prompts ──

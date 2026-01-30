@@ -23,7 +23,7 @@ type AIProductModalProps = {
 };
 
 const FREE_IMAGE_LABELS = ["Image principale", "Image secondaire", "Detail (tissu/broderie)"];
-const REF_IMAGE_LABELS = ["Vue secondaire (3/4)", "Detail (tissu/broderie)"];
+const REF_IMAGE_LABELS = ["Vue recadree", "Detail (tissu/broderie)"];
 
 export default function AIProductModal({
   currentName,
@@ -171,7 +171,7 @@ export default function AIProductModal({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-green-900">Image de reference detectee</p>
-                    <p className="text-xs text-green-700 mt-0.5">L&apos;image principale reste inchangee. 2 variantes supplementaires seront generees.</p>
+                    <p className="text-xs text-green-700 mt-0.5">L&apos;image principale reste inchangee. 2 recadrages seront crees automatiquement.</p>
                   </div>
                 </div>
               )}
@@ -180,11 +180,11 @@ export default function AIProductModal({
               <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-xl">
                 <div>
                   <p className="text-sm font-medium text-stone-900">
-                    {hasReference ? "Generer 2 images supplementaires" : "Generer aussi 3 images IA"}
+                    {hasReference ? "Creer 2 recadrages automatiques" : "Generer aussi 3 images IA"}
                   </p>
                   <p className="text-xs text-stone-500 mt-0.5">
                     {hasReference
-                      ? "Variantes realistes basees sur votre image"
+                      ? "Recadrages de votre photo originale (instantane)"
                       : "Images studio professionnelles (plus long, ~30s)"}
                   </p>
                 </div>
@@ -207,7 +207,7 @@ export default function AIProductModal({
                 </svg>
                 {withImages
                   ? hasReference
-                    ? "Generer texte + 2 variantes"
+                    ? "Generer texte + 2 recadrages"
                     : "Generer texte + 3 images"
                   : "Generer le texte"}
               </button>
@@ -291,11 +291,11 @@ export default function AIProductModal({
                     <div>
                       <label className="text-sm font-semibold text-stone-900">
                         {result.referenceUsed
-                          ? `Images supplementaires (${result.images.length})`
+                          ? `Recadrages photo (${result.images.length})`
                           : `Images generees (${result.images.length})`}
                       </label>
                       {result.referenceUsed && (
-                        <p className="text-xs text-green-600 mt-0.5">Variantes realistes — image principale inchangee</p>
+                        <p className="text-xs text-green-600 mt-0.5">Recadrages de votre photo originale — image principale inchangee</p>
                       )}
                     </div>
                     <label className="flex items-center gap-2 cursor-pointer">
