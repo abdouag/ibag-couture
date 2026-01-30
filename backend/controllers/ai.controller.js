@@ -148,8 +148,9 @@ Regles:
       const labels = ['principale', 'secondaire', 'detail'];
 
       if (referenceImageUrl) {
-        // ── Reference-based generation: use OpenAI image edit API ──
-        console.log(`[AI] Generation de 3 images avec reference: ${referenceImageUrl}`);
+        // ── Reference-based: generate 2 supplementary images only ──
+        // The admin's original image stays as mainImage (never replaced)
+        console.log(`[AI] Generation de 2 images supplementaires avec reference: ${referenceImageUrl}`);
 
         // Download the reference image from Cloudinary
         const refResponse = await fetch(referenceImageUrl);
@@ -160,23 +161,26 @@ Regles:
         const refBuffer = Buffer.from(await refResponse.arrayBuffer());
         const refFile = new File([refBuffer], 'reference.png', { type: 'image/png' });
 
+        const photoRealism = 'Photorealistic, natural imperfections, real fabric texture, camera-like lighting, not stylized, not illustration, not AI-generated looking. Ultra-realistic photography, looks like a real camera photo.';
+        const fidelityRules = 'Strictly based on the provided reference image. Same outfit, same fabric, same color, same cut, same proportions, same embroidery pattern, same design details, same model silhouette. No redesign, no style change, no artistic interpretation, no creative variation.';
         const fullBodyRules = 'Full body photo, head to toe visible, no cropping, no zoom, no close-up, centered framing, entire garment fully visible, feet included, realistic proportions.';
+
+        const refLabels = ['secondaire', 'detail'];
         const refPrompts = [
-          `Professional fashion e-commerce photography. Show this EXACT same garment on a model, front view facing camera. ${fullBodyRules} Same outfit, same fabric, same color palette, same embroidery pattern, same design details. No redesign, no creative variation. Studio setting, neutral background, soft professional lighting. High-end African couture. No text, no watermark.`,
-          `Professional fashion e-commerce photography. Show this EXACT same garment on a model, three-quarter angle, slight turn to show movement and draping. ${fullBodyRules} Same outfit, same fabric, same color palette, same embroidery pattern, same design details. No redesign, no creative variation. Studio setting, neutral background, soft professional lighting. High-end African couture. No text, no watermark.`,
-          `Professional close-up detail photograph of this EXACT same garment. Focus on the fabric texture, embroidery details, stitching craftsmanship, and material quality. Same fabric, same color, same pattern. No redesign. Macro photography style, studio lighting. Centered framing, no cropping. No text, no watermark.`,
+          `Realistic studio fashion photo of this EXACT same garment, three-quarter angle view, slight turn to show movement and draping of the fabric. ${fullBodyRules} ${fidelityRules} ${photoRealism} Professional e-commerce fashion shoot, neutral background, natural studio lighting. No text, no watermark.`,
+          `Professional close-up detail photograph of this EXACT same garment. Focus on the fabric texture, embroidery details, stitching craftsmanship, and material quality. Same fabric, same color, same pattern. No redesign. ${photoRealism} Macro photography style, natural studio lighting. Centered framing, no cropping. No text, no watermark.`,
         ];
 
         const imageResults = await Promise.allSettled(
           refPrompts.map(async (prompt, index) => {
-            console.log(`[AI] Generation image ${index + 1}/3 (${labels[index]}) avec reference...`);
+            console.log(`[AI] Generation image ${index + 1}/2 (${refLabels[index]}) avec reference...`);
 
             const response = await openai.images.edit({
               model: 'gpt-image-1',
               image: refFile,
               prompt,
               n: 1,
-              size: index === 2 ? '1024x1024' : '1024x1536',
+              size: index === 0 ? '1024x1536' : '1024x1024',
             });
 
             const imageData = response.data[0]?.b64_json;
@@ -185,7 +189,7 @@ Regles:
             }
 
             const imageBuffer = Buffer.from(imageData, 'base64');
-            const filename = `${slug}-ref-${labels[index]}-${timestamp}`;
+            const filename = `${slug}-ref-${refLabels[index]}-${timestamp}`;
 
             console.log(`[AI] Upload Cloudinary image ${index + 1}...`);
             const url = await uploadToCloudinary(imageBuffer, filename);
@@ -206,7 +210,7 @@ Regles:
 
         responseData.images = successfulImages;
         responseData.referenceUsed = true;
-        console.log(`[AI] ${successfulImages.length}/3 images (reference) generees avec succes`);
+        console.log(`[AI] ${successfulImages.length}/2 images (reference) generees avec succes`);
 
       } else {
         // ── Free generation: text-only prompts ──

@@ -22,7 +22,8 @@ type AIProductModalProps = {
   onClose: () => void;
 };
 
-const IMAGE_LABELS = ["Image principale", "Image secondaire", "Detail (tissu/broderie)"];
+const FREE_IMAGE_LABELS = ["Image principale", "Image secondaire", "Detail (tissu/broderie)"];
+const REF_IMAGE_LABELS = ["Vue secondaire (3/4)", "Detail (tissu/broderie)"];
 
 export default function AIProductModal({
   currentName,
@@ -48,6 +49,8 @@ export default function AIProductModal({
     traditionnel: "Traditionnel",
     moderne: "Moderne",
   };
+
+  const hasReference = !!referenceImageUrl;
 
   const generate = async () => {
     setLoading(true);
@@ -95,13 +98,20 @@ export default function AIProductModal({
     if (applyName) applied.name = result.name;
     if (applyDescription) applied.description = result.description;
     if (applyImages && result.images.length > 0) {
-      applied.mainImage = result.images[0];
-      applied.images = result.images.slice(1);
+      if (result.referenceUsed) {
+        // Reference mode: images are supplementary only, never replace mainImage
+        applied.images = result.images;
+      } else {
+        // Free mode: first image becomes mainImage, rest are additional
+        applied.mainImage = result.images[0];
+        applied.images = result.images.slice(1);
+      }
     }
     onApply(applied);
   };
 
   const hasImages = result && result.images.length > 0;
+  const imageLabels = result?.referenceUsed ? REF_IMAGE_LABELS : FREE_IMAGE_LABELS;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -154,14 +164,14 @@ export default function AIProductModal({
           {!result && !loading && (
             <div className="space-y-3">
               {/* Reference image indicator */}
-              {referenceImageUrl && (
+              {hasReference && (
                 <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-xl">
                   <div className="w-12 h-12 rounded-lg overflow-hidden border border-green-300 flex-shrink-0">
                     <img src={referenceImageUrl} alt="Reference" className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-green-900">Image de reference detectee</p>
-                    <p className="text-xs text-green-700 mt-0.5">Les images generees seront basees sur cette reference</p>
+                    <p className="text-xs text-green-700 mt-0.5">L&apos;image principale reste inchangee. 2 variantes supplementaires seront generees.</p>
                   </div>
                 </div>
               )}
@@ -169,10 +179,12 @@ export default function AIProductModal({
               {/* Toggle images */}
               <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-xl">
                 <div>
-                  <p className="text-sm font-medium text-stone-900">Generer aussi 3 images IA</p>
+                  <p className="text-sm font-medium text-stone-900">
+                    {hasReference ? "Generer 2 images supplementaires" : "Generer aussi 3 images IA"}
+                  </p>
                   <p className="text-xs text-stone-500 mt-0.5">
-                    {referenceImageUrl
-                      ? "Variantes basees sur l'image de reference"
+                    {hasReference
+                      ? "Variantes realistes basees sur votre image"
                       : "Images studio professionnelles (plus long, ~30s)"}
                   </p>
                 </div>
@@ -193,7 +205,11 @@ export default function AIProductModal({
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                 </svg>
-                {withImages ? "Generer texte + 3 images" : "Generer le texte"}
+                {withImages
+                  ? hasReference
+                    ? "Generer texte + 2 variantes"
+                    : "Generer texte + 3 images"
+                  : "Generer le texte"}
               </button>
             </div>
           )}
@@ -274,10 +290,12 @@ export default function AIProductModal({
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <label className="text-sm font-semibold text-stone-900">
-                        Images generees ({result.images.length})
+                        {result.referenceUsed
+                          ? `Images supplementaires (${result.images.length})`
+                          : `Images generees (${result.images.length})`}
                       </label>
                       {result.referenceUsed && (
-                        <p className="text-xs text-green-600 mt-0.5">Basees sur l&apos;image de reference</p>
+                        <p className="text-xs text-green-600 mt-0.5">Variantes realistes — image principale inchangee</p>
                       )}
                     </div>
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -290,17 +308,17 @@ export default function AIProductModal({
                       <span className="text-xs text-stone-500">Appliquer</span>
                     </label>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className={`grid ${result.referenceUsed ? "grid-cols-2" : "grid-cols-3"} gap-3`}>
                     {result.images.map((url, i) => (
                       <div key={i} className="relative group">
-                        <div className={`${i === 2 ? "aspect-square" : "aspect-[2/3]"} rounded-lg overflow-hidden bg-stone-100 border border-stone-200`}>
+                        <div className={`${(result.referenceUsed ? i === 1 : i === 2) ? "aspect-square" : "aspect-[2/3]"} rounded-lg overflow-hidden bg-stone-100 border border-stone-200`}>
                           <img
                             src={url}
-                            alt={IMAGE_LABELS[i] || `Image ${i + 1}`}
+                            alt={imageLabels[i] || `Image ${i + 1}`}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <p className="text-xs text-stone-500 text-center mt-1.5">{IMAGE_LABELS[i] || `Image ${i + 1}`}</p>
+                        <p className="text-xs text-stone-500 text-center mt-1.5">{imageLabels[i] || `Image ${i + 1}`}</p>
                       </div>
                     ))}
                   </div>
