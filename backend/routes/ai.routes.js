@@ -23,6 +23,9 @@ const generateValidation = [
   body('generateImages')
     .optional()
     .isBoolean().withMessage('generateImages doit etre un booleen'),
+  body('referenceImageUrl')
+    .optional()
+    .isURL().withMessage('referenceImageUrl doit etre une URL valide'),
 ];
 
 // Toutes les routes sont protegees (admin only)

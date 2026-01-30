@@ -9,6 +9,7 @@ type AIResult = {
   description: string;
   imageSuggestion: string;
   images: string[];
+  referenceUsed?: boolean;
 };
 
 type AIProductModalProps = {
@@ -16,6 +17,7 @@ type AIProductModalProps = {
   currentCategory: string;
   currentPrice: string;
   isCustomAvailable: boolean;
+  referenceImageUrl?: string;
   onApply: (result: { name?: string; description?: string; mainImage?: string; images?: string[] }) => void;
   onClose: () => void;
 };
@@ -27,6 +29,7 @@ export default function AIProductModal({
   currentCategory,
   currentPrice,
   isCustomAvailable,
+  referenceImageUrl,
   onApply,
   onClose,
 }: AIProductModalProps) {
@@ -66,6 +69,7 @@ export default function AIProductModal({
           basePrice: currentPrice ? Number(currentPrice) : undefined,
           isCustomAvailable,
           generateImages: withImages,
+          referenceImageUrl: withImages && referenceImageUrl ? referenceImageUrl : undefined,
         }),
       });
 
@@ -149,11 +153,28 @@ export default function AIProductModal({
           {/* Generate button */}
           {!result && !loading && (
             <div className="space-y-3">
+              {/* Reference image indicator */}
+              {referenceImageUrl && (
+                <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-xl">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden border border-green-300 flex-shrink-0">
+                    <img src={referenceImageUrl} alt="Reference" className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-green-900">Image de reference detectee</p>
+                    <p className="text-xs text-green-700 mt-0.5">Les images generees seront basees sur cette reference</p>
+                  </div>
+                </div>
+              )}
+
               {/* Toggle images */}
               <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-xl">
                 <div>
                   <p className="text-sm font-medium text-stone-900">Generer aussi 3 images IA</p>
-                  <p className="text-xs text-stone-500 mt-0.5">Images studio professionnelles (plus long, ~30s)</p>
+                  <p className="text-xs text-stone-500 mt-0.5">
+                    {referenceImageUrl
+                      ? "Variantes basees sur l'image de reference"
+                      : "Images studio professionnelles (plus long, ~30s)"}
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -251,9 +272,14 @@ export default function AIProductModal({
               {hasImages ? (
                 <div className="border border-stone-200 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-semibold text-stone-900">
-                      Images generees ({result.images.length})
-                    </label>
+                    <div>
+                      <label className="text-sm font-semibold text-stone-900">
+                        Images generees ({result.images.length})
+                      </label>
+                      {result.referenceUsed && (
+                        <p className="text-xs text-green-600 mt-0.5">Basees sur l&apos;image de reference</p>
+                      )}
+                    </div>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"

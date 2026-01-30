@@ -618,6 +618,7 @@ export default function EditProductPage() {
           currentCategory={form.category}
           currentPrice={form.basePrice}
           isCustomAvailable={form.isCustomAvailable}
+          referenceImageUrl={form.mainImage || undefined}
           onApply={(result) => {
             setForm((prev) => ({
               ...prev,

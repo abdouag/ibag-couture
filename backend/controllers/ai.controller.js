@@ -60,7 +60,7 @@ const generateProduct = async (req, res, next) => {
       return next(new AppError('Limite quotidienne de requetes IA atteinte (50/jour). Reessayez demain.', 429));
     }
 
-    const { name, category, basePrice, isCustomAvailable, generateImages } = req.body;
+    const { name, category, basePrice, isCustomAvailable, generateImages, referenceImageUrl } = req.body;
 
     if (!category) {
       return next(new AppError('La categorie est requise pour generer des suggestions.', 400));
@@ -102,7 +102,7 @@ Regles:
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    console.log(`[AI] Requete generate-product - categorie: ${category}, type: ${typeLabel}, nom: ${name || 'non fourni'}, images: ${generateImages ? 'oui' : 'non'}`);
+    console.log(`[AI] Requete generate-product - categorie: ${category}, type: ${typeLabel}, nom: ${name || 'non fourni'}, images: ${generateImages ? 'oui' : 'non'}, reference: ${referenceImageUrl ? 'oui' : 'non'}`);
 
     // Step 1: Generate text content
     const completion = await openai.chat.completions.create({
@@ -137,17 +137,7 @@ Regles:
 
     // Step 2: Generate images if requested
     if (generateImages) {
-      console.log('[AI] Generation de 3 images...');
-
       const productName = textResult.name || name || `vetement ${catLabel}`;
-      const baseImagePrompt = `Professional fashion photography of an elegant African haute couture garment: ${productName}. Category: ${catLabel}. Style: luxury African fashion house, artisanal craftsmanship. Studio setting with neutral background, soft professional lighting, high-end fashion photography. Square format 1:1. No text, no watermark, no logos.`;
-
-      const imagePrompts = [
-        `${baseImagePrompt} Full front view on a mannequin or model, showing the complete garment silhouette and draping.`,
-        `${baseImagePrompt} Three-quarter angle view showing movement and flow of the fabric, emphasizing the garment's construction and fit.`,
-        `${baseImagePrompt} Close-up detail shot focusing on fabric texture, embroidery details, stitching craftsmanship, and material quality.`,
-      ];
-
       const timestamp = Date.now();
       const slug = (textResult.name || name || category)
         .toLowerCase()
@@ -155,45 +145,119 @@ Regles:
         .replace(/^-|-$/g, '')
         .slice(0, 40);
 
-      const imageResults = await Promise.allSettled(
-        imagePrompts.map(async (prompt, index) => {
-          const labels = ['principale', 'secondaire', 'detail'];
-          console.log(`[AI] Generation image ${index + 1}/3 (${labels[index]})...`);
+      const labels = ['principale', 'secondaire', 'detail'];
 
-          const response = await openai.images.generate({
-            model: 'gpt-image-1',
-            prompt,
-            n: 1,
-            size: '1024x1024',
-          });
+      if (referenceImageUrl) {
+        // ── Reference-based generation: use OpenAI image edit API ──
+        console.log(`[AI] Generation de 3 images avec reference: ${referenceImageUrl}`);
 
-          const imageData = response.data[0]?.b64_json;
-          if (!imageData) {
-            throw new Error(`Pas de donnees image pour l'image ${index + 1}`);
-          }
-
-          const imageBuffer = Buffer.from(imageData, 'base64');
-          const filename = `${slug}-${labels[index]}-${timestamp}`;
-
-          console.log(`[AI] Upload Cloudinary image ${index + 1}...`);
-          const url = await uploadToCloudinary(imageBuffer, filename);
-          console.log(`[AI] Image ${index + 1} uploadee: ${url}`);
-
-          return url;
-        })
-      );
-
-      const successfulImages = [];
-      for (const result of imageResults) {
-        if (result.status === 'fulfilled') {
-          successfulImages.push(result.value);
-        } else {
-          console.error('[AI] Erreur image:', result.reason?.message || result.reason);
+        // Download the reference image from Cloudinary
+        const refResponse = await fetch(referenceImageUrl);
+        if (!refResponse.ok) {
+          console.error(`[AI] Echec telechargement image reference: ${refResponse.status}`);
+          return next(new AppError('Impossible de telecharger l\'image de reference.', 400));
         }
-      }
+        const refBuffer = Buffer.from(await refResponse.arrayBuffer());
+        const refFile = new File([refBuffer], 'reference.png', { type: 'image/png' });
 
-      responseData.images = successfulImages;
-      console.log(`[AI] ${successfulImages.length}/3 images generees avec succes`);
+        const refPrompts = [
+          `Professional fashion photography. Show this EXACT same garment in a full front view on a model or mannequin. Same outfit, same fabric, same color palette, same embroidery pattern, same design details. No redesign, no creative variation. Studio setting, neutral background, soft professional lighting. High-end fashion photography. No text, no watermark.`,
+          `Professional fashion photography. Show this EXACT same garment from a three-quarter angle, slight turn to show movement and draping. Same outfit, same fabric, same color palette, same embroidery pattern, same design details. No redesign, no creative variation. Studio setting, neutral background, soft professional lighting. No text, no watermark.`,
+          `Professional close-up detail photograph of this EXACT same garment. Focus on the fabric texture, embroidery details, stitching craftsmanship, and material quality. Same fabric, same color, same pattern. No redesign. Macro photography style, studio lighting. No text, no watermark.`,
+        ];
+
+        const imageResults = await Promise.allSettled(
+          refPrompts.map(async (prompt, index) => {
+            console.log(`[AI] Generation image ${index + 1}/3 (${labels[index]}) avec reference...`);
+
+            const response = await openai.images.edit({
+              model: 'gpt-image-1',
+              image: refFile,
+              prompt,
+              n: 1,
+              size: '1024x1024',
+            });
+
+            const imageData = response.data[0]?.b64_json;
+            if (!imageData) {
+              throw new Error(`Pas de donnees image pour l'image ${index + 1}`);
+            }
+
+            const imageBuffer = Buffer.from(imageData, 'base64');
+            const filename = `${slug}-ref-${labels[index]}-${timestamp}`;
+
+            console.log(`[AI] Upload Cloudinary image ${index + 1}...`);
+            const url = await uploadToCloudinary(imageBuffer, filename);
+            console.log(`[AI] Image ${index + 1} uploadee: ${url}`);
+
+            return url;
+          })
+        );
+
+        const successfulImages = [];
+        for (const result of imageResults) {
+          if (result.status === 'fulfilled') {
+            successfulImages.push(result.value);
+          } else {
+            console.error('[AI] Erreur image:', result.reason?.message || result.reason);
+          }
+        }
+
+        responseData.images = successfulImages;
+        responseData.referenceUsed = true;
+        console.log(`[AI] ${successfulImages.length}/3 images (reference) generees avec succes`);
+
+      } else {
+        // ── Free generation: text-only prompts ──
+        console.log('[AI] Generation de 3 images (libre, sans reference)...');
+
+        const baseImagePrompt = `Professional fashion photography of an elegant African haute couture garment: ${productName}. Category: ${catLabel}. Style: luxury African fashion house, artisanal craftsmanship. Studio setting with neutral background, soft professional lighting, high-end fashion photography. Square format 1:1. No text, no watermark, no logos.`;
+
+        const imagePrompts = [
+          `${baseImagePrompt} Full front view on a mannequin or model, showing the complete garment silhouette and draping.`,
+          `${baseImagePrompt} Three-quarter angle view showing movement and flow of the fabric, emphasizing the garment's construction and fit.`,
+          `${baseImagePrompt} Close-up detail shot focusing on fabric texture, embroidery details, stitching craftsmanship, and material quality.`,
+        ];
+
+        const imageResults = await Promise.allSettled(
+          imagePrompts.map(async (prompt, index) => {
+            console.log(`[AI] Generation image ${index + 1}/3 (${labels[index]})...`);
+
+            const response = await openai.images.generate({
+              model: 'gpt-image-1',
+              prompt,
+              n: 1,
+              size: '1024x1024',
+            });
+
+            const imageData = response.data[0]?.b64_json;
+            if (!imageData) {
+              throw new Error(`Pas de donnees image pour l'image ${index + 1}`);
+            }
+
+            const imageBuffer = Buffer.from(imageData, 'base64');
+            const filename = `${slug}-${labels[index]}-${timestamp}`;
+
+            console.log(`[AI] Upload Cloudinary image ${index + 1}...`);
+            const url = await uploadToCloudinary(imageBuffer, filename);
+            console.log(`[AI] Image ${index + 1} uploadee: ${url}`);
+
+            return url;
+          })
+        );
+
+        const successfulImages = [];
+        for (const result of imageResults) {
+          if (result.status === 'fulfilled') {
+            successfulImages.push(result.value);
+          } else {
+            console.error('[AI] Erreur image:', result.reason?.message || result.reason);
+          }
+        }
+
+        responseData.images = successfulImages;
+        console.log(`[AI] ${successfulImages.length}/3 images generees avec succes`);
+      }
     }
 
     res.status(200).json({
