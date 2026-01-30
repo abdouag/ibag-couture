@@ -142,6 +142,7 @@ export default function SearchBar({ isMobile = false }: { isMobile?: boolean }) 
                         src={getImageUrl(product.mainImage)!}
                         alt={product.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = "none"; }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

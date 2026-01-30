@@ -176,6 +176,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
                             })()}
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            onError={(e) => { e.currentTarget.style.display = "none"; }}
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center text-stone-400 group-hover:scale-110 transition-transform duration-700">

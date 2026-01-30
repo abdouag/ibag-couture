@@ -254,6 +254,16 @@ backend/
 - **Fichiers modifies** : components/Header.tsx
 - **Regle** : toute future page admin doit etre sous `/admin/*`. Le header client ne s'affiche jamais sur ces routes.
 
+### [2025-01-30] — Fix affichage images produits
+- **Type** : UI / Config
+- **Description** : Correction definitive de l'affichage des images produits. 3 problemes corriges :
+  1. **next.config.ts** : ajout de `remotePatterns` pour autoriser les images depuis Render (`ibag-couture.onrender.com`) et localhost (`localhost:5000`)
+  2. **ProductGallery.tsx** : image principale passee de `object-cover` (rognage) a `object-contain` (ratio preserve) avec fond `bg-white`. Ajout de `handleImgError` avec fallback SVG sur erreur de chargement. `onError` attache sur image principale et miniatures.
+  3. **Toutes les pages** : ajout de `onError` sur tous les `<img>` produits pour masquer gracieusement les images cassees (le fond gradient/placeholder reste visible).
+- **Fichiers modifies** : next.config.ts, components/ProductGallery.tsx, app/page.tsx, app/collections/page.tsx, app/commander/[slug]/page.tsx, components/MiniCart.tsx, components/SearchBar.tsx
+- **Regle** : toute nouvelle image produit doit utiliser `onError` pour un fallback propre. Les images en grille utilisent `object-cover`, l'image principale en detail utilise `object-contain`.
+- **Note** : Render a un filesystem ephemere — les images uploadees sont perdues au redeploy. Une solution de stockage persistant (S3/Cloudinary) sera necessaire en production.
+
 ### [2025-01-30] — CORS production + seed admin
 - **Type** : Backend / Config
 - **Description** : Ajout des origines CORS de production (ibagcouture.com, vercel.app) dans le fallback du config backend. Creation du script `scripts/seedAdmin.js` pour generer le premier compte admin sur MongoDB Atlas.
