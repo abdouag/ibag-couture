@@ -47,7 +47,7 @@ async function generateSecondaryImagesFromReference({
     throw new Error('GEMINI_API_KEY non configuree.');
   }
 
-  console.log('[AI][GEMINI] start - Generation de 2 images secondaires');
+  console.log('[AI][GEMINI] start - Generation de 3 images secondaires');
   console.log(`[AI][GEMINI] Reference: ${referenceImageUrl}`);
   console.log(`[AI][GEMINI] Produit: ${productName}, Categorie: ${category}`);
 
@@ -84,6 +84,10 @@ async function generateSecondaryImagesFromReference({
     {
       label: 'secondaire',
       text: `Look at this fashion product photo. Generate a NEW photograph of this EXACT SAME garment from a slightly different angle (three-quarter view). Full body photo, head to toe visible, no cropping, centered framing. ${fidelityRules}. Professional e-commerce fashion photography, neutral background, natural studio lighting. No text, no watermark.`,
+    },
+    {
+      label: 'dos',
+      text: `Look at this fashion product photo. Generate a NEW photograph of this EXACT SAME garment from the BACK (rear view). Show the back of the outfit clearly. Full body photo, head to toe visible, no cropping, centered framing. ${fidelityRules}. Professional e-commerce fashion photography, neutral background, natural studio lighting. No text, no watermark.`,
     },
     {
       label: 'detail',

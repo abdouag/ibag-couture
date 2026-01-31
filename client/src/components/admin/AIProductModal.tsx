@@ -24,7 +24,7 @@ type AIProductModalProps = {
 };
 
 const FREE_IMAGE_LABELS = ["Image principale", "Image secondaire", "Detail (tissu/broderie)"];
-const REF_GEMINI_LABELS = ["Vue secondaire (IA)", "Detail tissu (IA)"];
+const REF_GEMINI_LABELS = ["Vue secondaire (IA)", "Vue dos (IA)", "Detail tissu (IA)"];
 const REF_CLOUDINARY_LABELS = ["Vue recadree", "Detail (zoom)"];
 
 export default function AIProductModal({
@@ -175,7 +175,7 @@ export default function AIProductModal({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-green-900">Image de reference detectee</p>
-                    <p className="text-xs text-green-700 mt-0.5">L&apos;image principale reste inchangee. 2 variantes seront generees par IA (Gemini).</p>
+                    <p className="text-xs text-green-700 mt-0.5">L&apos;image principale reste inchangee. 3 variantes seront generees par IA (Gemini).</p>
                   </div>
                 </div>
               )}
@@ -184,7 +184,7 @@ export default function AIProductModal({
               <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-xl">
                 <div>
                   <p className="text-sm font-medium text-stone-900">
-                    {hasReference ? "Generer 2 variantes IA (Gemini)" : "Generer aussi 3 images IA"}
+                    {hasReference ? "Generer 3 variantes IA (Gemini)" : "Generer aussi 3 images IA"}
                   </p>
                   <p className="text-xs text-stone-500 mt-0.5">
                     {hasReference
@@ -211,7 +211,7 @@ export default function AIProductModal({
                 </svg>
                 {withImages
                   ? hasReference
-                    ? "Generer texte + 2 variantes IA"
+                    ? "Generer texte + 3 variantes IA"
                     : "Generer texte + 3 images"
                   : "Generer le texte"}
               </button>
@@ -318,10 +318,10 @@ export default function AIProductModal({
                       <span className="text-xs text-stone-500">Appliquer</span>
                     </label>
                   </div>
-                  <div className={`grid ${result.referenceUsed ? "grid-cols-2" : "grid-cols-3"} gap-3`}>
+                  <div className="grid grid-cols-3 gap-3">
                     {result.images.map((url, i) => (
                       <div key={i} className="relative group">
-                        <div className={`${(result.referenceUsed ? i === 1 : i === 2) ? "aspect-square" : "aspect-[2/3]"} rounded-lg overflow-hidden bg-stone-100 border border-stone-200`}>
+                        <div className={`${i === 2 ? "aspect-square" : "aspect-[2/3]"} rounded-lg overflow-hidden bg-stone-100 border border-stone-200`}>
                           <img
                             src={url}
                             alt={imageLabels[i] || `Image ${i + 1}`}
