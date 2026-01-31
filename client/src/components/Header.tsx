@@ -14,16 +14,26 @@ type User = {
   role: string;
 };
 
+const ANNOUNCEMENT_TEXT = "Commandez aujourd\u2019hui et faites-vous livrer sous 48h ouvrables";
+const ANNOUNCEMENT_STORAGE_KEY = "ibag-announcement-dismissed";
+
 export default function Header() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const { totalItems, setIsCartOpen, isHydrated } = useCart();
 
   const isAdmin = pathname.startsWith("/admin");
+
+  useEffect(() => {
+    if (isAdmin) return;
+    const dismissed = sessionStorage.getItem(ANNOUNCEMENT_STORAGE_KEY);
+    if (!dismissed) setShowAnnouncement(true);
+  }, [isAdmin]);
 
   useEffect(() => {
     if (isAdmin) return;
@@ -60,6 +70,11 @@ export default function Header() {
     window.location.href = "/";
   };
 
+  const dismissAnnouncement = () => {
+    setShowAnnouncement(false);
+    sessionStorage.setItem(ANNOUNCEMENT_STORAGE_KEY, "1");
+  };
+
   // Ne pas afficher le header client sur les pages admin
   if (isAdmin) {
     return null;
@@ -67,8 +82,37 @@ export default function Header() {
 
   return (
     <>
+      {/* Spacer to push page content below fixed header + announcement bar */}
+      {showAnnouncement && <div className="h-8 sm:h-9" />}
+
+      {/* Announcement Bar */}
+      {showAnnouncement && (
+        <div
+          role="banner"
+          aria-label="Information livraison"
+          className="fixed top-0 left-0 right-0 z-[60] bg-stone-900 text-white animate-[fadeIn_0.4s_ease-out]"
+        >
+          <div className="max-w-7xl mx-auto px-4 py-1.5 sm:py-2 flex items-center justify-center relative">
+            <p className="text-[11px] sm:text-xs font-light tracking-wide text-center pr-6">
+              <span className="mr-1.5 opacity-70" aria-hidden="true">&#10024;</span>
+              {ANNOUNCEMENT_TEXT}
+              <span className="ml-1.5 opacity-70" aria-hidden="true">&#10024;</span>
+            </p>
+            <button
+              onClick={dismissAnnouncement}
+              aria-label="Fermer le bandeau"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <svg className="w-3 h-3 text-white/60 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       <header
-        className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-stone-200 transition-shadow duration-300 ${
+        className={`fixed ${showAnnouncement ? "top-8 sm:top-9" : "top-0"} left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-stone-200 transition-all duration-300 ${
           isScrolled ? "shadow-sm" : ""
         }`}
       >
