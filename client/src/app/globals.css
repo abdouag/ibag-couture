@@ -75,3 +75,21 @@ body {
 .animate-fadeInBackdrop {
   animation: fadeInBackdrop 0.2s ease-out;
 }
+
+/* Scroll Reveal Animations */
+.sr-hidden {
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sr-from-up { transform: translateY(32px); }
+.sr-from-down { transform: translateY(-32px); }
+.sr-from-left { transform: translateX(-32px); }
+.sr-from-right { transform: translateX(32px); }
+.sr-from-none { transform: none; }
+
+.sr-visible {
+  opacity: 1 !important;
+  transform: translateY(0) translateX(0) !important;
+}

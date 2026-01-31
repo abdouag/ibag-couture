@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import Footer from "@/components/Footer";
+import ScrollReveal from "@/components/ScrollReveal";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -122,56 +123,211 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="apropos" className="py-16 md:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-            {/* Text - Desktop: left, Mobile: below image */}
-            <div className="order-2 md:order-1">
-              <p className="text-amber-700 text-sm tracking-[0.3em] uppercase mb-4">
-                Notre Histoire
+      {/* About Section — Notre Histoire */}
+      <section id="apropos" className="py-20 md:py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6">
+          <div className="grid md:grid-cols-2 gap-10 md:gap-20 items-center">
+            {/* Text */}
+            <ScrollReveal className="order-2 md:order-1" direction="left">
+              <p className="text-amber-700 text-xs tracking-[0.3em] uppercase mb-5 font-medium">
+                Notre Maison
               </p>
-              <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-6">
-                L&apos;art de la couture
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-stone-900 mb-8 leading-[1.15]">
+                Là où le tissu
                 <br />
-                <span className="italic font-light">réinventé</span>
+                <span className="italic font-light">rencontre l&apos;âme</span>
               </h2>
-              <div className="space-y-4 text-stone-600 leading-relaxed">
+              <div className="space-y-5 text-stone-600 leading-relaxed text-[15px] md:text-base">
                 <p>
-                  Ibag Couture naît de la passion pour l&apos;élégance et le raffinement.
-                  Notre maison perpétue les traditions de la haute couture africaine
-                  tout en embrassant la modernité.
+                  Chez Ibag Couture, chaque vêtement commence par une écoute.
+                  Celle de vos envies, de votre silhouette, de l&apos;occasion
+                  qui vous attend. Nous ne fabriquons pas du prêt-à-porter —
+                  nous façonnons des pièces qui vous ressemblent.
                 </p>
                 <p>
-                  Chaque création est le fruit d&apos;un savoir-faire artisanal transmis
-                  de génération en génération, allié aux techniques les plus contemporaines.
+                  Nos mains d&apos;artisans tracent, coupent et assemblent avec
+                  la même exigence depuis le premier jour : celle du geste juste,
+                  du détail qui fait la différence, du tissu choisi avec soin.
                 </p>
               </div>
-              <div className="mt-10 flex gap-12">
+              <div className="mt-10 flex gap-10 sm:gap-14">
                 <div>
-                  <p className="text-4xl font-serif text-stone-900">150+</p>
-                  <p className="text-sm text-stone-500 tracking-wide">Créations uniques</p>
+                  <p className="text-4xl md:text-5xl font-serif text-stone-900">150+</p>
+                  <p className="text-xs sm:text-sm text-stone-500 tracking-wide mt-1">Créations uniques</p>
                 </div>
                 <div>
-                  <p className="text-4xl font-serif text-stone-900">100%</p>
-                  <p className="text-sm text-stone-500 tracking-wide">Sur mesure</p>
+                  <p className="text-4xl md:text-5xl font-serif text-stone-900">100%</p>
+                  <p className="text-xs sm:text-sm text-stone-500 tracking-wide mt-1">Sur mesure</p>
                 </div>
               </div>
-            </div>
-            {/* Image - Desktop: right, Mobile: above text */}
-            <div className="relative order-1 md:order-2">
-              <div className="aspect-[4/5] relative rounded-sm overflow-hidden shadow-xl">
+              <div className="mt-10">
+                <Link
+                  href="/collections"
+                  className="inline-flex items-center gap-2 text-sm text-stone-900 tracking-[0.15em] uppercase border-b border-stone-900 pb-1 hover:text-amber-700 hover:border-amber-700 transition-colors duration-300"
+                >
+                  Découvrir nos créations
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </Link>
+              </div>
+            </ScrollReveal>
+
+            {/* Image */}
+            <ScrollReveal className="relative order-1 md:order-2" direction="right">
+              <div className="aspect-[4/5] relative rounded-sm overflow-hidden shadow-2xl">
                 <Image
                   src="/images/IMG_1991.PNG"
-                  alt="L'art de la couture Ibag - Notre savoir-faire"
+                  alt="Artisan Ibag Couture travaillant le tissu dans l'atelier"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   priority
                 />
               </div>
-              <div className="absolute -bottom-6 -left-6 w-32 h-32 border border-amber-600/30" />
+              <div className="absolute -bottom-4 -left-4 md:-bottom-6 md:-left-6 w-24 h-24 md:w-32 md:h-32 border border-amber-600/20" />
+              <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-20 h-20 md:w-28 md:h-28 border border-stone-300/30" />
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* Notre Philosophie — 3 Pillars */}
+      <section className="py-20 md:py-28 bg-stone-50">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6">
+          <ScrollReveal className="text-center mb-14 md:mb-20">
+            <p className="text-amber-700 text-xs tracking-[0.3em] uppercase mb-4 font-medium">
+              Notre Philosophie
+            </p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-stone-900 max-w-xl mx-auto leading-snug">
+              Trois engagements,
+              <br />
+              <span className="italic font-light">une même exigence</span>
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+            {/* Pillar 1: Le Geste */}
+            <ScrollReveal delay={0}>
+              <div className="text-center px-4">
+                <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-amber-700/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l.075 5.925m3.075-5.925v2.925m0-2.925a1.575 1.575 0 013.15 0v2.925m-3.15 0l.075 3m0 0a.75.75 0 01-.75.75H6.57a2.25 2.25 0 01-2.186-1.72L3.91 11.08a1.575 1.575 0 011.088-1.894l.394-.1m7.658 5.914l.6-3m-7.658-2.006L4.26 9.527A1.125 1.125 0 003.5 10.6v.15" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-3">Le Geste</h3>
+                <div className="w-8 h-px bg-amber-700/40 mx-auto mb-4" />
+                <p className="text-stone-500 leading-relaxed text-[15px]">
+                  Chaque couture est posée à la main. Pas de raccourci,
+                  pas de série. Un geste précis, répété avec patience,
+                  parce que c&apos;est dans le détail que naît la qualité.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            {/* Pillar 2: La Mesure */}
+            <ScrollReveal delay={150}>
+              <div className="text-center px-4">
+                <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-amber-700/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-3">La Mesure</h3>
+                <div className="w-8 h-px bg-amber-700/40 mx-auto mb-4" />
+                <p className="text-stone-500 leading-relaxed text-[15px]">
+                  Votre corps est unique, votre vêtement doit l&apos;être aussi.
+                  Nous prenons vos mesures avec rigueur pour un tombé
+                  qui épouse votre silhouette sans compromis.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            {/* Pillar 3: Le Tissu */}
+            <ScrollReveal delay={300}>
+              <div className="text-center px-4">
+                <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-amber-700/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-3">Le Tissu</h3>
+                <div className="w-8 h-px bg-amber-700/40 mx-auto mb-4" />
+                <p className="text-stone-500 leading-relaxed text-[15px]">
+                  Bazin, wax, lin, soie — nous sélectionnons chaque étoffe
+                  pour sa tenue, son éclat et sa noblesse. Un bon vêtement
+                  commence toujours par un bon tissu.
+                </p>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* Dans Notre Atelier */}
+      <section className="py-20 md:py-28 bg-white">
+        <div className="max-w-4xl mx-auto px-5 sm:px-6">
+          <ScrollReveal className="text-center">
+            <p className="text-amber-700 text-xs tracking-[0.3em] uppercase mb-4 font-medium">
+              Dans Notre Atelier
+            </p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-stone-900 mb-8 leading-snug">
+              Du croquis à la dernière couture
+            </h2>
+            <div className="max-w-2xl mx-auto space-y-5 text-stone-600 leading-relaxed text-[15px] md:text-base">
+              <p>
+                Tout commence par un échange. Vous nous parlez de l&apos;événement,
+                du style que vous aimez, des couleurs qui vous inspirent.
+                Puis nos artisans dessinent, ajustent et confectionnent —
+                pièce par pièce, à votre rythme.
+              </p>
+              <p>
+                Entre le premier coup de ciseau et l&apos;essayage final,
+                chaque étape est pensée pour que le résultat soit à la hauteur
+                de vos attentes. Pas de production en masse, pas de standardisation :
+                juste un vêtement fait pour vous, avec le temps qu&apos;il mérite.
+              </p>
             </div>
+          </ScrollReveal>
+
+          {/* Process Steps */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <ScrollReveal delay={0}>
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+                  <span className="text-sm font-serif text-stone-900">01</span>
+                </div>
+                <p className="text-sm font-medium text-stone-900 mb-1">Écoute</p>
+                <p className="text-xs text-stone-500 leading-relaxed">Vos envies, votre style, votre occasion</p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={100}>
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+                  <span className="text-sm font-serif text-stone-900">02</span>
+                </div>
+                <p className="text-sm font-medium text-stone-900 mb-1">Mesures</p>
+                <p className="text-xs text-stone-500 leading-relaxed">Prise de mesures précise et rigoureuse</p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={200}>
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+                  <span className="text-sm font-serif text-stone-900">03</span>
+                </div>
+                <p className="text-sm font-medium text-stone-900 mb-1">Confection</p>
+                <p className="text-xs text-stone-500 leading-relaxed">Coupe, assemblage et finitions à la main</p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={300}>
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+                  <span className="text-sm font-serif text-stone-900">04</span>
+                </div>
+                <p className="text-sm font-medium text-stone-900 mb-1">Livraison</p>
+                <p className="text-xs text-stone-500 leading-relaxed">Votre pièce livrée avec soin, prête à porter</p>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -272,95 +428,114 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Advantages Section */}
-      <section className="py-16 md:py-24 bg-stone-900 text-white">
+      {/* Pourquoi Ibag Couture */}
+      <section className="py-20 md:py-28 bg-stone-900 text-white">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
-          <div className="text-center mb-10 md:mb-14">
-            <p className="text-amber-500 text-xs sm:text-sm tracking-[0.3em] uppercase mb-3">
+          <ScrollReveal className="text-center mb-14 md:mb-20">
+            <p className="text-amber-400/90 text-xs tracking-[0.3em] uppercase mb-4 font-medium">
               Pourquoi nous choisir
             </p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif leading-snug">
               L&apos;excellence à chaque étape
             </h2>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8">
-            {/* Sur Mesure */}
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 border border-amber-500/50 rounded-full flex items-center justify-center">
-                <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8">
+            <ScrollReveal delay={0}>
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-5 border border-amber-500/30 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-amber-400/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-lg mb-2">Sur Mesure</h3>
+                <p className="text-stone-400 leading-relaxed text-sm">
+                  Confectionné selon vos mesures exactes,
+                  pour un ajustement qui vous est propre.
+                </p>
               </div>
-              <h3 className="font-serif text-xl mb-3">Sur Mesure</h3>
-              <p className="text-stone-400 leading-relaxed">
-                Chaque vêtement est confectionné selon vos mesures exactes
-                pour un ajustement parfait.
-              </p>
-            </div>
+            </ScrollReveal>
 
-            {/* Qualité Premium */}
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 border border-amber-500/50 rounded-full flex items-center justify-center">
-                <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-                </svg>
+            <ScrollReveal delay={100}>
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-5 border border-amber-500/30 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-amber-400/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-lg mb-2">Qualité Premium</h3>
+                <p className="text-stone-400 leading-relaxed text-sm">
+                  Tissus nobles et finitions impeccables
+                  pour des pièces qui traversent le temps.
+                </p>
               </div>
-              <h3 className="font-serif text-xl mb-3">Qualité Premium</h3>
-              <p className="text-stone-400 leading-relaxed">
-                Des tissus nobles et des finitions impeccables
-                pour des pièces qui traversent le temps.
-              </p>
-            </div>
+            </ScrollReveal>
 
-            {/* Livraison */}
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 border border-amber-500/50 rounded-full flex items-center justify-center">
-                <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                </svg>
+            <ScrollReveal delay={200}>
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-5 border border-amber-500/30 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-amber-400/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-lg mb-2">Livraison Soignée</h3>
+                <p className="text-stone-400 leading-relaxed text-sm">
+                  Votre commande livrée dans un écrin,
+                  prête à être portée pour vos moments précieux.
+                </p>
               </div>
-              <h3 className="font-serif text-xl mb-3">Livraison Soignée</h3>
-              <p className="text-stone-400 leading-relaxed">
-                Votre commande livrée dans un écrin,
-                prête à être portée pour vos moments précieux.
-              </p>
-            </div>
+            </ScrollReveal>
 
-            {/* Satisfaction Garantie */}
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 border border-amber-500/50 rounded-full flex items-center justify-center">
-                <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                </svg>
+            <ScrollReveal delay={300}>
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-5 border border-amber-500/30 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-amber-400/90" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-lg mb-2">Satisfaction Garantie</h3>
+                <p className="text-stone-400 leading-relaxed text-sm">
+                  Retouches incluses et suivi personnalisé
+                  pour une satisfaction totale.
+                </p>
               </div>
-              <h3 className="font-serif text-xl mb-3">Satisfaction Garantie</h3>
-              <p className="text-stone-400 leading-relaxed">
-                Retouches incluses et suivi personnalisé
-                pour une satisfaction totale à chaque commande.
-              </p>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-amber-50">
-        <div className="max-w-3xl mx-auto px-5 sm:px-6 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-stone-900 mb-4">
-            Prêt à créer votre pièce unique ?
-          </h2>
-          <p className="text-stone-600 mb-8 leading-relaxed">
-            Parlons de votre projet. Nos artisans sont à votre écoute
-            pour donner vie à vos envies.
-          </p>
-          <Link
-            href="/collections"
-            className="inline-block bg-stone-900 text-white px-12 py-4 text-sm tracking-[0.2em] uppercase hover:bg-stone-800 hover:shadow-lg transition-all duration-300"
-          >
-            Parcourir nos créations
-          </Link>
-        </div>
+      {/* CTA Final */}
+      <section className="py-20 md:py-28 bg-amber-50/60">
+        <ScrollReveal>
+          <div className="max-w-3xl mx-auto px-5 sm:px-6 text-center">
+            <p className="text-amber-700 text-xs tracking-[0.3em] uppercase mb-4 font-medium">
+              Votre prochaine pièce
+            </p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-stone-900 mb-5 leading-snug">
+              Prêt à créer un vêtement
+              <br />
+              <span className="italic font-light">qui vous ressemble ?</span>
+            </h2>
+            <p className="text-stone-600 mb-10 leading-relaxed max-w-lg mx-auto">
+              Parcourez nos collections ou contactez-nous directement.
+              Nos artisans sont à votre écoute pour donner vie à vos envies.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/collections"
+                className="inline-block bg-stone-900 text-white px-10 py-4 text-xs sm:text-sm tracking-[0.2em] uppercase hover:bg-stone-800 hover:shadow-lg transition-all duration-300 font-medium"
+              >
+                Découvrir la collection
+              </Link>
+              <a
+                href="#contact"
+                className="inline-block border border-stone-400 text-stone-700 px-10 py-4 text-xs sm:text-sm tracking-[0.2em] uppercase hover:bg-stone-100 transition-all duration-300"
+              >
+                Commander sur mesure
+              </a>
+            </div>
+          </div>
+        </ScrollReveal>
       </section>
 
       <Footer variant="full" />
