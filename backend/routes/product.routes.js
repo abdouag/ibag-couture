@@ -65,6 +65,15 @@ const productValidation = [
   body('isActive')
     .optional()
     .isBoolean().withMessage('isActive doit être un booléen'),
+  body('hasStock')
+    .optional()
+    .isBoolean().withMessage('hasStock doit être un booléen'),
+  body('stockQuantity')
+    .optional({ nullable: true })
+    .isInt({ min: 0 }).withMessage('La quantité en stock doit être un entier positif ou nul'),
+  body('promoPrice')
+    .optional({ nullable: true })
+    .isFloat({ min: 0 }).withMessage('Le prix promotionnel doit être un nombre positif'),
 ];
 
 const updateValidation = [
@@ -112,6 +121,15 @@ const updateValidation = [
   body('isActive')
     .optional()
     .isBoolean().withMessage('isActive doit être un booléen'),
+  body('hasStock')
+    .optional()
+    .isBoolean().withMessage('hasStock doit être un booléen'),
+  body('stockQuantity')
+    .optional({ nullable: true })
+    .isInt({ min: 0 }).withMessage('La quantité en stock doit être un entier positif ou nul'),
+  body('promoPrice')
+    .optional({ nullable: true })
+    .isFloat({ min: 0 }).withMessage('Le prix promotionnel doit être un nombre positif'),
 ];
 
 const mongoIdValidation = [

@@ -74,6 +74,20 @@ const productSchema = new mongoose.Schema({
     default: 7,
     min: [1, 'Le temps de production doit être d\'au moins 1 jour'],
   },
+  hasStock: {
+    type: Boolean,
+    default: false,
+  },
+  stockQuantity: {
+    type: Number,
+    default: null,
+    min: [0, 'La quantité en stock ne peut pas être négative'],
+  },
+  promoPrice: {
+    type: Number,
+    default: null,
+    min: [0, 'Le prix promotionnel ne peut pas être négatif'],
+  },
   isActive: {
     type: Boolean,
     default: true,

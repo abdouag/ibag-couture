@@ -26,6 +26,9 @@ type Product = {
   options?: Option[];
   productionTime?: number;
   isActive?: boolean;
+  hasStock?: boolean;
+  stockQuantity?: number | null;
+  promoPrice?: number | null;
 };
 
 type ApiResponse = {
@@ -102,10 +105,16 @@ export default async function ProductPage({ params }: Props) {
     notFound();
   }
 
+  const displayPrice = product.promoPrice != null && product.promoPrice < product.basePrice
+    ? product.promoPrice
+    : product.basePrice;
+
   const totalWithOptions = product.options?.reduce(
     (sum, opt) => sum + opt.price,
-    product.basePrice
-  ) || product.basePrice;
+    displayPrice
+  ) || displayPrice;
+
+  const isOutOfStock = product.hasStock && (product.stockQuantity == null || product.stockQuantity <= 0);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ibagcouture.com";
   const imageUrl = product.mainImage || (product.images && product.images.length > 0 ? product.images[0] : null);
@@ -127,8 +136,8 @@ export default async function ProductPage({ params }: Props) {
       "@type": "Offer",
       url: `${siteUrl}/produits/${product.slug}`,
       priceCurrency: "XOF",
-      price: product.basePrice,
-      availability: "https://schema.org/InStock",
+      price: displayPrice,
+      availability: isOutOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
     },
     category: product.category,
   };
@@ -187,15 +196,57 @@ export default async function ProductPage({ params }: Props) {
                   </h1>
                 </div>
 
+                {/* Stock Badge */}
+                {product.hasStock && (
+                  <div className="flex items-center gap-2">
+                    {isOutOfStock ? (
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stone-100 border border-stone-200 rounded-full">
+                        <span className="w-2 h-2 rounded-full bg-stone-400" />
+                        <span className="text-sm text-stone-500 font-medium">Rupture de stock</span>
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-stock-pulse absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                        </span>
+                        <span className="text-sm text-emerald-700 font-medium">En stock ({product.stockQuantity})</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Price Section - Enhanced */}
                 <div className="bg-white rounded-sm p-4 md:p-5 border border-stone-200 shadow-sm">
-                  <div className="flex items-baseline justify-between mb-1">
-                    <span className="text-stone-500 text-sm">Prix de base</span>
-                    <span className="text-xs text-stone-400 tracking-wide uppercase">FCFA</span>
-                  </div>
-                  <p className="text-3xl md:text-4xl font-serif text-stone-900 tracking-tight">
-                    {product.basePrice.toLocaleString('fr-FR')}
-                  </p>
+                  {product.promoPrice != null && product.promoPrice < product.basePrice ? (
+                    <>
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="inline-block px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded tracking-wide uppercase">
+                          -{Math.round((1 - product.promoPrice / product.basePrice) * 100)}%
+                        </span>
+                        <span className="text-stone-400 text-sm font-medium">Promotion</span>
+                      </div>
+                      <div className="flex items-baseline gap-3 mb-1">
+                        <p className="text-3xl md:text-4xl font-serif text-red-700 tracking-tight">
+                          {product.promoPrice.toLocaleString('fr-FR')}
+                        </p>
+                        <span className="text-xs text-stone-400 tracking-wide uppercase">FCFA</span>
+                      </div>
+                      <p className="text-stone-400 text-base line-through">
+                        {product.basePrice.toLocaleString('fr-FR')} FCFA
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-baseline justify-between mb-1">
+                        <span className="text-stone-500 text-sm">Prix de base</span>
+                        <span className="text-xs text-stone-400 tracking-wide uppercase">FCFA</span>
+                      </div>
+                      <p className="text-3xl md:text-4xl font-serif text-stone-900 tracking-tight">
+                        {product.basePrice.toLocaleString('fr-FR')}
+                      </p>
+                    </>
+                  )}
 
                   {product.options && product.options.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-stone-100">
@@ -303,28 +354,36 @@ export default async function ProductPage({ params }: Props) {
 
                 {/* CTA Button - Premium */}
                 <div className="space-y-4">
-                  <Link
-                    href={`/commander/${product.slug || product._id}`}
-                    className="group relative block w-full bg-stone-900 text-white text-center py-4 md:py-5 text-sm md:text-base tracking-[0.15em] uppercase font-medium overflow-hidden transition-all duration-500 hover:bg-stone-800 hover:shadow-lg"
-                  >
-                    <span className="relative z-10 flex items-center justify-center gap-3">
-                      Commander ce modele
-                      <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                      </svg>
-                    </span>
-                  </Link>
+                  {isOutOfStock ? (
+                    <div className="block w-full bg-stone-300 text-white text-center py-4 md:py-5 text-sm md:text-base tracking-[0.15em] uppercase font-medium cursor-not-allowed">
+                      <span className="flex items-center justify-center gap-3">
+                        Indisponible
+                      </span>
+                    </div>
+                  ) : (
+                    <Link
+                      href={`/commander/${product.slug || product._id}`}
+                      className="group relative block w-full bg-stone-900 text-white text-center py-4 md:py-5 text-sm md:text-base tracking-[0.15em] uppercase font-medium overflow-hidden transition-all duration-500 hover:bg-stone-800 hover:shadow-lg"
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-3">
+                        Commander ce modele
+                        <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                        </svg>
+                      </span>
+                    </Link>
+                  )}
 
-                  <AddToCartButton
+                  {!isOutOfStock && <AddToCartButton
                     product={{
                       productId: product._id,
                       slug: product.slug,
                       name: product.name,
                       category: product.category,
-                      basePrice: product.basePrice,
+                      basePrice: displayPrice,
                       mainImage: product.mainImage,
                     }}
-                  />
+                  />}
 
                   {product.isCustomAvailable && (
                     <p className="text-center text-xs md:text-sm text-stone-500">
@@ -450,16 +509,33 @@ export default async function ProductPage({ params }: Props) {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs text-stone-500">A partir de</p>
-            <p className="text-lg font-serif text-stone-900 font-medium">
-              {product.basePrice.toLocaleString('fr-FR')} <span className="text-sm text-stone-500">FCFA</span>
-            </p>
+            {product.promoPrice != null && product.promoPrice < product.basePrice ? (
+              <div className="flex items-baseline gap-2">
+                <p className="text-lg font-serif text-red-700 font-medium">
+                  {product.promoPrice.toLocaleString('fr-FR')} <span className="text-sm text-stone-500">FCFA</span>
+                </p>
+                <p className="text-sm text-stone-400 line-through">
+                  {product.basePrice.toLocaleString('fr-FR')}
+                </p>
+              </div>
+            ) : (
+              <p className="text-lg font-serif text-stone-900 font-medium">
+                {product.basePrice.toLocaleString('fr-FR')} <span className="text-sm text-stone-500">FCFA</span>
+              </p>
+            )}
           </div>
-          <Link
-            href={`/commander/${product.slug || product._id}`}
-            className="bg-stone-900 text-white px-6 py-3 text-sm tracking-[0.1em] uppercase font-medium hover:bg-stone-800 transition-colors"
-          >
-            Commander
-          </Link>
+          {isOutOfStock ? (
+            <span className="bg-stone-300 text-white px-6 py-3 text-sm tracking-[0.1em] uppercase font-medium cursor-not-allowed">
+              Indisponible
+            </span>
+          ) : (
+            <Link
+              href={`/commander/${product.slug || product._id}`}
+              className="bg-stone-900 text-white px-6 py-3 text-sm tracking-[0.1em] uppercase font-medium hover:bg-stone-800 transition-colors"
+            >
+              Commander
+            </Link>
+          )}
         </div>
       </div>
       {/* Spacer for sticky CTA on mobile */}

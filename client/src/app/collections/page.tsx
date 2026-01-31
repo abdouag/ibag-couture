@@ -15,6 +15,9 @@ type Product = {
   mainImage?: string;
   images?: string[];
   productionTime?: number;
+  hasStock?: boolean;
+  stockQuantity?: number | null;
+  promoPrice?: number | null;
 };
 
 type ApiResponse = {
@@ -196,18 +199,34 @@ export default async function CollectionsPage({ searchParams }: Props) {
                         )}
 
                         {/* Category Badge */}
-                        <div className="absolute top-2 left-2 sm:top-4 sm:left-4">
+                        <div className="absolute top-2 left-2 sm:top-4 sm:left-4 flex flex-col gap-1">
                           <span className="bg-white/90 backdrop-blur-sm text-stone-900 text-[10px] sm:text-xs tracking-wider uppercase px-2 py-0.5 sm:px-3 sm:py-1">
                             {product.category}
                           </span>
+                          {product.promoPrice != null && product.promoPrice < product.basePrice && (
+                            <span className="bg-red-600 text-white text-[10px] sm:text-xs font-semibold px-2 py-0.5 sm:px-3 sm:py-1">
+                              -{Math.round((1 - product.promoPrice / product.basePrice) * 100)}%
+                            </span>
+                          )}
                         </div>
 
+                        {/* Out of stock overlay */}
+                        {product.hasStock && (product.stockQuantity == null || product.stockQuantity <= 0) && (
+                          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                            <span className="bg-stone-900/80 text-white text-xs sm:text-sm px-4 py-1.5 tracking-wide uppercase">
+                              Rupture de stock
+                            </span>
+                          </div>
+                        )}
+
                         {/* Quick View Overlay */}
-                        <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/20 transition-all duration-500 flex items-center justify-center">
-                          <span className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 bg-white text-stone-900 px-6 py-2 text-sm tracking-wide">
-                            Voir le modèle
-                          </span>
-                        </div>
+                        {!(product.hasStock && (product.stockQuantity == null || product.stockQuantity <= 0)) && (
+                          <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/20 transition-all duration-500 flex items-center justify-center">
+                            <span className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 bg-white text-stone-900 px-6 py-2 text-sm tracking-wide">
+                              Voir le modèle
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </Link>
 
@@ -226,11 +245,19 @@ export default async function CollectionsPage({ searchParams }: Props) {
                       )}
 
                       <div className="flex items-center justify-between">
-                        <p className="text-stone-900 text-xs sm:text-base">
-                          <span className="hidden sm:inline text-sm text-stone-500">À partir de </span>
-                          <span className="font-medium">{product.basePrice.toLocaleString('fr-FR')}</span>
-                          <span className="text-xs sm:text-sm text-stone-500"> FCFA</span>
-                        </p>
+                        {product.promoPrice != null && product.promoPrice < product.basePrice ? (
+                          <p className="text-xs sm:text-base">
+                            <span className="font-medium text-red-700">{product.promoPrice.toLocaleString('fr-FR')}</span>
+                            <span className="text-xs sm:text-sm text-stone-500"> FCFA</span>
+                            <span className="ml-1.5 text-stone-400 line-through text-[10px] sm:text-sm">{product.basePrice.toLocaleString('fr-FR')}</span>
+                          </p>
+                        ) : (
+                          <p className="text-stone-900 text-xs sm:text-base">
+                            <span className="hidden sm:inline text-sm text-stone-500">À partir de </span>
+                            <span className="font-medium">{product.basePrice.toLocaleString('fr-FR')}</span>
+                            <span className="text-xs sm:text-sm text-stone-500"> FCFA</span>
+                          </p>
+                        )}
                       </div>
 
                       {product.productionTime && (

@@ -26,6 +26,9 @@ type ProductForm = {
   isCustomAvailable: boolean;
   customPriceImpact: string;
   options: ProductOption[];
+  hasStock: boolean;
+  stockQuantity: string;
+  promoPrice: string;
 };
 
 const categories = [
@@ -72,6 +75,9 @@ export default function EditProductPage() {
     isCustomAvailable: false,
     customPriceImpact: "0",
     options: [],
+    hasStock: false,
+    stockQuantity: "",
+    promoPrice: "",
   });
 
   useEffect(() => {
@@ -97,6 +103,9 @@ export default function EditProductPage() {
               isCustomAvailable: product.isCustomAvailable ?? false,
               customPriceImpact: product.customPriceImpact?.toString() || "0",
               options: product.options || [],
+              hasStock: product.hasStock ?? false,
+              stockQuantity: product.stockQuantity != null ? product.stockQuantity.toString() : "",
+              promoPrice: product.promoPrice != null ? product.promoPrice.toString() : "",
             });
           } else {
             setNotFound(true);
@@ -185,6 +194,9 @@ export default function EditProductPage() {
               price: typeof o.price === 'string' ? parseFloat(o.price) : o.price
             }))
           : [],
+        hasStock: form.hasStock,
+        stockQuantity: form.hasStock ? parseInt(form.stockQuantity) || 0 : null,
+        promoPrice: form.promoPrice ? parseFloat(form.promoPrice) : null,
       };
 
       const res = await fetch(`${API_URL}/api/products/${productId}`, {
@@ -578,6 +590,89 @@ export default function EditProductPage() {
                 Aucune option ajoutee. Les options permettent de proposer des personnalisations (broderie, tissu premium, etc.)
               </p>
             )}
+          </div>
+        </div>
+
+        {/* Stock & Promo Card */}
+        <div className="bg-white rounded-xl border border-stone-200 p-4 sm:p-6">
+          <h2 className="font-medium text-stone-900 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+            </svg>
+            Stock et promotion
+          </h2>
+
+          {/* Stock Toggle */}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <label className="text-sm font-medium text-stone-700">
+                Gestion du stock
+              </label>
+              <p className="text-xs text-stone-400 mt-0.5">
+                Activez pour suivre la quantite disponible
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, hasStock: !prev.hasStock }))}
+              className={`relative w-12 h-7 rounded-full transition-colors ${
+                form.hasStock ? "bg-amber-500" : "bg-stone-300"
+              }`}
+            >
+              <div className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                form.hasStock ? "translate-x-5" : "translate-x-0"
+              }`} />
+            </button>
+          </div>
+
+          {form.hasStock && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+              <label className="block text-sm font-medium text-stone-700 mb-2">
+                Quantite en stock <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                name="stockQuantity"
+                value={form.stockQuantity}
+                onChange={handleChange}
+                min="0"
+                placeholder="Ex: 5"
+                required
+                className="w-full sm:w-48 px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all bg-white"
+              />
+              <p className="text-xs text-stone-500 mt-2">
+                Si la quantite atteint 0, le produit sera affiche comme &quot;Rupture de stock&quot; sur le site.
+              </p>
+            </div>
+          )}
+
+          {/* Promo Price */}
+          <div className="pt-6 border-t border-stone-200">
+            <label className="block text-sm font-medium text-stone-700 mb-2">
+              Prix promotionnel (FCFA)
+            </label>
+            <input
+              type="number"
+              name="promoPrice"
+              value={form.promoPrice}
+              onChange={handleChange}
+              min="0"
+              placeholder="Laisser vide si pas de promotion"
+              className="w-full sm:w-64 px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+            />
+            {form.promoPrice && form.basePrice && parseFloat(form.promoPrice) >= parseFloat(form.basePrice) && (
+              <p className="text-xs text-red-500 mt-2">
+                Le prix promotionnel doit etre inferieur au prix de base ({parseFloat(form.basePrice).toLocaleString("fr-FR")} FCFA).
+              </p>
+            )}
+            {form.promoPrice && form.basePrice && parseFloat(form.promoPrice) < parseFloat(form.basePrice) && (
+              <p className="text-xs text-green-600 mt-2">
+                Reduction de {Math.round((1 - parseFloat(form.promoPrice) / parseFloat(form.basePrice)) * 100)}% affichee sur le site.
+              </p>
+            )}
+            <p className="text-xs text-stone-400 mt-1">
+              Laissez vide pour ne pas appliquer de promotion.
+            </p>
           </div>
         </div>
 
