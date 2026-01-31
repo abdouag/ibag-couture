@@ -3,6 +3,10 @@ const cloudinary = require('../config/cloudinary');
 const { AppError } = require('../middleware');
 const { generateSecondaryImagesFromReference } = require('../services/geminiImageGenerator');
 
+// Log API key status at startup
+console.log(`[AI] OPENAI_API_KEY: ${process.env.OPENAI_API_KEY ? 'configuree' : 'ABSENTE'}`);
+console.log(`[AI] GEMINI_API_KEY: ${process.env.GEMINI_API_KEY ? 'configuree' : 'ABSENTE'}`);
+
 // Rate limiting: track requests per day
 const dailyRequestLog = new Map(); // key: date string, value: count
 const MAX_REQUESTS_PER_DAY = 50;

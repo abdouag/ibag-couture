@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 const cloudinary = require('../config/cloudinary');
 
 /**
@@ -27,9 +27,10 @@ async function uploadToCloudinary(imageBuffer, filename) {
 /**
  * Generate 2 secondary images from a reference image using Google Gemini.
  *
+ * Uses gemini-2.5-flash-image model with image-to-image generation.
+ *
  * IMPORTANT LIMITATION: Gemini is a generative model. It regenerates pixels
  * and CANNOT guarantee pixel-level fidelity to the reference image.
- * For guaranteed fidelity, use Cloudinary crop/zoom transformations instead.
  *
  * @param {Object} params
  * @param {string} params.referenceImageUrl - Cloudinary URL of the reference image
@@ -61,13 +62,7 @@ async function generateSecondaryImagesFromReference({
   // Detect mime type from URL
   const mimeType = referenceImageUrl.match(/\.png/i) ? 'image/png' : 'image/jpeg';
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-exp',
-    generationConfig: {
-      responseModalities: ['TEXT', 'IMAGE'],
-    },
-  });
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const timestamp = Date.now();
   const slug = (productName || category || 'produit')
@@ -107,15 +102,18 @@ async function generateSecondaryImagesFromReference({
     prompts.map(async ({ label, text }, index) => {
       console.log(`[AI][GEMINI] Generation image ${index + 1}/2 (${label})...`);
 
-      const result = await model.generateContent([imageReference, text]);
-      const response = result.response;
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: [imageReference, { text }],
+      });
 
       // Extract image from response
       const parts = response.candidates?.[0]?.content?.parts || [];
       const imagePart = parts.find((p) => p.inlineData?.mimeType?.startsWith('image/'));
 
       if (!imagePart) {
-        throw new Error(`Gemini n'a pas genere d'image pour ${label}`);
+        const textParts = parts.filter((p) => p.text).map((p) => p.text).join(' ');
+        throw new Error(`Gemini n'a pas genere d'image pour ${label}. Reponse: ${textParts.slice(0, 200)}`);
       }
 
       const imageBuffer = Buffer.from(imagePart.inlineData.data, 'base64');
