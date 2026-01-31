@@ -52,14 +52,21 @@ async function uploadToCloudinary(imageBuffer, filename) {
  * Returns [secondaryUrl, detailUrl] or null if the URL is not a valid Cloudinary URL.
  */
 function buildCloudinaryCrops(referenceImageUrl) {
-  const cloudinaryMatch = referenceImageUrl.match(
-    /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(?:[^/]+\/)*(.*?)(?:\.[a-z]+)?$/i
+  const match = referenceImageUrl.match(
+    /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.*?)(?:\.[a-z]{3,4})?$/i
   );
 
-  if (!cloudinaryMatch) return null;
+  if (!match) return null;
 
-  const cloudinaryBase = cloudinaryMatch[1];
-  const publicId = cloudinaryMatch[2];
+  const cloudinaryBase = match[1];
+  const pathAfterUpload = match[2];
+
+  // Split path segments — transformation segments contain commas, folder/file segments don't
+  const segments = pathAfterUpload.split('/');
+  const publicIdSegments = segments.filter(seg => !seg.includes(','));
+  const publicId = publicIdSegments.join('/');
+
+  if (!publicId) return null;
 
   const secondaryUrl = `${cloudinaryBase}w_1024,h_1536,c_fill,g_auto,q_auto/${publicId}`;
   const detailUrl = `${cloudinaryBase}w_1024,h_1024,c_crop,g_center,z_2.0,q_auto/${publicId}`;
