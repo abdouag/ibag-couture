@@ -29,8 +29,8 @@ export default function Footer({ variant = "compact" }: FooterProps) {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#apropos" className="hover:text-white transition-colors text-sm sm:text-base">
-                    Notre Maison
+                  <Link href="/contact" className="hover:text-white transition-colors text-sm sm:text-base">
+                    Contact
                   </Link>
                 </li>
                 <li>
@@ -147,8 +147,8 @@ export default function Footer({ variant = "compact" }: FooterProps) {
             <Link href="/collections" className="hover:text-white transition-colors">
               Collections
             </Link>
-            <Link href="/#apropos" className="hover:text-white transition-colors">
-              Notre Maison
+            <Link href="/contact" className="hover:text-white transition-colors">
+              Contact
             </Link>
             <a href="tel:+221770470928" className="hover:text-white transition-colors">
               +221 77 047 09 28

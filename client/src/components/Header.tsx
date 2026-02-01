@@ -126,18 +126,24 @@ export default function Header() {
               >
                 Collections
               </Link>
-              <a
-                href="/#apropos"
+              <Link
+                href="/collections?category=homme"
                 className="text-[13px] uppercase tracking-[0.12em] text-stone-500 hover:text-stone-900 transition-colors"
               >
-                Notre Maison
-              </a>
-              <a
-                href="/#contact"
+                Homme
+              </Link>
+              <Link
+                href="/collections?category=femme"
+                className="text-[13px] uppercase tracking-[0.12em] text-stone-500 hover:text-stone-900 transition-colors"
+              >
+                Femme
+              </Link>
+              <Link
+                href="/contact"
                 className="text-[13px] uppercase tracking-[0.12em] text-stone-500 hover:text-stone-900 transition-colors"
               >
                 Contact
-              </a>
+              </Link>
             </nav>
           </div>
         </div>
@@ -297,20 +303,30 @@ export default function Header() {
                 >
                   Collections
                 </Link>
-                <a
-                  href="/#apropos"
-                  className="px-4 py-3.5 text-base font-medium text-stone-700 hover:text-stone-900 hover:bg-stone-50 transition-colors tracking-wide rounded"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Notre Maison
-                </a>
-                <a
-                  href="/#contact"
+                <div className="flex gap-2 px-4 py-2">
+                  {[
+                    { label: "Homme", slug: "homme" },
+                    { label: "Femme", slug: "femme" },
+                    { label: "Traditionnel", slug: "traditionnel" },
+                    { label: "Moderne", slug: "moderne" },
+                  ].map((cat) => (
+                    <Link
+                      key={cat.slug}
+                      href={`/collections?category=${cat.slug}`}
+                      className="px-3 py-1.5 text-xs tracking-wide uppercase bg-stone-100 text-stone-600 hover:bg-stone-900 hover:text-white rounded-full transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {cat.label}
+                    </Link>
+                  ))}
+                </div>
+                <Link
+                  href="/contact"
                   className="px-4 py-3.5 text-base font-medium text-stone-700 hover:text-stone-900 hover:bg-stone-50 transition-colors tracking-wide rounded"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Contact
-                </a>
+                </Link>
               </nav>
 
               {/* Mobile Auth / Account */}

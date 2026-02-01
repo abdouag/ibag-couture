@@ -295,7 +295,7 @@ export default async function Home() {
                   href={`/collections?category=${cat.slug}`}
                   className="group flex flex-col items-center text-center"
                 >
-                  <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-stone-200 group-hover:border-amber-600 transition-all duration-300 shadow-md group-hover:shadow-xl mb-3 sm:mb-4">
+                  <div className="relative w-[72px] h-[72px] sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-stone-200 group-hover:border-amber-600 transition-all duration-300 shadow-md group-hover:shadow-xl mb-3 sm:mb-4">
                     {imgSrc ? (
                       <img
                         src={imgSrc}
