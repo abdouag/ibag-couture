@@ -56,34 +56,22 @@ export default async function Home() {
 
   const featured = products.slice(0, 6);
 
-  // Build category data from actual products
-  const categoryMap: Record<string, { count: number; image?: string }> = {};
-  for (const p of products) {
-    const cat = p.category.toLowerCase();
-    if (!categoryMap[cat]) {
-      const img = p.mainImage || (p.images && p.images.length > 0 ? p.images[0] : undefined);
-      categoryMap[cat] = { count: 1, image: img };
-    } else {
-      categoryMap[cat].count++;
-      if (!categoryMap[cat].image) {
-        categoryMap[cat].image = p.mainImage || (p.images && p.images.length > 0 ? p.images[0] : undefined);
-      }
-    }
-  }
+  // Always show all 4 categories with product images
+  const allCategories = [
+    { slug: "homme", label: "Homme" },
+    { slug: "femme", label: "Femme" },
+    { slug: "traditionnel", label: "Traditionnel" },
+    { slug: "moderne", label: "Moderne" },
+  ];
 
-  const categoryLabels: Record<string, string> = {
-    homme: "Homme",
-    femme: "Femme",
-    traditionnel: "Traditionnel",
-    moderne: "Moderne",
-  };
-
-  const categories = Object.entries(categoryMap).map(([key, val]) => ({
-    slug: key,
-    label: categoryLabels[key] || key.charAt(0).toUpperCase() + key.slice(1),
-    count: val.count,
-    image: val.image,
-  }));
+  const categories = allCategories.map((cat) => {
+    const catProducts = products.filter((p) => p.category.toLowerCase() === cat.slug);
+    const firstWithImage = catProducts.find((p) => p.mainImage || (p.images && p.images.length > 0));
+    const img = firstWithImage
+      ? firstWithImage.mainImage || (firstWithImage.images && firstWithImage.images[0])
+      : undefined;
+    return { ...cat, count: catProducts.length, image: img };
+  });
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -285,50 +273,51 @@ export default async function Home() {
       </section>
 
       {/* ═══════════════ CATEGORIES ═══════════════ */}
-      {categories.length > 0 && (
-        <section className="py-14 md:py-20 bg-stone-100">
-          <div className="max-w-7xl mx-auto px-5 sm:px-6">
-            <div className="text-center mb-8 md:mb-12">
-              <p className="text-amber-700 text-xs tracking-[0.3em] uppercase mb-2 font-medium">
-                Explorer
-              </p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-stone-900">
-                Nos cat&eacute;gories
-              </h2>
-            </div>
+      <section className="py-14 md:py-20 bg-stone-100">
+        <div className="max-w-5xl mx-auto px-5 sm:px-6">
+          <div className="text-center mb-8 md:mb-12">
+            <p className="text-amber-700 text-xs tracking-[0.3em] uppercase mb-2 font-medium">
+              Explorer
+            </p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-stone-900">
+              Nos cat&eacute;gories
+            </h2>
+          </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-              {categories.map((cat) => {
-                const imgSrc = cat.image
-                  ? cat.image.startsWith("http") ? cat.image : `${API_URL}${cat.image}`
-                  : null;
-                return (
-                  <Link
-                    key={cat.slug}
-                    href={`/collections?category=${cat.slug}`}
-                    className="group relative aspect-[3/4] sm:aspect-[4/5] overflow-hidden bg-stone-300"
-                  >
+          <div className="flex justify-center gap-6 sm:gap-10 md:gap-14">
+            {categories.map((cat) => {
+              const imgSrc = cat.image
+                ? cat.image.startsWith("http") ? cat.image : `${API_URL}${cat.image}`
+                : null;
+              return (
+                <Link
+                  key={cat.slug}
+                  href={`/collections?category=${cat.slug}`}
+                  className="group flex flex-col items-center text-center"
+                >
+                  <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-stone-200 group-hover:border-amber-600 transition-all duration-300 shadow-md group-hover:shadow-xl mb-3 sm:mb-4">
                     {imgSrc ? (
                       <img
                         src={imgSrc}
                         alt={cat.label}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-stone-300 to-stone-400" />
+                      <div className="w-full h-full bg-gradient-to-br from-stone-200 to-stone-300 flex items-center justify-center">
+                        <svg className="w-8 h-8 sm:w-10 sm:h-10 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
-                      <h3 className="font-serif text-base sm:text-xl text-white mb-0.5">{cat.label}</h3>
-                      <p className="text-stone-300 text-xs sm:text-sm">{cat.count} cr&eacute;ation{cat.count > 1 ? "s" : ""}</p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+                  </div>
+                  <h3 className="font-serif text-sm sm:text-base text-stone-900 group-hover:text-amber-700 transition-colors">{cat.label}</h3>
+                  <p className="text-[10px] sm:text-xs text-stone-400 mt-0.5">{cat.count} article{cat.count > 1 ? "s" : ""}</p>
+                </Link>
+              );
+            })}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* ═══════════════ POURQUOI IBAG COUTURE ═══════════════ */}
       <section className="py-14 md:py-20 bg-white">
