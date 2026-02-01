@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FooterMapWrapper from "@/components/FooterMapWrapper";
 
 type FooterProps = {
   variant?: "full" | "compact";
@@ -81,6 +82,15 @@ export default function Footer({ variant = "compact" }: FooterProps) {
               </ul>
             </div>
           </div>
+
+          {/* Carte de localisation */}
+          <div className="mb-12">
+            <h4 className="font-medium mb-4 tracking-wide text-sm uppercase text-stone-400">Nous trouver</h4>
+            <div className="h-[200px] md:h-[260px] max-w-2xl rounded-lg overflow-hidden shadow-lg border border-stone-700/50">
+              <FooterMapWrapper />
+            </div>
+          </div>
+
           <div className="border-t border-stone-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-stone-500 text-sm">
               &copy; {new Date().getFullYear()} Ibag Couture. Tous droits r&eacute;serv&eacute;s.
