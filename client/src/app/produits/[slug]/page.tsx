@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import Footer from "@/components/Footer";
 import ProductGallery from "@/components/ProductGallery";
 import AddToCartButton from "@/components/AddToCartButton";
+import DeliveryInfo from "@/components/DeliveryInfo";
+import ContactWhatsAppButton from "@/components/ContactWhatsAppButton";
+import SimilarProducts from "@/components/SimilarProducts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -340,17 +343,8 @@ export default async function ProductPage({ params }: Props) {
                   </div>
                 )}
 
-                {/* Production Time */}
-                {product.productionTime && (
-                  <div className="flex items-center gap-3 text-stone-600 bg-amber-50 p-4 rounded-sm border border-amber-100">
-                    <svg className="w-5 h-5 text-amber-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-sm">
-                      Delai de confection : <strong className="text-stone-900">{product.productionTime} jours ouvrables</strong>
-                    </span>
-                  </div>
-                )}
+                {/* Delivery Info */}
+                <DeliveryInfo />
 
                 {/* CTA Button - Premium */}
                 <div className="space-y-4">
@@ -391,6 +385,8 @@ export default async function ProductPage({ params }: Props) {
                       Vous serez guide pour fournir vos mesures personnalisees
                     </p>
                   )}
+
+                  <ContactWhatsAppButton productName={product.name} />
                 </div>
 
                 {/* Trust Badges - Micro-confiance */}
@@ -417,7 +413,7 @@ export default async function ProductPage({ params }: Props) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                       </svg>
                     </div>
-                    <p className="text-[10px] md:text-xs text-stone-500 leading-tight">Livraison<br/>estimee 7-14j</p>
+                    <p className="text-[10px] md:text-xs text-stone-500 leading-tight">Livraison<br/>24&ndash;72h</p>
                   </div>
                 </div>
 
@@ -433,6 +429,9 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Similar Products */}
+      <SimilarProducts category={product.category} currentProductId={product._id} />
 
       {/* Info Section - Enhanced */}
       <section className="py-12 md:py-16 bg-white border-t border-stone-200">
