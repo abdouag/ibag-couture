@@ -97,9 +97,16 @@ export default function MiniCart() {
                     >
                       {item.name}
                     </Link>
-                    <p className="text-sm text-stone-700 font-medium mt-1">
-                      {item.basePrice.toLocaleString("fr-FR")} FCFA
-                    </p>
+                    {item.promoPrice != null && item.promoPrice > 0 && item.promoPrice < item.basePrice ? (
+                      <p className="text-sm mt-1">
+                        <span className="font-medium text-red-700">{item.promoPrice.toLocaleString("fr-FR")} FCFA</span>
+                        <span className="ml-1.5 text-stone-400 line-through text-xs">{item.basePrice.toLocaleString("fr-FR")}</span>
+                      </p>
+                    ) : (
+                      <p className="text-sm text-stone-700 font-medium mt-1">
+                        {item.basePrice.toLocaleString("fr-FR")} FCFA
+                      </p>
+                    )}
 
                     {/* Quantity + Actions */}
                     <div className="flex items-center justify-between mt-2">

@@ -17,6 +17,7 @@ type Product = {
   name: string;
   slug: string;
   basePrice: number;
+  promoPrice?: number | null;
   category: string;
   description?: string;
   mainImage?: string;
@@ -142,7 +143,9 @@ export default function CheckoutPage() {
   }, [slug]);
 
   // Calculate total
-  const basePrice = product?.basePrice || 0;
+  const originalPrice = product?.basePrice || 0;
+  const hasPromo = product?.promoPrice != null && product.promoPrice > 0 && product.promoPrice < originalPrice;
+  const basePrice = hasPromo ? product!.promoPrice! : originalPrice;
   const optionsTotal = selectedOptions
     .filter((opt) => opt.selected)
     .reduce((sum, opt) => sum + opt.price, 0);
@@ -216,7 +219,8 @@ export default function CheckoutPage() {
           address: customer.address || undefined,
         },
         notes: customer.notes || undefined,
-        basePrice: product.basePrice,
+        basePrice: basePrice,
+        originalPrice: originalPrice,
         optionsPrice: optionsTotal,
         totalPrice: totalPrice,
         isGuest: !user,
@@ -1079,7 +1083,14 @@ export default function CheckoutPage() {
                           <p className="font-medium text-stone-900">{product?.name}</p>
                           <p className="text-sm text-stone-500">{product?.category}</p>
                         </div>
-                        <p className="font-medium text-stone-900">{basePrice.toLocaleString("fr-FR")} FCFA</p>
+                        {hasPromo ? (
+                          <p>
+                            <span className="font-medium text-red-700">{basePrice.toLocaleString("fr-FR")} FCFA</span>
+                            <span className="ml-1.5 text-stone-400 line-through text-xs">{originalPrice.toLocaleString("fr-FR")}</span>
+                          </p>
+                        ) : (
+                          <p className="font-medium text-stone-900">{basePrice.toLocaleString("fr-FR")} FCFA</p>
+                        )}
                       </div>
                     </div>
 
@@ -1309,7 +1320,14 @@ export default function CheckoutPage() {
                 <div className="space-y-3 pt-4 border-t border-stone-200">
                   <div className="flex justify-between text-sm">
                     <span className="text-stone-600">Prix de base</span>
-                    <span className="text-stone-900">{basePrice.toLocaleString("fr-FR")} FCFA</span>
+                    {hasPromo ? (
+                      <span>
+                        <span className="text-red-700 font-medium">{basePrice.toLocaleString("fr-FR")} FCFA</span>
+                        <span className="ml-1.5 text-stone-400 line-through text-xs">{originalPrice.toLocaleString("fr-FR")}</span>
+                      </span>
+                    ) : (
+                      <span className="text-stone-900">{basePrice.toLocaleString("fr-FR")} FCFA</span>
+                    )}
                   </div>
 
                   {customSurcharge > 0 && (

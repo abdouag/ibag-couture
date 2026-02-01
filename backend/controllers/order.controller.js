@@ -32,8 +32,9 @@ const createOrder = async (req, res, next) => {
       return next(new AppError('Ce produit n\'est plus disponible', 400));
     }
 
-    // Calculer les prix
-    const basePrice = product.basePrice;
+    // Calculer les prix — toujours recalculer côté serveur (ne jamais faire confiance au client)
+    const hasPromo = product.promoPrice != null && product.promoPrice > 0 && product.promoPrice < product.basePrice;
+    const basePrice = hasPromo ? product.promoPrice : product.basePrice;
     const optionsPrice = selectedOptions.reduce((sum, opt) => sum + (opt.price || 0), 0);
     const totalPrice = basePrice + optionsPrice;
 

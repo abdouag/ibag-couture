@@ -8,6 +8,7 @@ export type CartItem = {
   name: string;
   category: string;
   basePrice: number;
+  promoPrice?: number | null;
   mainImage?: string;
   quantity: number;
 };
@@ -89,7 +90,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + i.basePrice * i.quantity, 0);
+  const totalPrice = items.reduce((sum, i) => {
+    const unitPrice = (i.promoPrice != null && i.promoPrice > 0 && i.promoPrice < i.basePrice)
+      ? i.promoPrice
+      : i.basePrice;
+    return sum + unitPrice * i.quantity;
+  }, 0);
 
   return (
     <CartContext.Provider

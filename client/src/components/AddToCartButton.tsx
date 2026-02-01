@@ -10,6 +10,7 @@ type Props = {
     name: string;
     category: string;
     basePrice: number;
+    promoPrice?: number | null;
     mainImage?: string;
   };
 };

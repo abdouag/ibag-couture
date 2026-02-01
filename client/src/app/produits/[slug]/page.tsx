@@ -380,7 +380,8 @@ export default async function ProductPage({ params }: Props) {
                       slug: product.slug,
                       name: product.name,
                       category: product.category,
-                      basePrice: displayPrice,
+                      basePrice: product.basePrice,
+                      promoPrice: product.promoPrice,
                       mainImage: product.mainImage,
                     }}
                   />}
