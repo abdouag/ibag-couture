@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Footer from "@/components/Footer";
 import CategoryFilter from "@/components/CategoryFilter";
+import ProductCardActions from "@/components/ProductCardActions";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -238,12 +239,6 @@ export default async function CollectionsPage({ searchParams }: Props) {
                         </h2>
                       </Link>
 
-                      {product.description && (
-                        <p className="text-stone-500 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1 sm:line-clamp-2 hidden sm:block">
-                          {product.description}
-                        </p>
-                      )}
-
                       <div className="flex items-center justify-between">
                         {product.promoPrice != null && product.promoPrice < product.basePrice ? (
                           <p className="text-xs sm:text-base">
@@ -260,14 +255,18 @@ export default async function CollectionsPage({ searchParams }: Props) {
                         )}
                       </div>
 
-                      {product.productionTime && (
-                        <p className="text-xs text-stone-400 mt-1 sm:mt-2 items-center gap-1 hidden sm:flex">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          Confection en {product.productionTime} jours
-                        </p>
-                      )}
+                      <ProductCardActions
+                        product={{
+                          productId: product._id,
+                          slug: product.slug,
+                          name: product.name,
+                          category: product.category,
+                          basePrice: product.basePrice,
+                          promoPrice: product.promoPrice,
+                          mainImage: product.mainImage,
+                        }}
+                        isOutOfStock={product.hasStock === true && (product.stockQuantity == null || product.stockQuantity <= 0)}
+                      />
                     </div>
                   </article>
                 ))}
