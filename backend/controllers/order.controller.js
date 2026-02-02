@@ -195,9 +195,10 @@ const STATUS_NOTIFICATIONS = {
   },
 };
 
+const { sendOrderStatusEmail } = require('../services/emailService');
+
 /**
  * Hook pour envoyer une notification au client lors d'un changement de statut
- * TODO: Implémenter l'envoi d'email réel
  * @param {Object} order - La commande mise à jour
  * @param {string} newStatus - Le nouveau statut
  */
@@ -205,21 +206,19 @@ const onStatusChange = async (order, newStatus) => {
   const notification = STATUS_NOTIFICATIONS[newStatus];
   if (!notification || !order.customer?.email) return;
 
-  // TODO: Implémenter l'envoi d'email ici
-  // Exemple avec un service d'email:
-  // await emailService.send({
-  //   to: order.customer.email,
-  //   subject: notification.subject,
-  //   template: 'order-status-update',
-  //   data: {
-  //     customerName: order.customer.fullName,
-  //     orderNumber: order.orderNumber || order._id,
-  //     productName: order.product?.name,
-  //     message: notification.message,
-  //   },
-  // });
-
-  console.log(`[Email Hook] Notification "${newStatus}" préparée pour ${order.customer.email}`);
+  try {
+    await sendOrderStatusEmail({
+      to: order.customer.email,
+      customerName: order.customer.fullName || 'Client',
+      orderNumber: order.orderNumber || order._id.toString().slice(-8),
+      productName: order.product?.name,
+      status: newStatus,
+      subject: notification.subject,
+      message: notification.message,
+    });
+  } catch (err) {
+    console.error(`[EMAIL] Erreur envoi email pour commande ${order._id}: ${err.message}`);
+  }
 };
 
 /**
