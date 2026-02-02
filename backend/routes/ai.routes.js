@@ -2,7 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const router = express.Router();
 
-const { generateProduct } = require('../controllers/ai.controller');
+const { generateProduct, analyzeImage } = require('../controllers/ai.controller');
 const { protect, adminOnly } = require('../middleware/auth');
 const { validate } = require('../middleware');
 
@@ -28,9 +28,16 @@ const generateValidation = [
     .isURL().withMessage('referenceImageUrl doit etre une URL valide'),
 ];
 
+const analyzeValidation = [
+  body('imageUrl')
+    .notEmpty().withMessage('L\'URL de l\'image est requise')
+    .isURL().withMessage('imageUrl doit etre une URL valide'),
+];
+
 // Toutes les routes sont protegees (admin only)
 router.use(protect, adminOnly);
 
 router.post('/generate-product', validate(generateValidation), generateProduct);
+router.post('/analyze-image', validate(analyzeValidation), analyzeImage);
 
 module.exports = router;

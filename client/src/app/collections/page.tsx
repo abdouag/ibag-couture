@@ -211,6 +211,19 @@ export default async function CollectionsPage({ searchParams }: Props) {
                           )}
                         </div>
 
+                        {/* Stock badge */}
+                        {product.hasStock === true && product.stockQuantity != null && product.stockQuantity > 0 && product.stockQuantity <= 5 && (
+                          <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
+                            <span className="inline-flex items-center gap-1 bg-emerald-500/90 backdrop-blur-sm text-white text-[10px] sm:text-xs font-medium px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full">
+                              <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-stock-pulse absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+                              </span>
+                              {product.stockQuantity} restant{product.stockQuantity > 1 ? 's' : ''}
+                            </span>
+                          </div>
+                        )}
+
                         {/* Out of stock overlay */}
                         {product.hasStock && (product.stockQuantity == null || product.stockQuantity <= 0) && (
                           <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
