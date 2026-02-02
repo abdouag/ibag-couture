@@ -78,20 +78,30 @@ async function generateSecondaryImagesFromReference({
 - No redesign, no style change, no artistic interpretation
 - Photorealistic, natural imperfections, real fabric texture
 - Camera-like lighting, not stylized, not illustration
-- Must look like a real camera photograph, not AI-generated`;
+- Must look like a real camera photograph, not AI-generated
+
+MANDATORY POSE RULES (NON-NEGOTIABLE):
+- The mannequin/model MUST face the camera (FRONT VIEW ONLY)
+- Maximum slight angle: 30 degrees from front
+- NEVER show the back of the garment
+- NEVER show a rear view or back view
+- NEVER rotate the body away from camera
+- NO back view, NO rear angle, NO turning around
+- Do NOT invent or create any details on the back of the garment
+- Only show what is visible from the FRONT of the reference image`;
 
   const prompts = [
     {
       label: 'secondaire',
-      text: `Look at this fashion product photo. Generate a NEW photograph of this EXACT SAME garment from a slightly different angle (three-quarter view). Full body photo, head to toe visible, no cropping, centered framing. ${fidelityRules}. Professional e-commerce fashion photography, neutral background, natural studio lighting. No text, no watermark.`,
+      text: `Look at this fashion product photo. Generate a NEW photograph of this EXACT SAME garment. The mannequin MUST face the camera directly (front-facing pose). Slight angle allowed (max 30 degrees). ABSOLUTELY NO back view, NO rear angle, NO body rotation. Full body photo, head to toe visible, no cropping, centered framing. ${fidelityRules}. Professional e-commerce fashion photography, neutral background, natural studio lighting. No text, no watermark.`,
     },
     {
-      label: 'dos',
-      text: `Look at this fashion product photo. Generate a NEW photograph of this EXACT SAME garment from the BACK (rear view). Show the back of the outfit clearly. Full body photo, head to toe visible, no cropping, centered framing. ${fidelityRules}. Professional e-commerce fashion photography, neutral background, natural studio lighting. No text, no watermark.`,
+      label: 'portrait',
+      text: `Look at this fashion product photo. Generate a NEW photograph of this EXACT SAME garment in a front-facing portrait style (waist up, closer framing). The mannequin MUST face the camera directly. ABSOLUTELY NO back view, NO rear angle, NO body rotation. Show the upper body details clearly from the front. ${fidelityRules}. Professional e-commerce fashion photography, neutral background, natural studio lighting. No text, no watermark.`,
     },
     {
       label: 'detail',
-      text: `Look at this fashion product photo. Generate a CLOSE-UP detail photograph of the fabric, embroidery and stitching visible in this EXACT SAME garment. Focus on textile texture, thread work, and material quality. Same fabric, same color, same pattern as the reference. ${fidelityRules}. Macro photography style, natural studio lighting. No text, no watermark.`,
+      text: `Look at this fashion product photo. Generate a CLOSE-UP detail photograph of the fabric, embroidery and stitching visible on the FRONT of this EXACT SAME garment. Focus on textile texture, thread work, and material quality visible from the front only. Same fabric, same color, same pattern as the reference. Do NOT invent any pattern or detail not visible in the reference. ${fidelityRules}. Macro photography style, natural studio lighting. No text, no watermark.`,
     },
   ];
 
@@ -102,9 +112,45 @@ async function generateSecondaryImagesFromReference({
     },
   };
 
+  // Helper: verify generated image is front-facing using Gemini Vision
+  async function verifyFrontView(imageBuffer, label) {
+    try {
+      const imgBase64 = imageBuffer.toString('base64');
+      const verifyResponse = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [
+          {
+            inlineData: {
+              mimeType: 'image/png',
+              data: imgBase64,
+            },
+          },
+          {
+            text: `Analyze this fashion photo. Is the person/mannequin shown from the BACK or REAR view? Answer ONLY with a JSON object: {"isBackView": true} or {"isBackView": false}. A back view means you can see the back of the person's body/garment. A front view or slight side angle (less than 90 degrees from front) is NOT a back view.`,
+          },
+        ],
+      });
+
+      const verifyParts = verifyResponse.candidates?.[0]?.content?.parts || [];
+      const verifyText = verifyParts.filter((p) => p.text).map((p) => p.text).join('');
+      const jsonMatch = verifyText.match(/\{[\s\S]*?\}/);
+      if (jsonMatch) {
+        const result = JSON.parse(jsonMatch[0]);
+        if (result.isBackView === true) {
+          console.log(`[AI][GEMINI] REJECTED - Image ${label}: vue arriere detectee`);
+          return false;
+        }
+      }
+      return true;
+    } catch (err) {
+      console.warn(`[AI][GEMINI] Verification skipped for ${label}: ${err.message}`);
+      return true; // Allow if verification fails
+    }
+  }
+
   const results = await Promise.allSettled(
     prompts.map(async ({ label, text }, index) => {
-      console.log(`[AI][GEMINI] Generation image ${index + 1}/2 (${label})...`);
+      console.log(`[AI][GEMINI] Generation image ${index + 1}/3 (${label})...`);
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
@@ -121,6 +167,13 @@ async function generateSecondaryImagesFromReference({
       }
 
       const imageBuffer = Buffer.from(imagePart.inlineData.data, 'base64');
+
+      // Verify the image is front-facing before uploading
+      const isFrontView = await verifyFrontView(imageBuffer, label);
+      if (!isFrontView) {
+        throw new Error(`Image rejetee : vue arriere non autorisee (fidelite couture) - ${label}`);
+      }
+
       const filename = `${slug}-gemini-${label}-${timestamp}`;
 
       console.log(`[AI][GEMINI] Upload Cloudinary image ${index + 1} (${label})...`);
@@ -148,7 +201,7 @@ async function generateSecondaryImagesFromReference({
     throw new Error(`Gemini: aucune image generee. Erreurs: ${errors.join('; ')}`);
   }
 
-  console.log(`[AI][GEMINI] success - ${successfulImages.length}/2 images generees`);
+  console.log(`[AI][GEMINI] success - ${successfulImages.length}/3 images generees`);
 
   return {
     images: successfulImages,

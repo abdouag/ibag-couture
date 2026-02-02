@@ -20,6 +20,8 @@ export default function MultiImageUpload({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [dragActive, setDragActive] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getFullImageUrl = (url: string) => {
@@ -101,14 +103,14 @@ export default function MultiImageUpload({
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleDrag = (e: React.DragEvent) => {
+  const handleFileDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
     else if (e.type === "dragleave") setDragActive(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleFileDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -117,8 +119,69 @@ export default function MultiImageUpload({
     }
   };
 
-  const setAsMain = (url: string) => {
-    onMainImageChange(url);
+  // --- Drag-and-drop reordering ---
+  const handleReorderDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index));
+    // Make the drag image semi-transparent
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = "0.5";
+    }
+  };
+
+  const handleReorderDragEnd = (e: React.DragEvent) => {
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = "1";
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleReorderDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverIndex(index);
+  };
+
+  const handleReorderDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleReorderDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    // Reorder allImages
+    const reordered = [...allImages];
+    const [moved] = reordered.splice(draggedIndex, 1);
+    reordered.splice(dropIndex, 0, moved);
+
+    // First image becomes main
+    const newMain = reordered[0];
+    onMainImageChange(newMain);
+    onImagesChange(reordered);
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  // --- Move buttons for mobile ---
+  const moveImage = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= allImages.length) return;
+    const reordered = [...allImages];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+
+    const newMain = reordered[0];
+    onMainImageChange(newMain);
+    onImagesChange(reordered);
   };
 
   const removeImage = async (url: string) => {
@@ -161,41 +224,75 @@ export default function MultiImageUpload({
       {allImages.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {allImages.map((url, index) => {
-            const isMain = url === mainImage;
+            const isMain = index === 0;
+            const isDragOver = dragOverIndex === index && draggedIndex !== index;
             return (
               <div
                 key={url + index}
-                className={`relative aspect-square bg-stone-100 rounded-xl overflow-hidden group border-2 ${
-                  isMain ? "border-amber-500" : "border-transparent"
-                }`}
+                draggable
+                onDragStart={(e) => handleReorderDragStart(e, index)}
+                onDragEnd={handleReorderDragEnd}
+                onDragOver={(e) => handleReorderDragOver(e, index)}
+                onDragLeave={handleReorderDragLeave}
+                onDrop={(e) => handleReorderDrop(e, index)}
+                className={`relative aspect-square bg-stone-100 rounded-xl overflow-hidden group border-2 cursor-grab active:cursor-grabbing transition-all ${
+                  isMain
+                    ? "border-amber-500"
+                    : isDragOver
+                    ? "border-amber-300 scale-105"
+                    : "border-transparent"
+                } ${draggedIndex === index ? "opacity-50" : ""}`}
               >
                 <img
                   src={getFullImageUrl(url)}
                   alt={`Image ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover pointer-events-none"
                 />
 
                 {/* Main badge */}
                 {isMain && (
-                  <div className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-medium uppercase tracking-wide px-2 py-0.5 rounded">
+                  <div className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-medium uppercase tracking-wide px-2 py-0.5 rounded flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
                     Principale
                   </div>
                 )}
 
+                {/* Position indicator */}
+                <div className="absolute top-2 right-2 w-6 h-6 bg-black/50 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {index + 1}
+                </div>
+
                 {/* Hover actions */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                  {!isMain && (
+                  {/* Move left */}
+                  {index > 0 && (
                     <button
                       type="button"
-                      onClick={() => setAsMain(url)}
-                      className="p-2 bg-white rounded-lg text-stone-700 hover:bg-amber-50 transition-colors"
-                      title="Definir comme principale"
+                      onClick={() => moveImage(index, index - 1)}
+                      className="p-2 bg-white rounded-lg text-stone-700 hover:bg-stone-50 transition-colors"
+                      title="Deplacer a gauche"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
                   )}
+                  {/* Move right */}
+                  {index < allImages.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={() => moveImage(index, index + 1)}
+                      className="p-2 bg-white rounded-lg text-stone-700 hover:bg-stone-50 transition-colors"
+                      title="Deplacer a droite"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  )}
+                  {/* Delete */}
                   <button
                     type="button"
                     onClick={() => removeImage(url)}
@@ -238,10 +335,10 @@ export default function MultiImageUpload({
       {allImages.length === 0 && (
         <div
           onClick={() => fileInputRef.current?.click()}
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
+          onDragEnter={handleFileDrag}
+          onDragLeave={handleFileDrag}
+          onDragOver={handleFileDrag}
+          onDrop={handleFileDrop}
           className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
             dragActive
               ? "border-amber-500 bg-amber-50"
@@ -273,8 +370,8 @@ export default function MultiImageUpload({
 
       {/* Info */}
       <p className="text-xs text-stone-400">
-        {allImages.length}/6 images. La premiere image sera affichee en principal.
-        Cliquez sur l&apos;etoile pour changer l&apos;image principale.
+        {allImages.length}/6 images. Glissez-deposez pour reorganiser.
+        L&apos;image en position 1 est l&apos;image principale.
       </p>
 
       {/* Error */}
