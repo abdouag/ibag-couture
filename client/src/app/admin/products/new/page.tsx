@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import MultiImageUpload from "@/components/admin/MultiImageUpload";
 import AIProductModal from "@/components/admin/AIProductModal";
@@ -42,6 +42,7 @@ const ALL_SIZES = ["S", "M", "L", "XL", "XXL"];
 
 export default function NewProductPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -56,6 +57,13 @@ export default function NewProductPage() {
   }, [success, router]);
 
   const [showAI, setShowAI] = useState(false);
+
+  // Auto-open AI modal if ?ai=true in URL
+  useEffect(() => {
+    if (searchParams.get("ai") === "true") {
+      setShowAI(true);
+    }
+  }, [searchParams]);
 
   const [form, setForm] = useState<ProductForm>({
     name: "",

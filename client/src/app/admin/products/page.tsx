@@ -129,15 +129,26 @@ export default function AdminProductsPage() {
         <div>
           <p className="text-stone-500 text-sm">{products.length} produits au total</p>
         </div>
-        <Link
-          href="/admin/products/new"
-          className="inline-flex items-center justify-center gap-2 bg-stone-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-stone-800 transition-colors rounded-lg shadow-sm"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Ajouter un produit
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/admin/products/new?ai=true"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-2.5 text-sm font-medium hover:from-amber-600 hover:to-orange-600 transition-all rounded-lg shadow-sm"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+            Creer avec IA
+          </Link>
+          <Link
+            href="/admin/products/new"
+            className="inline-flex items-center justify-center gap-2 bg-stone-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-stone-800 transition-colors rounded-lg shadow-sm"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Ajouter un produit
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
