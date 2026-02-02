@@ -647,6 +647,7 @@ export default function NewProductPage() {
             setShowAI(false);
           }}
           onClose={() => setShowAI(false)}
+          onSuccess={() => router.push("/admin/products")}
         />
       )}
     </div>

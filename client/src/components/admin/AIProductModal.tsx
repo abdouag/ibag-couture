@@ -22,6 +22,7 @@ type AIProductModalProps = {
   referenceImageUrl?: string;
   onApply: (result: { name?: string; description?: string; mainImage?: string; images?: string[] }) => void;
   onClose: () => void;
+  onSuccess?: () => void;
 };
 
 type ChatMessage = {
@@ -41,10 +42,13 @@ type ChatStep =
   | "name"
   | "category"
   | "price"
+  | "sizes"
+  | "stock"
   | "generating"
   | "review"
   | "ask-images"
   | "generating-images"
+  | "creating"
   | "done";
 
 const CATEGORIES = [
@@ -53,6 +57,8 @@ const CATEGORIES = [
   { value: "traditionnel", label: "Traditionnel" },
   { value: "moderne", label: "Moderne" },
 ];
+
+const ALL_SIZES = ["S", "M", "L", "XL", "XXL"];
 
 let msgId = 0;
 function nextId() {
@@ -67,6 +73,7 @@ export default function AIProductModal({
   referenceImageUrl,
   onApply,
   onClose,
+  onSuccess,
 }: AIProductModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [step, setStep] = useState<ChatStep>("welcome");
@@ -82,6 +89,9 @@ export default function AIProductModal({
   const [category, setCategory] = useState(currentCategory || "");
   const [basePrice, setBasePrice] = useState(currentPrice || "");
   const [promoPrice, setPromoPrice] = useState("");
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [hasStock, setHasStock] = useState(false);
+  const [stockQuantity, setStockQuantity] = useState("");
   const [generatedText, setGeneratedText] = useState<{
     name: string;
     description: string;
@@ -291,9 +301,33 @@ export default function AIProductModal({
       : `${Number(price).toLocaleString("fr-FR")} FCFA`;
     addMessage("user", priceText);
 
+    addMessage("assistant", "Selectionnez les tailles disponibles pour ce produit.");
+    setStep("sizes");
+  };
+
+  // ── Sizes submission ──
+  const handleSubmitSizes = () => {
+    const sizesText = selectedSizes.length > 0 ? selectedSizes.join(", ") : "Aucune taille";
+    addMessage("user", sizesText);
+
+    addMessage(
+      "assistant",
+      "Souhaitez-vous activer la gestion du stock ?\n\nSi oui, indiquez la quantite disponible."
+    );
+    setStep("stock");
+  };
+
+  // ── Stock submission ──
+  const handleSubmitStock = () => {
+    if (hasStock && stockQuantity) {
+      addMessage("user", `Stock: ${stockQuantity} unites`);
+    } else {
+      addMessage("user", "Pas de gestion de stock");
+    }
+
     addMessage("assistant", "Generation de la fiche produit en cours...");
     setStep("generating");
-    runTextGeneration(productName, category, price);
+    runTextGeneration(productName, category, basePrice);
   };
 
   // ── AI Text Generation ──
@@ -349,11 +383,7 @@ export default function AIProductModal({
         }, 500);
       } else {
         setTimeout(() => {
-          addMessage(
-            "assistant",
-            "Votre fiche produit est prete ! Cliquez sur 'Appliquer' pour remplir le formulaire."
-          );
-          setStep("done");
+          goToCreateStep();
         }, 500);
       }
     } catch {
@@ -398,9 +428,9 @@ export default function AIProductModal({
       if (!res.ok) {
         addMessage(
           "assistant",
-          `Erreur: ${data.message || "Generation d'images echouee."}.\n\nVotre fiche produit est prete sans images supplementaires.`
+          `Erreur: ${data.message || "Generation d'images echouee."}. On continue sans images supplementaires.`
         );
-        setStep("done");
+        goToCreateStep();
         return;
       }
 
@@ -412,56 +442,100 @@ export default function AIProductModal({
       });
 
       setTimeout(() => {
-        addMessage(
-          "assistant",
-          "Votre fiche produit est complete ! Cliquez sur 'Appliquer' pour remplir le formulaire."
-        );
-        setStep("done");
+        goToCreateStep();
       }, 500);
     } catch {
       addMessage(
         "assistant",
-        "Erreur lors de la generation d'images.\n\nVotre fiche produit est prete sans images supplementaires."
+        "Erreur lors de la generation d'images. On continue sans images supplementaires."
       );
-      setStep("done");
+      goToCreateStep();
     }
   };
 
   const handleSkipImages = () => {
     addMessage("user", "Non, passer cette etape");
+    goToCreateStep();
+  };
+
+  const goToCreateStep = () => {
     addMessage(
       "assistant",
-      "Votre fiche produit est prete ! Cliquez sur 'Appliquer' pour remplir le formulaire."
+      "Votre fiche produit est prete ! Cliquez sur 'Publier' pour creer le produit."
     );
     setStep("done");
   };
 
-  // ── Apply to form ──
-  const handleApply = () => {
-    const result: {
-      name?: string;
-      description?: string;
-      mainImage?: string;
-      images?: string[];
-    } = {};
+  // ── Create product directly via API ──
+  const handleCreateProduct = async () => {
+    setStep("creating");
+    addMessage("user", "Publier le produit");
+    addMessage("assistant", "Creation du produit en cours...");
 
-    const finalName = generatedText?.name || productName;
-    if (finalName) result.name = finalName;
-    if (generatedText?.description) result.description = generatedText.description;
+    try {
+      const token = localStorage.getItem("token");
+      const finalName = generatedText?.name || productName;
 
-    if (uploadedImages.length > 0) {
-      result.mainImage = uploadedImages[0];
-      const extraImages = [
-        ...uploadedImages.slice(1),
+      const allImages = [
+        ...uploadedImages,
         ...generatedImages,
       ];
-      if (extraImages.length > 0) result.images = extraImages;
-    } else if (generatedImages.length > 0) {
-      result.mainImage = generatedImages[0];
-      result.images = generatedImages.slice(1);
-    }
 
-    onApply(result);
+      const payload: Record<string, unknown> = {
+        name: finalName,
+        category,
+        basePrice: parseFloat(basePrice) || 0,
+        description: generatedText?.description || "",
+        productionTime: 7,
+        isActive: true,
+        isCustomAvailable,
+        mainImage: allImages[0] || undefined,
+        images: allImages.length > 0 ? allImages : undefined,
+        availableSizes: selectedSizes.length > 0 ? selectedSizes : undefined,
+        hasStock,
+        stockQuantity: hasStock && stockQuantity ? parseInt(stockQuantity) : null,
+        promoPrice: promoPrice ? parseFloat(promoPrice) : null,
+      };
+
+      const res = await fetch(`${API_URL}/api/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        addMessage(
+          "assistant",
+          "Produit cree avec succes ! Il est maintenant visible sur le site.\n\nRedirection en cours..."
+        );
+        setStep("done");
+
+        setTimeout(() => {
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            onClose();
+          }
+        }, 2000);
+      } else {
+        addMessage(
+          "assistant",
+          `Erreur: ${data.message || "Impossible de creer le produit."}. Verifiez les informations et reessayez.`
+        );
+        setStep("done");
+      }
+    } catch {
+      addMessage(
+        "assistant",
+        "Erreur de connexion au serveur. Verifiez votre connexion et reessayez."
+      );
+      setStep("done");
+    }
   };
 
   // ── Start flow ──
@@ -681,8 +755,8 @@ export default function AIProductModal({
       );
     }
 
-    // Analyzing / Generating: loading state
-    if (step === "analyzing" || step === "generating" || step === "generating-images") {
+    // Analyzing / Generating / Creating: loading state
+    if (step === "analyzing" || step === "generating" || step === "generating-images" || step === "creating") {
       return (
         <div className="p-4 border-t border-stone-200 bg-white">
           <div className="flex items-center justify-center gap-3 py-3">
@@ -692,6 +766,8 @@ export default function AIProductModal({
                 ? "Analyse de l'image en cours..."
                 : step === "generating-images"
                 ? "Generation des images (30-60s)..."
+                : step === "creating"
+                ? "Creation du produit..."
                 : "Generation en cours..."}
             </p>
           </div>
@@ -804,6 +880,91 @@ export default function AIProductModal({
       );
     }
 
+    // Sizes selection
+    if (step === "sizes") {
+      return (
+        <div className="p-4 border-t border-stone-200 bg-white">
+          <div className="bg-stone-50 rounded-xl p-4 border border-stone-200 space-y-3">
+            <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Tailles disponibles (optionnel)</p>
+            <div className="flex flex-wrap gap-2">
+              {ALL_SIZES.map((size) => (
+                <button
+                  key={size}
+                  onClick={() =>
+                    setSelectedSizes((prev) =>
+                      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+                    )
+                  }
+                  className={`w-12 h-12 flex items-center justify-center font-medium border-2 rounded-xl text-sm transition-all ${
+                    selectedSizes.includes(size)
+                      ? "border-amber-500 bg-amber-50 text-amber-700"
+                      : "border-stone-200 bg-white text-stone-500 hover:border-stone-300"
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleSubmitSizes}
+              className="w-full py-2.5 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors"
+            >
+              Continuer
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // Stock
+    if (step === "stock") {
+      return (
+        <div className="p-4 border-t border-stone-200 bg-white">
+          <div className="bg-stone-50 rounded-xl p-4 border border-stone-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Gestion du stock</p>
+              <button
+                onClick={() => setHasStock(!hasStock)}
+                className={`relative w-11 h-6 rounded-full transition-colors ${
+                  hasStock ? "bg-amber-500" : "bg-stone-300"
+                }`}
+              >
+                <div
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                    hasStock ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {hasStock && (
+              <div>
+                <label className="text-xs font-medium text-stone-600 mb-1 block">
+                  Quantite en stock
+                </label>
+                <input
+                  type="number"
+                  value={stockQuantity}
+                  onChange={(e) => setStockQuantity(e.target.value)}
+                  placeholder="Ex: 10"
+                  min="0"
+                  className="w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            <button
+              onClick={handleSubmitStock}
+              className="w-full py-2.5 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors"
+            >
+              Continuer
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     // Ask for image generation
     if (step === "ask-images") {
       return (
@@ -827,24 +988,24 @@ export default function AIProductModal({
       );
     }
 
-    // Done: apply button
+    // Done: publish button
     if (step === "done") {
       return (
         <div className="p-4 border-t border-stone-200 bg-white space-y-2">
           <button
-            onClick={handleApply}
-            className="w-full py-3.5 bg-stone-900 text-white rounded-xl text-sm font-semibold hover:bg-stone-800 transition-colors flex items-center justify-center gap-2"
+            onClick={handleCreateProduct}
+            className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold hover:from-amber-600 hover:to-orange-600 transition-all flex items-center justify-center gap-2 shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-            Appliquer au formulaire
+            Publier le produit
           </button>
           <button
             onClick={onClose}
             className="w-full py-2.5 text-stone-500 text-sm hover:text-stone-700 transition-colors"
           >
-            Fermer sans appliquer
+            Annuler
           </button>
         </div>
       );
