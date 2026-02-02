@@ -186,7 +186,10 @@ const generateProduct = async (req, res, next) => {
             responseData.images = geminiResult.images;
             responseData.referenceUsed = true;
             responseData.provider = geminiResult.provider;
-            console.log(`[AI][GEMINI] success - ${geminiResult.images.length} images Gemini generees`);
+            if (geminiResult.rejectedCount > 0) {
+              responseData.rejectedCount = geminiResult.rejectedCount;
+            }
+            console.log(`[AI][GEMINI] success - ${geminiResult.images.length} images Gemini generees${geminiResult.rejectedCount ? `, ${geminiResult.rejectedCount} rejetee(s)` : ''}`);
           } catch (geminiErr) {
             console.error(`[AI][GEMINI] failure - ${geminiErr.message}`);
             console.log('[AI] Fallback vers Cloudinary crop/zoom...');

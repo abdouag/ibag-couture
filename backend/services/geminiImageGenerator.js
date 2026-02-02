@@ -25,18 +25,18 @@ async function uploadToCloudinary(imageBuffer, filename) {
 }
 
 /**
- * Generate 2 secondary images from a reference image using Google Gemini.
+ * Generate 3 secondary images from a reference image using Google Gemini.
+ *
+ * Structure: 2 images "portees" (full human, front view) + 1 zoom detail couture.
+ * The admin-uploaded image remains the main image and is NEVER replaced.
  *
  * Uses gemini-2.5-flash-image model with image-to-image generation.
- *
- * IMPORTANT LIMITATION: Gemini is a generative model. It regenerates pixels
- * and CANNOT guarantee pixel-level fidelity to the reference image.
  *
  * @param {Object} params
  * @param {string} params.referenceImageUrl - Cloudinary URL of the reference image
  * @param {string} params.productName - Product name for context
  * @param {string} params.category - Product category
- * @returns {Promise<{images: string[], provider: string}>}
+ * @returns {Promise<{images: string[], rejectedCount: number, provider: string}>}
  */
 async function generateSecondaryImagesFromReference({
   referenceImageUrl,
@@ -71,37 +71,81 @@ async function generateSecondaryImagesFromReference({
     .replace(/^-|-$/g, '')
     .slice(0, 40);
 
-  const fidelityRules = `CRITICAL RULES:
-- This is the SAME garment from the reference image
+  const fidelityRules = `ABSOLUTE FIDELITY RULES (NON-NEGOTIABLE):
+- This is the EXACT SAME garment from the reference image
 - Same outfit, same fabric, same color, same cut, same proportions
-- Same embroidery pattern, same design details
+- Same embroidery pattern, same design details — NOTHING invented
 - No redesign, no style change, no artistic interpretation
+- If a detail is NOT visible on the reference image, do NOT create it
+- NEVER invent a pattern, embroidery, or back design
+- NEVER modify the cut or silhouette
 - Photorealistic, natural imperfections, real fabric texture
 - Camera-like lighting, not stylized, not illustration
-- Must look like a real camera photograph, not AI-generated
+- Must look like a real premium boutique photograph
 
 MANDATORY POSE RULES (NON-NEGOTIABLE):
-- The mannequin/model MUST face the camera (FRONT VIEW ONLY)
+- STRICTLY FRONT VIEW ONLY — face the camera directly
 - Maximum slight angle: 30 degrees from front
 - NEVER show the back of the garment
 - NEVER show a rear view or back view
 - NEVER rotate the body away from camera
-- NO back view, NO rear angle, NO turning around
+- NO back view, NO rear angle, NO turning around, NO 3/4 back
 - Do NOT invent or create any details on the back of the garment
-- Only show what is visible from the FRONT of the reference image`;
+- Only show what is visible from the FRONT of the reference image
 
+VISUAL STYLE:
+- Premium couture boutique aesthetic
+- Neutral background (studio, light grey, beige)
+- Soft, professional studio lighting
+- No parasitic decor, no text, no watermark`;
+
+  // 2 images "portees" (full human worn) + 1 zoom detail couture
   const prompts = [
     {
-      label: 'secondaire',
-      text: `Look at this fashion product photo. Generate a NEW photograph of this EXACT SAME garment. The mannequin MUST face the camera directly (front-facing pose). Slight angle allowed (max 30 degrees). ABSOLUTELY NO back view, NO rear angle, NO body rotation. Full body photo, head to toe visible, no cropping, centered framing. ${fidelityRules}. Professional e-commerce fashion photography, neutral background, natural studio lighting. No text, no watermark.`,
+      label: 'portee-1',
+      type: 'worn',
+      text: `Look at this fashion product photo. Generate a NEW premium e-commerce photograph of this EXACT SAME garment WORN BY A COMPLETE HUMAN MODEL.
+
+MANDATORY — the model must be:
+- Full body visible: head, bust, legs, feet — ALL visible, nothing cropped
+- Facing the camera DIRECTLY (strict front view)
+- Elegant, natural posture — premium e-commerce pose
+- Standing centered in frame
+
+${fidelityRules}`,
     },
     {
-      label: 'portrait',
-      text: `Look at this fashion product photo. Generate a NEW photograph of this EXACT SAME garment in a front-facing portrait style (waist up, closer framing). The mannequin MUST face the camera directly. ABSOLUTELY NO back view, NO rear angle, NO body rotation. Show the upper body details clearly from the front. ${fidelityRules}. Professional e-commerce fashion photography, neutral background, natural studio lighting. No text, no watermark.`,
+      label: 'portee-2',
+      type: 'worn',
+      text: `Look at this fashion product photo. Generate a NEW premium e-commerce photograph of this EXACT SAME garment WORN BY A COMPLETE HUMAN MODEL, with a slightly different elegant pose.
+
+MANDATORY — the model must be:
+- Full body visible: head, bust, legs, feet — ALL visible, nothing cropped
+- Facing the camera DIRECTLY (strict front view, max 30 degrees)
+- Different pose from the first image but still elegant and natural
+- Standing centered in frame
+
+${fidelityRules}`,
     },
     {
-      label: 'detail',
-      text: `Look at this fashion product photo. Generate a CLOSE-UP detail photograph of the fabric, embroidery and stitching visible on the FRONT of this EXACT SAME garment. Focus on textile texture, thread work, and material quality visible from the front only. Same fabric, same color, same pattern as the reference. Do NOT invent any pattern or detail not visible in the reference. ${fidelityRules}. Macro photography style, natural studio lighting. No text, no watermark.`,
+      label: 'zoom-detail',
+      type: 'detail',
+      text: `Look at this fashion product photo. Generate a CLOSE-UP DETAIL photograph focusing STRICTLY on the craftsmanship visible on the FRONT of this EXACT SAME garment.
+
+ZOOM MUST FOCUS ON:
+- Embroidery, stitching, collar, sleeves, fabric texture
+- Only details VISIBLE on the reference image front
+- The model body may be partially visible but NO FACE
+
+STRICT PROHIBITIONS:
+- NO face visible
+- NO back view
+- NO invented pattern or design
+- NO embroidery or motif not present in the reference
+- Focus ONLY on the garment craftsmanship
+
+${fidelityRules}
+Macro photography style, shallow depth of field.`,
     },
   ];
 
@@ -112,10 +156,22 @@ MANDATORY POSE RULES (NON-NEGOTIABLE):
     },
   };
 
-  // Helper: verify generated image is front-facing using Gemini Vision
-  async function verifyFrontView(imageBuffer, label) {
+  // Helper: verify generated image compliance using Gemini Vision
+  async function verifyImageCompliance(imageBuffer, label, promptType) {
     try {
       const imgBase64 = imageBuffer.toString('base64');
+
+      const checkPrompt = promptType === 'detail'
+        ? `Analyze this fashion detail photo. Check these criteria and answer ONLY with a JSON object:
+1. Is a human face clearly visible? (faceVisible: true/false)
+2. Is the garment shown from the BACK or REAR view? (isBackView: true/false)
+Answer: {"faceVisible": bool, "isBackView": bool}`
+        : `Analyze this fashion photo. Check these criteria and answer ONLY with a JSON object:
+1. Is the person shown from the BACK or REAR view? (isBackView: true/false) — back of body/garment visible = true
+2. Is the FULL body visible (head, torso, legs, feet)? (isFullBody: true/false)
+A front view or slight side angle (less than 90 degrees from front) is NOT a back view.
+Answer: {"isBackView": bool, "isFullBody": bool}`;
+
       const verifyResponse = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: [
@@ -125,9 +181,7 @@ MANDATORY POSE RULES (NON-NEGOTIABLE):
               data: imgBase64,
             },
           },
-          {
-            text: `Analyze this fashion photo. Is the person/mannequin shown from the BACK or REAR view? Answer ONLY with a JSON object: {"isBackView": true} or {"isBackView": false}. A back view means you can see the back of the person's body/garment. A front view or slight side angle (less than 90 degrees from front) is NOT a back view.`,
-          },
+          { text: checkPrompt },
         ],
       });
 
@@ -136,20 +190,31 @@ MANDATORY POSE RULES (NON-NEGOTIABLE):
       const jsonMatch = verifyText.match(/\{[\s\S]*?\}/);
       if (jsonMatch) {
         const result = JSON.parse(jsonMatch[0]);
+
         if (result.isBackView === true) {
           console.log(`[AI][GEMINI] REJECTED - Image ${label}: vue arriere detectee`);
-          return false;
+          return { ok: false, reason: 'vue arriere' };
+        }
+
+        if (promptType === 'detail' && result.faceVisible === true) {
+          console.log(`[AI][GEMINI] REJECTED - Image ${label}: visage visible sur zoom detail`);
+          return { ok: false, reason: 'visage visible sur zoom detail' };
+        }
+
+        if (promptType === 'worn' && result.isFullBody === false) {
+          console.log(`[AI][GEMINI] WARNING - Image ${label}: corps non complet`);
+          // Warning only, don't reject — Gemini may partially crop
         }
       }
-      return true;
+      return { ok: true };
     } catch (err) {
       console.warn(`[AI][GEMINI] Verification skipped for ${label}: ${err.message}`);
-      return true; // Allow if verification fails
+      return { ok: true }; // Allow if verification fails
     }
   }
 
   const results = await Promise.allSettled(
-    prompts.map(async ({ label, text }, index) => {
+    prompts.map(async ({ label, type, text }, index) => {
       console.log(`[AI][GEMINI] Generation image ${index + 1}/3 (${label})...`);
 
       const response = await ai.models.generateContent({
@@ -168,10 +233,10 @@ MANDATORY POSE RULES (NON-NEGOTIABLE):
 
       const imageBuffer = Buffer.from(imagePart.inlineData.data, 'base64');
 
-      // Verify the image is front-facing before uploading
-      const isFrontView = await verifyFrontView(imageBuffer, label);
-      if (!isFrontView) {
-        throw new Error(`Image rejetee : vue arriere non autorisee (fidelite couture) - ${label}`);
+      // Verify compliance before uploading
+      const compliance = await verifyImageCompliance(imageBuffer, label, type);
+      if (!compliance.ok) {
+        throw new Error(`Image rejetee : non conforme au modele couture Ibag (${compliance.reason}) - ${label}`);
       }
 
       const filename = `${slug}-gemini-${label}-${timestamp}`;
@@ -197,14 +262,20 @@ MANDATORY POSE RULES (NON-NEGOTIABLE):
     }
   }
 
+  const rejectedCount = errors.length;
+
   if (successfulImages.length === 0) {
     throw new Error(`Gemini: aucune image generee. Erreurs: ${errors.join('; ')}`);
   }
 
+  if (rejectedCount > 0) {
+    console.log(`[AI][GEMINI] ${rejectedCount} image(s) rejetee(s) : non conforme(s) au modele couture Ibag`);
+  }
   console.log(`[AI][GEMINI] success - ${successfulImages.length}/3 images generees`);
 
   return {
     images: successfulImages,
+    rejectedCount,
     provider: 'gemini',
   };
 }
