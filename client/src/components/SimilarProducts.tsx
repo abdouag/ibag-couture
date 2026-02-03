@@ -27,7 +27,7 @@ export default async function SimilarProducts({ category, currentProductId }: Pr
   let products: Product[] = [];
 
   try {
-    const res = await fetch(`${API_URL}/api/products?category=${encodeURIComponent(category)}`, {
+    const res = await fetch(`${API_URL}/api/products?category=${encodeURIComponent(category)}&limit=20`, {
       cache: "no-store",
     });
     if (res.ok) {
