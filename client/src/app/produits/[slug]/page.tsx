@@ -5,6 +5,7 @@ import ProductGallery from "@/components/ProductGallery";
 import AddToCartButton from "@/components/AddToCartButton";
 import DeliveryInfo from "@/components/DeliveryInfo";
 import ContactWhatsAppButton from "@/components/ContactWhatsAppButton";
+import ShareButtons from "@/components/ShareButtons";
 import SimilarProducts from "@/components/SimilarProducts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -416,6 +417,9 @@ export default async function ProductPage({ params }: Props) {
                     <p className="text-[10px] md:text-xs text-stone-500 leading-tight">Livraison<br/>24&ndash;72h</p>
                   </div>
                 </div>
+
+                {/* Social Share */}
+                <ShareButtons productName={product.name} slug={product.slug} />
 
                 {/* Additional Info */}
                 <div className="flex items-center gap-2 text-stone-400 text-xs">
