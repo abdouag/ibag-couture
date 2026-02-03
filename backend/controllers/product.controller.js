@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const Order = require('../models/Order');
 const { AppError } = require('../middleware');
 
 /**
@@ -36,7 +37,7 @@ const getAllProducts = async (req, res, next) => {
       category,
       isActive,
       search,
-      sort = '-createdAt',
+      sort,
       page = 1,
       limit = 10,
     } = req.query;
@@ -58,27 +59,90 @@ const getAllProducts = async (req, res, next) => {
 
     // Pagination
     const pageNum = Math.max(1, parseInt(page, 10));
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10)));
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit, 10)));
     const skip = (pageNum - 1) * limitNum;
 
-    // Exécution des requêtes en parallèle
-    const [products, total] = await Promise.all([
-      Product.find(filter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limitNum)
-        .lean(),
+    // Si un tri custom est demande, utiliser le tri simple
+    if (sort) {
+      const [products, total] = await Promise.all([
+        Product.find(filter)
+          .sort(sort)
+          .skip(skip)
+          .limit(limitNum)
+          .lean(),
+        Product.countDocuments(filter),
+      ]);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Produits récupérés avec succès',
+        count: products.length,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+        currentPage: pageNum,
+        data: products,
+      });
+    }
+
+    // Tri intelligent : best sellers > promo > recents > aleatoire
+    const [allProducts, total, orderCounts] = await Promise.all([
+      Product.find(filter).lean(),
       Product.countDocuments(filter),
+      Order.aggregate([
+        { $match: { status: { $nin: ['cancelled'] } } },
+        { $group: { _id: '$product', orderCount: { $sum: 1 } } },
+      ]),
     ]);
+
+    // Map des ventes par produit
+    const orderCountMap = {};
+    orderCounts.forEach(({ _id, orderCount }) => {
+      if (_id) orderCountMap[_id.toString()] = orderCount;
+    });
+
+    const maxOrders = Math.max(1, ...Object.values(orderCountMap), 0);
+    const now = Date.now();
+    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+
+    // Score chaque produit
+    const scored = allProducts.map((product) => {
+      const pid = product._id.toString();
+      const orders = orderCountMap[pid] || 0;
+
+      // Best sellers (0-40 points)
+      const sellerScore = (orders / maxOrders) * 40;
+
+      // Produits en promo (0 ou 25 points)
+      const hasPromo = product.promoPrice && product.promoPrice < product.basePrice;
+      const promoScore = hasPromo ? 25 : 0;
+
+      // Recence (0-25 points, decroit sur 30 jours)
+      const age = now - new Date(product.createdAt).getTime();
+      const recencyScore = Math.max(0, (1 - age / thirtyDays)) * 25;
+
+      // Facteur aleatoire (0-10 points)
+      const randomScore = Math.random() * 10;
+
+      return {
+        ...product,
+        _score: sellerScore + promoScore + recencyScore + randomScore,
+      };
+    });
+
+    // Tri par score decroissant
+    scored.sort((a, b) => b._score - a._score);
+
+    // Pagination et suppression du score interne
+    const paginated = scored.slice(skip, skip + limitNum).map(({ _score, ...product }) => product);
 
     res.status(200).json({
       success: true,
       message: 'Produits récupérés avec succès',
-      count: products.length,
+      count: paginated.length,
       total,
       totalPages: Math.ceil(total / limitNum),
       currentPage: pageNum,
-      data: products,
+      data: paginated,
     });
   } catch (error) {
     next(error);
