@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { AppError } = require('../middleware');
+const { sendOrderConfirmationEmail } = require('../services/emailService');
 
 /**
  * @desc    Créer une nouvelle commande
@@ -67,6 +68,22 @@ const createOrder = async (req, res, next) => {
 
     // Populer le produit pour la réponse
     await order.populate('product', 'name slug category productionTime');
+
+    // Envoyer email de confirmation au client
+    if (customer?.email) {
+      try {
+        await sendOrderConfirmationEmail({
+          to: customer.email,
+          customerName: customer.fullName || 'Client',
+          orderNumber: order.orderNumber || order._id.toString().slice(-8),
+          productName: product.name,
+          totalPrice,
+          size,
+        });
+      } catch (err) {
+        console.error(`[EMAIL] Erreur envoi confirmation pour commande ${order._id}: ${err.message}`);
+      }
+    }
 
     res.status(201).json({
       success: true,
