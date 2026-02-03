@@ -120,6 +120,10 @@ const orderSchema = new mongoose.Schema({
     },
     default: 'non_paye',
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
   client: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client',
@@ -198,6 +202,7 @@ orderSchema.index({ 'customer.email': 1 });
 orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ size: 1 });
 orderSchema.index({ orderNumber: 1 });
+orderSchema.index({ user: 1 });
 orderSchema.index({ client: 1 });
 orderSchema.index({ workshopStatus: 1 });
 orderSchema.index({ expectedDeliveryDate: 1 });

@@ -39,6 +39,20 @@ const createOrder = async (req, res, next) => {
     const optionsPrice = selectedOptions.reduce((sum, opt) => sum + (opt.price || 0), 0);
     const totalPrice = basePrice + optionsPrice;
 
+    // Extraire le user connecté si présent (commande authentifiée)
+    let userId = null;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      try {
+        const jwt = require('jsonwebtoken');
+        const config = require('../config');
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, config.jwtSecret);
+        userId = decoded.id;
+      } catch {
+        // Token invalide ou expiré — on continue sans lier le user
+      }
+    }
+
     // Préparer les données de commande
     const orderData = {
       product: productId,
@@ -49,6 +63,7 @@ const createOrder = async (req, res, next) => {
       optionsPrice,
       totalPrice,
       notes: notes || undefined,
+      user: userId || undefined,
     };
 
     // Ajouter les mesures uniquement si sur-mesure
@@ -98,6 +113,36 @@ const createOrder = async (req, res, next) => {
     if (error.name === 'CastError') {
       return next(new AppError('ID de produit invalide', 400));
     }
+    next(error);
+  }
+};
+
+/**
+ * @desc    Récupérer les commandes de l'utilisateur connecté
+ * @route   GET /api/orders/my-orders
+ */
+const getMyOrders = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const userEmail = req.user.email;
+
+    // Chercher par user ID ou par email du client
+    const orders = await Order.find({
+      $or: [
+        { user: userId },
+        { 'customer.email': userEmail },
+      ],
+    })
+      .populate('product', 'name slug category mainImage productionTime')
+      .sort('-createdAt')
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      data: orders,
+    });
+  } catch (error) {
     next(error);
   }
 };
@@ -416,6 +461,7 @@ const getWorkshopOrders = async (req, res, next) => {
 
 module.exports = {
   createOrder,
+  getMyOrders,
   getAllOrders,
   getOrderById,
   updateOrderStatus,

@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
   createOrder,
+  getMyOrders,
   getAllOrders,
   getOrderById,
   updateOrderStatus,
@@ -14,6 +15,9 @@ const { protect, adminOnly } = require('../middleware/auth');
 
 // POST /api/orders - Créer une commande (public)
 router.post('/', createOrder);
+
+// GET /api/orders/my-orders - Commandes du client connecté (AVANT /:id)
+router.get('/my-orders', protect, getMyOrders);
 
 // GET /api/orders/workshop - Vue atelier (admin) — AVANT /:id pour éviter conflit
 router.get('/workshop', protect, adminOnly, getWorkshopOrders);

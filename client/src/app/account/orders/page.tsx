@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api";
 
 type Order = {
   _id: string;
@@ -9,7 +10,9 @@ type Order = {
   product: {
     name: string;
     slug: string;
+    mainImage?: string;
   };
+  size: string;
   totalPrice: number;
   status: string;
   createdAt: string;
@@ -17,16 +20,83 @@ type Order = {
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: "En attente", color: "bg-yellow-100 text-yellow-800" },
-  confirmed: { label: "Confirmee", color: "bg-blue-100 text-blue-800" },
   in_production: { label: "En confection", color: "bg-purple-100 text-purple-800" },
-  shipped: { label: "Expediee", color: "bg-indigo-100 text-indigo-800" },
-  delivered: { label: "Livree", color: "bg-green-100 text-green-800" },
+  ready: { label: "Prete", color: "bg-green-100 text-green-800" },
+  delivered: { label: "Livree", color: "bg-stone-100 text-stone-800" },
   cancelled: { label: "Annulee", color: "bg-red-100 text-red-800" },
 };
 
 export default function OrdersPage() {
-  // In a real app, this would fetch from the API
-  const [orders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("Veuillez vous connecter pour voir vos commandes.");
+          setLoading(false);
+          return;
+        }
+
+        const data = await api("/api/orders/my-orders", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setOrders(data.data || []);
+      } catch {
+        setError("Impossible de charger vos commandes.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl md:text-2xl font-serif text-stone-900">Mes commandes</h2>
+          <p className="text-sm text-stone-500 mt-1">Chargement...</p>
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-sm border border-stone-200 p-6 animate-pulse">
+              <div className="h-4 bg-stone-200 rounded w-1/4 mb-3"></div>
+              <div className="h-3 bg-stone-100 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl md:text-2xl font-serif text-stone-900">Mes commandes</h2>
+        </div>
+        <div className="bg-red-50 border border-red-100 rounded-sm p-6 text-center">
+          <p className="text-red-700 text-sm">{error}</p>
+          {error.includes("connecter") && (
+            <Link
+              href="/login"
+              className="inline-block mt-4 bg-stone-900 text-white px-6 py-2.5 text-sm hover:bg-stone-800 transition-colors"
+            >
+              Se connecter
+            </Link>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -75,68 +145,59 @@ export default function OrdersPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-sm border border-stone-200 overflow-hidden">
-          {/* Table Header */}
-          <div className="hidden md:grid grid-cols-5 gap-4 px-6 py-3 bg-stone-50 border-b border-stone-200 text-xs text-stone-500 uppercase tracking-wide">
-            <span>Commande</span>
-            <span>Produit</span>
-            <span>Total</span>
-            <span>Statut</span>
-            <span className="text-right">Actions</span>
-          </div>
-
-          {/* Orders */}
-          <div className="divide-y divide-stone-100">
-            {orders.map((order) => (
-              <div key={order._id} className="p-6 md:grid md:grid-cols-5 md:gap-4 md:items-center">
-                {/* Order Number */}
-                <div className="mb-4 md:mb-0">
-                  <p className="text-xs text-stone-400 md:hidden mb-1">Commande</p>
+        <div className="space-y-3">
+          {orders.map((order) => (
+            <div key={order._id} className="bg-white rounded-sm border border-stone-200 p-5">
+              <div className="flex items-start justify-between gap-4 mb-3">
+                <div>
                   <p className="font-medium text-stone-900">#{order.orderNumber}</p>
-                  <p className="text-xs text-stone-500">
-                    {new Date(order.createdAt).toLocaleDateString('fr-FR')}
+                  <p className="text-xs text-stone-500 mt-0.5">
+                    {new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
                   </p>
                 </div>
-
-                {/* Product */}
-                <div className="mb-4 md:mb-0">
-                  <p className="text-xs text-stone-400 md:hidden mb-1">Produit</p>
-                  <p className="text-stone-900">{order.product.name}</p>
-                </div>
-
-                {/* Total */}
-                <div className="mb-4 md:mb-0">
-                  <p className="text-xs text-stone-400 md:hidden mb-1">Total</p>
-                  <p className="font-medium text-stone-900">
-                    {order.totalPrice.toLocaleString('fr-FR')} FCFA
-                  </p>
-                </div>
-
-                {/* Status */}
-                <div className="mb-4 md:mb-0">
-                  <p className="text-xs text-stone-400 md:hidden mb-1">Statut</p>
-                  <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
-                    statusLabels[order.status]?.color || 'bg-stone-100 text-stone-800'
-                  }`}>
-                    {statusLabels[order.status]?.label || order.status}
-                  </span>
-                </div>
-
-                {/* Actions */}
-                <div className="flex justify-end">
-                  <Link
-                    href={`/account/orders/${order._id}`}
-                    className="inline-flex items-center gap-1 text-sm text-amber-700 hover:text-amber-800 transition-colors"
-                  >
-                    Voir details
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                    </svg>
-                  </Link>
-                </div>
+                <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
+                  statusLabels[order.status]?.color || 'bg-stone-100 text-stone-800'
+                }`}>
+                  {statusLabels[order.status]?.label || order.status}
+                </span>
               </div>
-            ))}
-          </div>
+
+              <div className="flex items-center gap-3 mb-3">
+                {order.product?.mainImage && (
+                  <img
+                    src={order.product.mainImage}
+                    alt={order.product?.name}
+                    className="w-12 h-12 object-cover rounded-sm bg-stone-100"
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-stone-900 truncate">{order.product?.name || "Produit"}</p>
+                  <p className="text-xs text-stone-500">
+                    Taille : {order.size === 'sur-mesure' ? 'Sur-mesure' : order.size}
+                  </p>
+                </div>
+                <p className="text-sm font-semibold text-stone-900 whitespace-nowrap">
+                  {order.totalPrice.toLocaleString('fr-FR')} FCFA
+                </p>
+              </div>
+
+              <div className="flex justify-end pt-2 border-t border-stone-100">
+                <Link
+                  href={`/produits/${order.product?.slug}`}
+                  className="inline-flex items-center gap-1 text-xs text-amber-700 hover:text-amber-800 transition-colors"
+                >
+                  Voir le produit
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
