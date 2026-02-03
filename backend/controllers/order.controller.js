@@ -414,10 +414,34 @@ const getWorkshopOrders = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Récupérer les commandes du client connecté (par email)
+ * @route   GET /api/orders/my-orders
+ */
+const getMyOrders = async (req, res, next) => {
+  try {
+    const userEmail = req.user.email;
+
+    const orders = await Order.find({ 'customer.email': userEmail })
+      .populate('product', 'name slug category images')
+      .sort('-createdAt')
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      data: orders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
+  getMyOrders,
   updateOrderStatus,
   updateAdminNotes,
   updateWorkshopInfo,
