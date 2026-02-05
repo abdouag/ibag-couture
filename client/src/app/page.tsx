@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Footer from "@/components/Footer";
 import ProductCardActions from "@/components/ProductCardActions";
+import HeroDynamicGallery from "@/components/HeroDynamicGallery";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -82,6 +83,15 @@ export default async function Home() {
 
   const featured = pickDiverse(products, 8);
 
+  // Extract hero images from products with images (random selection)
+  const heroImages = products
+    .filter((p) => p.mainImage || (p.images && p.images.length > 0))
+    .slice(0, 20) // Limit pool for performance
+    .map((p) => ({
+      url: p.mainImage || (p.images && p.images[0]) || "",
+      alt: p.name,
+    }));
+
   // Always show all 4 categories with product images
   const allCategories = [
     { slug: "homme", label: "Homme" },
@@ -127,17 +137,12 @@ export default async function Home() {
 
       {/* ═══════════════ HERO ═══════════════ */}
       <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center pt-10 md:pt-12 overflow-hidden">
-        {/* Background image */}
-        <div className="absolute inset-0">
-          <Image
-            src="/images/IMG_1991.PNG"
-            alt="Ibag Couture — Haute couture africaine"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-stone-900/80 via-stone-900/50 to-stone-900/30" />
-        </div>
+        {/* Dynamic product slideshow background */}
+        <HeroDynamicGallery
+          images={heroImages}
+          fallbackImage="/images/IMG_1991.PNG"
+          interval={6000}
+        />
 
         <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 w-full">
           <div className="max-w-xl">
