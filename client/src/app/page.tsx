@@ -54,7 +54,33 @@ export default async function Home() {
     // API not available
   }
 
-  const featured = products.slice(0, 6);
+  // Selection intelligente : on prend les 8 premiers produits du tri intelligent backend,
+  // puis on rearrange pour garantir la diversite des categories cote affichage
+  const pickDiverse = (items: Product[], count: number): Product[] => {
+    if (items.length <= count) return items;
+    const result: Product[] = [];
+    const pool = [...items.slice(0, count * 2)]; // pool elargi
+    const catCount: Record<string, number> = {};
+
+    while (result.length < count && pool.length > 0) {
+      // Trouver le produit dont la categorie est la moins representee
+      let bestIdx = 0;
+      let bestCount = Infinity;
+      for (let i = 0; i < pool.length; i++) {
+        const cc = catCount[pool[i].category] || 0;
+        if (cc < bestCount) {
+          bestCount = cc;
+          bestIdx = i;
+        }
+      }
+      const picked = pool.splice(bestIdx, 1)[0];
+      catCount[picked.category] = (catCount[picked.category] || 0) + 1;
+      result.push(picked);
+    }
+    return result;
+  };
+
+  const featured = pickDiverse(products, 8);
 
   // Always show all 4 categories with product images
   const allCategories = [
@@ -164,7 +190,7 @@ export default async function Home() {
               Nos collections arrivent bient&ocirc;t&hellip;
             </p>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
               {featured.map((product) => {
                 const isOutOfStock = product.hasStock === true && (product.stockQuantity == null || product.stockQuantity <= 0);
                 return (

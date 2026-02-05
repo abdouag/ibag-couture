@@ -84,7 +84,7 @@ const getAllProducts = async (req, res, next) => {
       });
     }
 
-    // Tri intelligent : best sellers > promo > recents > aleatoire
+    // Tri intelligent : best sellers > promo > recents > diversite > rotation
     const [allProducts, total, orderCounts] = await Promise.all([
       Product.find(filter).lean(),
       Product.countDocuments(filter),
@@ -104,36 +104,74 @@ const getAllProducts = async (req, res, next) => {
     const now = Date.now();
     const thirtyDays = 30 * 24 * 60 * 60 * 1000;
 
+    // Seed pseudo-aleatoire base sur le jour (rotation quotidienne)
+    const today = new Date();
+    const daySeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    const seededRandom = (id) => {
+      let hash = daySeed;
+      for (let i = 0; i < id.length; i++) {
+        hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
+      }
+      return ((hash & 0x7fffffff) % 1000) / 1000;
+    };
+
     // Score chaque produit
     const scored = allProducts.map((product) => {
       const pid = product._id.toString();
       const orders = orderCountMap[pid] || 0;
 
-      // Best sellers (0-40 points)
-      const sellerScore = (orders / maxOrders) * 40;
+      // Best sellers (0-30 points)
+      const sellerScore = (orders / maxOrders) * 30;
 
-      // Produits en promo (0 ou 25 points)
+      // Produits en promo (0 ou 20 points)
       const hasPromo = product.promoPrice && product.promoPrice < product.basePrice;
-      const promoScore = hasPromo ? 25 : 0;
+      const promoScore = hasPromo ? 20 : 0;
 
-      // Recence (0-25 points, decroit sur 30 jours)
+      // Recence (0-15 points, decroit sur 30 jours)
       const age = now - new Date(product.createdAt).getTime();
-      const recencyScore = Math.max(0, (1 - age / thirtyDays)) * 25;
+      const recencyScore = Math.max(0, (1 - age / thirtyDays)) * 15;
 
-      // Facteur aleatoire (0-10 points)
-      const randomScore = Math.random() * 10;
+      // Produit avec image (0 ou 10 points) — priorise les produits visuels
+      const hasImage = product.mainImage || (product.images && product.images.length > 0);
+      const imageScore = hasImage ? 10 : 0;
+
+      // Rotation quotidienne (0-25 points) — change l'ordre chaque jour
+      const rotationScore = seededRandom(pid) * 25;
 
       return {
         ...product,
-        _score: sellerScore + promoScore + recencyScore + randomScore,
+        _score: sellerScore + promoScore + recencyScore + imageScore + rotationScore,
+        _category: (product.category || '').toLowerCase(),
       };
     });
 
     // Tri par score decroissant
     scored.sort((a, b) => b._score - a._score);
 
-    // Pagination et suppression du score interne
-    const paginated = scored.slice(skip, skip + limitNum).map(({ _score, ...product }) => product);
+    // Diversite de categories : repartir les produits pour alterner les categories
+    // On prend les top produits et on les rearrange pour eviter les clusters de meme categorie
+    const diversified = [];
+    const remaining = [...scored];
+    const categorySeen = {};
+
+    while (remaining.length > 0) {
+      // Chercher le prochain produit dont la categorie a ete la moins representee
+      let bestIdx = 0;
+      let bestCatCount = Infinity;
+      for (let i = 0; i < Math.min(remaining.length, 8); i++) {
+        const catCount = categorySeen[remaining[i]._category] || 0;
+        if (catCount < bestCatCount) {
+          bestCatCount = catCount;
+          bestIdx = i;
+        }
+      }
+      const picked = remaining.splice(bestIdx, 1)[0];
+      categorySeen[picked._category] = (categorySeen[picked._category] || 0) + 1;
+      diversified.push(picked);
+    }
+
+    // Pagination et suppression des champs internes
+    const paginated = diversified.slice(skip, skip + limitNum).map(({ _score, _category, ...product }) => product);
 
     res.status(200).json({
       success: true,
