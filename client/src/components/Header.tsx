@@ -112,8 +112,8 @@ export default function Header() {
       )}
 
       <header
-        className={`fixed ${showAnnouncement ? "top-8 sm:top-9" : "top-0"} left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-stone-200 transition-all duration-300 ${
-          isScrolled ? "shadow-sm" : ""
+        className={`fixed ${showAnnouncement ? "top-8 sm:top-9" : "top-0"} left-0 right-0 z-50 bg-white border-b border-stone-200 transition-shadow duration-300 ${
+          isScrolled ? "shadow-md" : ""
         }`}
       >
         {/* Desktop Nav Row */}

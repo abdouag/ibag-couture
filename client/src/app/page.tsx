@@ -126,7 +126,7 @@ export default async function Home() {
       />
 
       {/* ═══════════════ HERO ═══════════════ */}
-      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center pt-16 overflow-hidden">
+      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center pt-36 md:pt-28 overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0">
           <Image
