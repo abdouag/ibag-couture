@@ -57,9 +57,35 @@ export default async function CollectionsPage({ searchParams }: Props) {
     // API not available
   }
 
+  // Diversifier l'affichage : alterner les catégories pour un mélange visuel
+  const diversify = (items: Product[]): Product[] => {
+    if (items.length <= 1) return items;
+    const result: Product[] = [];
+    const remaining = [...items];
+    const catCount: Record<string, number> = {};
+
+    while (remaining.length > 0) {
+      let bestIdx = 0;
+      let bestCatCount = Infinity;
+      const lookAhead = Math.min(remaining.length, 8);
+      for (let i = 0; i < lookAhead; i++) {
+        const cc = catCount[remaining[i].category?.toLowerCase() || ""] || 0;
+        if (cc < bestCatCount) {
+          bestCatCount = cc;
+          bestIdx = i;
+        }
+      }
+      const picked = remaining.splice(bestIdx, 1)[0];
+      const cat = picked.category?.toLowerCase() || "";
+      catCount[cat] = (catCount[cat] || 0) + 1;
+      result.push(picked);
+    }
+    return result;
+  };
+
   const activeCategory = category || "tous";
   const products = activeCategory === "tous"
-    ? allProducts
+    ? diversify(allProducts)
     : allProducts.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
 
   const categories = ["tous", "homme", "femme", "traditionnel", "moderne"];
