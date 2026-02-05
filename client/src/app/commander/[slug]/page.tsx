@@ -258,7 +258,7 @@ export default function CheckoutPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-stone-50 pt-20 md:pt-24">
+      <main className="min-h-screen bg-stone-50 pt-6 md:pt-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
           <div className="flex items-center justify-center py-20">
             <div className="animate-spin w-8 h-8 border-2 border-stone-300 border-t-stone-900 rounded-full" />
@@ -270,7 +270,7 @@ export default function CheckoutPage() {
 
   if (error && !product) {
     return (
-      <main className="min-h-screen bg-stone-50 pt-20 md:pt-24">
+      <main className="min-h-screen bg-stone-50 pt-6 md:pt-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
           <div className="text-center py-20">
             <p className="text-red-600 mb-4">{error}</p>
@@ -291,7 +291,7 @@ export default function CheckoutPage() {
     return (
       <main className="min-h-screen bg-stone-50">
         {/* Header */}
-        <div className="pt-20 md:pt-24 pb-8 bg-white border-b border-stone-200">
+        <div className="pt-6 md:pt-8 pb-8 bg-white border-b border-stone-200">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <nav className="flex items-center gap-2 text-sm text-stone-400 mb-4">
               <Link href="/" className="hover:text-stone-900 transition-colors">
@@ -415,7 +415,7 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen bg-stone-50">
       {/* Header */}
-      <div className="pt-20 md:pt-24 pb-8 bg-white border-b border-stone-200">
+      <div className="pt-6 md:pt-8 pb-8 bg-white border-b border-stone-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-sm text-stone-400 mb-4">
             <Link href="/" className="hover:text-stone-900 transition-colors">

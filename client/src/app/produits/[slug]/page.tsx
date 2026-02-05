@@ -153,7 +153,7 @@ export default async function ProductPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {/* Breadcrumb */}
-      <div className="pt-16 md:pt-20 pb-3 bg-white border-b border-stone-200">
+      <div className="pt-4 md:pt-6 pb-3 bg-white border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-sm text-stone-400">
             <Link href="/" className="hover:text-stone-900 transition-colors">

@@ -75,7 +75,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
   return (
     <main className="min-h-screen bg-stone-50">
       {/* Hero Introduction */}
-      <section className="pt-20 md:pt-24 pb-10 md:pb-14 bg-white border-b border-stone-200">
+      <section className="pt-8 md:pt-10 pb-10 md:pb-14 bg-white border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-stone-400 mb-8">
@@ -105,7 +105,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
       </section>
 
       {/* Filters */}
-      <section className="py-5 bg-white border-b border-stone-200 shadow-sm sticky top-[140px] md:top-[108px] lg:top-[148px] z-40">
+      <section className="py-5 bg-white border-b border-stone-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6">
           <Suspense fallback={
             <div className="flex items-center gap-2">

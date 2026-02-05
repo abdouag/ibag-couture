@@ -13,7 +13,7 @@ export default function ContactPage() {
   return (
     <main className="min-h-screen bg-stone-50">
       {/* Header spacer */}
-      <div className="pt-20 md:pt-24" />
+      <div className="pt-6 md:pt-8" />
 
       {/* Hero */}
       <section className="pb-10 md:pb-14">
