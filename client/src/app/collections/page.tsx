@@ -105,7 +105,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
       </section>
 
       {/* Filters */}
-      <section className="py-5 bg-white/95 backdrop-blur-sm border-b border-stone-200 sticky top-[56px] md:top-[64px] z-40">
+      <section className="py-5 bg-white border-b border-stone-200 shadow-sm sticky top-[140px] md:top-[108px] lg:top-[148px] z-40">
         <div className="max-w-7xl mx-auto px-6">
           <Suspense fallback={
             <div className="flex items-center gap-2">
