@@ -144,8 +144,8 @@ export default function AIProductModal({
         addMessage("assistant", "Format non supporte. Utilisez JPG, PNG ou WebP.");
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        addMessage("assistant", "L'image depasse 5MB. Veuillez en choisir une plus legere.");
+      if (file.size > 10 * 1024 * 1024) {
+        addMessage("assistant", "L'image depasse 10MB. Veuillez en choisir une plus legere.");
         return;
       }
     }

@@ -38,9 +38,9 @@ export default function ImageUpload({
         return;
       }
 
-      // Validate file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError("Le fichier est trop volumineux. Taille max: 5MB");
+      // Validate file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setError("Le fichier est trop volumineux. Taille max: 10MB");
         return;
       }
 

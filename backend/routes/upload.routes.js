@@ -38,7 +38,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max
+    fileSize: 10 * 1024 * 1024, // 10MB max
   }
 });
 
@@ -48,7 +48,7 @@ const handleUploadError = (err, next) => {
 
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return next(new AppError('Le fichier est trop volumineux. Taille max: 5MB', 400));
+      return next(new AppError('Le fichier est trop volumineux. Taille max: 10MB', 400));
     }
     if (err.code === 'LIMIT_UNEXPECTED_FILE') {
       return next(new AppError('Maximum 6 images autorisees', 400));
