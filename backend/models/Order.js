@@ -62,6 +62,15 @@ const customerSchema = new mongoose.Schema({
   },
 }, { _id: false });
 
+// Snapshot du produit au moment de la commande (backup si produit supprimé)
+const productSnapshotSchema = new mongoose.Schema({
+  name: { type: String, trim: true },
+  slug: { type: String, trim: true },
+  category: { type: String, trim: true },
+  mainImage: { type: String, trim: true },
+  basePrice: { type: Number },
+}, { _id: false });
+
 const orderSchema = new mongoose.Schema({
   orderNumber: {
     type: String,
@@ -71,6 +80,10 @@ const orderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
     required: [true, 'Le produit est requis'],
+  },
+  productSnapshot: {
+    type: productSnapshotSchema,
+    default: null,
   },
   selectedOptions: [selectedOptionSchema],
   size: {

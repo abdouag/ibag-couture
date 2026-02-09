@@ -56,6 +56,13 @@ const createOrder = async (req, res, next) => {
     // Préparer les données de commande
     const orderData = {
       product: productId,
+      productSnapshot: {
+        name: product.name,
+        slug: product.slug,
+        category: product.category,
+        mainImage: product.mainImage || (product.images && product.images[0]) || null,
+        basePrice: product.basePrice,
+      },
       selectedOptions,
       size,
       customer,
@@ -137,10 +144,20 @@ const getMyOrders = async (req, res, next) => {
       .sort('-createdAt')
       .lean();
 
+    // Utiliser productSnapshot si produit supprimé
+    const enrichedOrders = orders.map((order) => {
+      const productInfo = order.product || order.productSnapshot || {
+        name: '[Produit supprimé]',
+        slug: null,
+        mainImage: null,
+      };
+      return { ...order, product: productInfo };
+    });
+
     res.status(200).json({
       success: true,
-      count: orders.length,
-      data: orders,
+      count: enrichedOrders.length,
+      data: enrichedOrders,
     });
   } catch (error) {
     next(error);
@@ -185,7 +202,7 @@ const getAllOrders = async (req, res, next) => {
     // Exécution des requêtes en parallèle
     const [orders, total] = await Promise.all([
       Order.find(filter)
-        .populate('product', 'name slug category productionTime')
+        .populate('product', 'name slug category mainImage productionTime')
         .sort(sort)
         .skip(skip)
         .limit(limitNum)
@@ -193,14 +210,31 @@ const getAllOrders = async (req, res, next) => {
       Order.countDocuments(filter),
     ]);
 
+    // Enrichir les commandes : utiliser productSnapshot si produit supprimé
+    const enrichedOrders = orders.map((order) => {
+      const productDeleted = !order.product;
+      const productInfo = order.product || order.productSnapshot || {
+        name: '[Produit supprimé]',
+        slug: null,
+        category: null,
+        mainImage: null,
+      };
+
+      return {
+        ...order,
+        product: productInfo,
+        productDeleted,
+      };
+    });
+
     res.status(200).json({
       success: true,
       message: 'Commandes récupérées avec succès',
-      count: orders.length,
+      count: enrichedOrders.length,
       total,
       totalPages: Math.ceil(total / limitNum),
       currentPage: pageNum,
-      data: orders,
+      data: enrichedOrders,
     });
   } catch (error) {
     next(error);
