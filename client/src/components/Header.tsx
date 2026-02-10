@@ -144,105 +144,105 @@ export default function Header() {
           </div>
 
           {/* Main header row — 3 columns: left | center logo | right */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-3 items-center h-16 md:h-[72px]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-3 items-center h-20 md:h-24 lg:h-28">
               {/* Left: Burger (mobile) + Search (desktop) */}
               <div className="flex items-center">
                 {/* Mobile Burger */}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="md:hidden p-2 -ml-2 text-stone-700 hover:text-stone-900 transition-colors"
+                  className="md:hidden p-2.5 -ml-2 text-stone-600 hover:text-stone-900 transition-colors"
                   aria-label="Menu"
                 >
                   {isMenuOpen ? (
-                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   ) : (
-                    <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                     </svg>
                   )}
                 </button>
 
                 {/* Desktop Search */}
-                <div className="hidden md:block w-full max-w-xs">
+                <div className="hidden md:block w-full max-w-sm lg:max-w-md">
                   <SearchBar />
                 </div>
               </div>
 
-              {/* Center: Logo */}
+              {/* Center: Logo - LUXURY SIZE */}
               <div className="flex justify-center">
-                <Link href="/" className="flex items-center flex-shrink-0">
+                <Link href="/" className="flex items-center flex-shrink-0 transition-opacity hover:opacity-80">
                   <img
                     src="/logo.png"
                     alt="Ibag Couture"
-                    className="h-11 md:h-14 w-auto object-contain"
+                    className="h-14 md:h-20 lg:h-24 w-auto object-contain"
                   />
                 </Link>
               </div>
 
-              {/* Right: Icons */}
-              <div className="flex items-center justify-end gap-1 sm:gap-2">
-                {/* Account Icon */}
+              {/* Right: Icons - LUXURY SPACING */}
+              <div className="flex items-center justify-end gap-2 sm:gap-3 lg:gap-4">
+                {/* Account Icon - LUXURY */}
                 <div className="relative" ref={accountMenuRef}>
                   {user ? (
                     <button
                       onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-                      className="p-2 text-stone-500 hover:text-stone-900 transition-colors relative"
+                      className="p-2.5 text-stone-500 hover:text-stone-900 transition-all duration-300 relative group"
                       aria-label="Mon compte"
                     >
-                      <svg className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                      <svg className="w-6 h-6 lg:w-7 lg:h-7 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                       </svg>
                     </button>
                   ) : (
                     <Link
                       href="/login"
-                      className="p-2 text-stone-500 hover:text-stone-900 transition-colors"
+                      className="p-2.5 text-stone-500 hover:text-stone-900 transition-all duration-300 group"
                       aria-label="Connexion"
                     >
-                      <svg className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                      <svg className="w-6 h-6 lg:w-7 lg:h-7 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                       </svg>
                     </Link>
                   )}
 
-                  {/* Account Dropdown */}
+                  {/* Account Dropdown - LUXURY */}
                   {user && isAccountMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-sm shadow-lg border border-stone-200 py-2 animate-fadeIn">
-                      <div className="px-4 py-3 border-b border-stone-100">
-                        <p className="text-sm font-medium text-stone-900">{user.fullName || "Client"}</p>
+                    <div className="absolute right-0 mt-3 w-64 bg-white rounded-sm shadow-2xl border border-stone-200 py-3 animate-fadeIn z-50">
+                      <div className="px-5 py-4 border-b border-stone-100">
+                        <p className="text-sm font-medium text-stone-900 mb-0.5">{user.fullName || "Client"}</p>
                         <p className="text-xs text-stone-500 truncate">{user.email}</p>
                       </div>
                       <div className="py-2">
                         <Link
                           href="/account"
                           onClick={() => setIsAccountMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
+                          className="flex items-center gap-3 px-5 py-3 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-all duration-300"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                           </svg>
                           Mon compte
                         </Link>
                         <Link
                           href="/account/orders"
                           onClick={() => setIsAccountMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
+                          className="flex items-center gap-3 px-5 py-3 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-all duration-300"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                           </svg>
                           Mes commandes
                         </Link>
                         <Link
                           href="/account/measures"
                           onClick={() => setIsAccountMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
+                          className="flex items-center gap-3 px-5 py-3 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-all duration-300"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" />
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" />
                           </svg>
                           Mes mesures
                         </Link>
@@ -250,29 +250,29 @@ export default function Header() {
                       <div className="border-t border-stone-100 pt-2">
                         <button
                           onClick={handleLogout}
-                          className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
+                          className="flex items-center gap-3 w-full px-5 py-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-300"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                           </svg>
-                          Deconnexion
+                          Déconnexion
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Cart Icon */}
+                {/* Cart Icon - LUXURY */}
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="p-2 text-stone-500 hover:text-stone-900 transition-colors relative"
+                  className="p-2.5 text-stone-500 hover:text-stone-900 transition-all duration-300 relative group"
                   aria-label="Panier"
                 >
-                  <svg className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                  <svg className="w-6 h-6 lg:w-7 lg:h-7 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
                   {isHydrated && totalItems > 0 && (
-                    <span className="absolute top-0 right-0 bg-stone-900 text-white text-[10px] font-medium rounded-full flex items-center justify-center min-w-[18px] h-[18px]">
+                    <span className="absolute -top-1 -right-1 bg-stone-900 text-white text-[10px] font-semibold rounded-full flex items-center justify-center min-w-[20px] h-[20px] shadow-md">
                       {totalItems > 9 ? "9+" : totalItems}
                     </span>
                   )}
@@ -280,8 +280,8 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Mobile Search Row */}
-            <div className="md:hidden pb-2.5">
+            {/* Mobile Search Row - LUXURY */}
+            <div className="md:hidden pb-3 pt-1">
               <SearchBar isMobile />
             </div>
           </div>

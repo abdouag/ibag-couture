@@ -3,6 +3,17 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Luxury color palette */
+  --gold-50: #fefce8;
+  --gold-100: #fef9c3;
+  --gold-200: #fef08a;
+  --gold-300: #fde047;
+  --gold-400: #facc15;
+  --gold-500: #eab308;
+  --gold-600: #ca8a04;
+  --gold-700: #a16207;
+  --gold-800: #854d0e;
+  --gold-900: #713f12;
 }
 
 @theme inline {
@@ -10,6 +21,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-playfair);
+  --font-serif-alt: var(--font-cormorant);
   /* Custom breakpoint for extra small devices */
   --breakpoint-xs: 480px;
 }
@@ -24,14 +37,53 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom Animations */
+/* Luxury Typography Utilities */
+.font-luxury {
+  font-family: var(--font-playfair), serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.font-luxury-alt {
+  font-family: var(--font-cormorant), serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Premium heading styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ============================================
+   LUXURY ANIMATIONS & TRANSITIONS
+   ============================================ */
+
+/* Fade In - Refined */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-12px);
   }
   to {
     opacity: 1;
@@ -40,7 +92,57 @@ body {
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fade In Up - Premium */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scale In - Subtle luxury effect */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Luxury hover scale */
+.hover-scale {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Premium shadow transition */
+.hover-shadow {
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
 }
 
 /* Hide scrollbar for filter section */
@@ -116,10 +218,70 @@ body {
     transform: scale(1);
   }
   100% {
-    transform: scale(1.1);
+    transform: scale(1.08);
   }
 }
 
 .animate-hero-zoom {
-  animation: heroZoom 7s ease-out forwards;
+  animation: heroZoom 8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================
+   LUXURY UTILITY CLASSES
+   ============================================ */
+
+/* Premium text shadow for hero overlays */
+.text-shadow-luxury {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Luxury gradient overlays */
+.gradient-overlay-dark {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+.gradient-overlay-hero {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+
+/* Premium backdrop blur */
+.backdrop-blur-luxury {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+/* Luxury border */
+.border-luxury {
+  border: 1px solid rgba(120, 113, 108, 0.2);
+}
+
+/* Premium focus states */
+.focus-luxury:focus {
+  outline: 2px solid rgba(202, 138, 4, 0.5);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, select, textarea {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Premium selection color */
+::selection {
+  background-color: rgba(202, 138, 4, 0.2);
+  color: inherit;
+}
+
+::-moz-selection {
+  background-color: rgba(202, 138, 4, 0.2);
+  color: inherit;
 }
