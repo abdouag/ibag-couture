@@ -7,6 +7,7 @@ import DeliveryInfo from "@/components/DeliveryInfo";
 import ContactWhatsAppButton from "@/components/ContactWhatsAppButton";
 import ShareButtons from "@/components/ShareButtons";
 import SimilarProducts from "@/components/SimilarProducts";
+import ProductDescription from "@/components/ProductDescription";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -265,16 +266,9 @@ export default async function ProductPage({ params }: Props) {
                   )}
                 </div>
 
-                {/* Description - LUXURY */}
+                {/* Description - Collapsible */}
                 {product.description && (
-                  <div>
-                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-stone-400 mb-4 font-light">
-                      Description
-                    </h2>
-                    <p className="text-stone-600 leading-relaxed text-base md:text-lg">
-                      {product.description}
-                    </p>
-                  </div>
+                  <ProductDescription description={product.description} />
                 )}
 
                 {/* Options - LUXURY */}
