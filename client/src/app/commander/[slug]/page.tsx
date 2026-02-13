@@ -604,49 +604,54 @@ export default function CheckoutPage() {
                           Toutes les mesures sont en centimetres (cm). Les champs marques * sont obligatoires.
                         </p>
 
-                        {/* Visual Guide */}
+                        {/* Visual Guide - Body Diagram */}
                         <div className="mb-6 p-4 bg-white border border-stone-200 rounded-lg">
-                          <p className="text-xs font-medium text-stone-700 uppercase tracking-wide mb-3">Guide de mesure</p>
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                            <div className="p-3 bg-stone-50 rounded-lg">
-                              <div className="w-12 h-12 mx-auto mb-2 bg-amber-100 rounded-full flex items-center justify-center">
-                                <svg className="w-6 h-6 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8h16M4 8v4M20 8v4" />
-                                  <circle cx="12" cy="6" r="2" strokeWidth={1.5} />
-                                </svg>
-                              </div>
-                              <p className="text-xs font-medium text-stone-900">Epaules</p>
-                              <p className="text-xs text-stone-500">D&apos;epaule a epaule</p>
+                          <p className="text-xs font-medium text-stone-700 uppercase tracking-wide mb-4">Guide de mesure</p>
+                          <div className="flex flex-col sm:flex-row gap-5 items-center">
+                            {/* SVG Body Diagram */}
+                            <div className="flex-shrink-0">
+                              <svg viewBox="0 0 280 420" className="w-[180px] h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M140 40 C140 40 155 40 160 55 C165 70 160 85 160 85 L165 95 C175 100 195 110 200 120 L215 150 C220 160 218 165 210 165 L195 160 L185 155 L180 170 L182 240 L190 310 L188 370 C188 380 178 385 170 385 L155 385 C150 385 148 380 148 375 L150 310 L145 260 L140 310 L138 375 C138 380 135 385 130 385 L115 385 C107 385 97 380 97 370 L95 310 L103 240 L105 170 L100 155 L90 160 L75 165 C67 165 65 160 70 150 L85 120 C90 110 110 100 120 95 L125 85 C125 85 120 70 125 55 C130 40 140 40 140 40 Z"
+                                  fill="#F5F0EB" stroke="#A8A29E" strokeWidth="1.5"
+                                />
+                                <circle cx="140" cy="25" r="20" fill="#F5F0EB" stroke="#A8A29E" strokeWidth="1.5" />
+                                {/* Shoulder line */}
+                                <line x1="85" y1="118" x2="195" y2="118" stroke="#B45309" strokeWidth="2" strokeDasharray="6 3" />
+                                <circle cx="85" cy="118" r="4" fill="#B45309" /><circle cx="195" cy="118" r="4" fill="#B45309" />
+                                {/* Chest line */}
+                                <line x1="98" y1="155" x2="182" y2="155" stroke="#B45309" strokeWidth="2" strokeDasharray="6 3" />
+                                <circle cx="98" cy="155" r="4" fill="#B45309" /><circle cx="182" cy="155" r="4" fill="#B45309" />
+                                {/* Waist line */}
+                                <line x1="103" y1="200" x2="177" y2="200" stroke="#B45309" strokeWidth="2" strokeDasharray="6 3" />
+                                <circle cx="103" cy="200" r="4" fill="#B45309" /><circle cx="177" cy="200" r="4" fill="#B45309" />
+                                {/* Hips line */}
+                                <line x1="97" y1="240" x2="183" y2="240" stroke="#B45309" strokeWidth="2" strokeDasharray="6 3" />
+                                <circle cx="97" cy="240" r="4" fill="#B45309" /><circle cx="183" cy="240" r="4" fill="#B45309" />
+                                {/* Labels */}
+                                <text x="215" y="122" fill="#78716C" fontSize="12" fontFamily="sans-serif">Épaules</text>
+                                <text x="202" y="159" fill="#78716C" fontSize="12" fontFamily="sans-serif">Poitrine</text>
+                                <text x="197" y="204" fill="#78716C" fontSize="12" fontFamily="sans-serif">Taille</text>
+                                <text x="203" y="244" fill="#78716C" fontSize="12" fontFamily="sans-serif">Hanches</text>
+                                <line x1="195" y1="118" x2="212" y2="118" stroke="#D6D3D1" strokeWidth="1" />
+                                <line x1="182" y1="155" x2="199" y2="155" stroke="#D6D3D1" strokeWidth="1" />
+                                <line x1="177" y1="200" x2="194" y2="200" stroke="#D6D3D1" strokeWidth="1" />
+                                <line x1="183" y1="240" x2="200" y2="240" stroke="#D6D3D1" strokeWidth="1" />
+                              </svg>
                             </div>
-                            <div className="p-3 bg-stone-50 rounded-lg">
-                              <div className="w-12 h-12 mx-auto mb-2 bg-amber-100 rounded-full flex items-center justify-center">
-                                <svg className="w-6 h-6 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                  <ellipse cx="12" cy="12" rx="6" ry="4" strokeWidth={1.5} />
-                                  <path strokeLinecap="round" strokeWidth={1.5} d="M12 8v8" />
-                                </svg>
-                              </div>
-                              <p className="text-xs font-medium text-stone-900">Poitrine</p>
-                              <p className="text-xs text-stone-500">Tour complet</p>
-                            </div>
-                            <div className="p-3 bg-stone-50 rounded-lg">
-                              <div className="w-12 h-12 mx-auto mb-2 bg-amber-100 rounded-full flex items-center justify-center">
-                                <svg className="w-6 h-6 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                  <ellipse cx="12" cy="12" rx="4" ry="3" strokeWidth={1.5} />
-                                  <path strokeLinecap="round" strokeWidth={1.5} d="M8 12h8" />
-                                </svg>
-                              </div>
-                              <p className="text-xs font-medium text-stone-900">Taille</p>
-                              <p className="text-xs text-stone-500">Au creux naturel</p>
-                            </div>
-                            <div className="p-3 bg-stone-50 rounded-lg">
-                              <div className="w-12 h-12 mx-auto mb-2 bg-amber-100 rounded-full flex items-center justify-center">
-                                <svg className="w-6 h-6 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                  <ellipse cx="12" cy="14" rx="6" ry="4" strokeWidth={1.5} />
-                                  <path strokeLinecap="round" strokeWidth={1.5} d="M6 14v4M18 14v4" />
-                                </svg>
-                              </div>
-                              <p className="text-xs font-medium text-stone-900">Hanches</p>
-                              <p className="text-xs text-stone-500">Partie la plus large</p>
+                            {/* Measurement descriptions */}
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+                              {[
+                                { label: "Épaules", desc: "D'une pointe d'épaule à l'autre, en passant par le haut du dos" },
+                                { label: "Poitrine", desc: "Tour complet au niveau le plus fort de la poitrine" },
+                                { label: "Taille", desc: "Au creux naturel de la taille, la partie la plus fine" },
+                                { label: "Hanches", desc: "Tour complet à la partie la plus large des hanches" },
+                              ].map((m) => (
+                                <div key={m.label} className="p-3 bg-stone-50 rounded-lg border border-stone-100">
+                                  <p className="text-xs font-medium text-stone-900 mb-0.5">{m.label}</p>
+                                  <p className="text-xs text-stone-500 leading-snug">{m.desc}</p>
+                                </div>
+                              ))}
                             </div>
                           </div>
                         </div>
