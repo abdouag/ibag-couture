@@ -301,22 +301,20 @@ export default function SizeGuideModal({
         <div
           role="dialog"
           aria-modal="true"
+          id="size-guide-overlay"
           style={{
             position: "fixed",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            width: "100vw",
-            height: "100dvh",
-            zIndex: 99999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            width: "100%",
+            height: "100%",
+            zIndex: 2147483647,
             isolation: "isolate",
           }}
         >
-          {/* Backdrop */}
+          {/* Panel — takes the ENTIRE screen, nothing can cover it */}
           <div
             style={{
               position: "absolute",
@@ -324,39 +322,54 @@ export default function SizeGuideModal({
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "rgba(0,0,0,0.6)",
+              backgroundColor: "#fff",
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
             }}
-            className="animate-fadeInBackdrop"
-            onClick={() => setIsOpen(false)}
-          />
-
-          {/* Panel — full screen on mobile, centered card on desktop */}
-          <div
-            className="animate-scaleIn"
-            style={{ position: "relative", width: "100%", height: "100%", maxWidth: "36rem", maxHeight: "85vh", display: "flex", flexDirection: "column", backgroundColor: "#fff", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0,0,0,.25)" }}
           >
-            {/* Header with close button */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-stone-200" style={{ flexShrink: 0 }}>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-luxury text-stone-900">Guide de taille</h2>
+            {/* Header with prominent close button */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "12px 16px",
+                borderBottom: "1px solid #e7e5e4",
+                flexShrink: 0,
+                backgroundColor: "#fff",
+              }}
+            >
+              <h2 className="text-lg font-luxury text-stone-900">Guide de taille</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
                 aria-label="Fermer"
-                style={{ width: 44, height: 44, minWidth: 44 }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  minWidth: 40,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%",
+                  backgroundColor: "#f5f5f4",
+                  border: "none",
+                  cursor: "pointer",
+                }}
               >
-                <svg className="w-6 h-6 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#57534e" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-stone-200 px-4 sm:px-6" style={{ flexShrink: 0 }}>
+            <div className="flex border-b border-stone-200" style={{ flexShrink: 0, padding: "0 16px" }}>
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex-1 sm:flex-none px-2 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors relative ${
+                  className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
                     activeTab === tab.key
                       ? "text-stone-900"
                       : "text-stone-400 hover:text-stone-600"
@@ -370,11 +383,11 @@ export default function SizeGuideModal({
               ))}
             </div>
 
-            {/* Content — scrollable */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "16px" }} className="sm:px-6 sm:py-5">
+            {/* Content — scrollable, takes remaining space */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "16px", WebkitOverflowScrolling: "touch" }}>
               {activeTab === "chart" && (
                 <div className="space-y-4">
-                  <p className="text-xs sm:text-sm text-stone-500">
+                  <p className="text-xs text-stone-500">
                     Comparez vos mensurations au tableau ci-dessous.
                   </p>
                   <SizeChartTable availableSizes={availableSizes} />
@@ -394,6 +407,26 @@ export default function SizeGuideModal({
               {activeTab === "measure" && <BodyDiagram />}
 
               {activeTab === "recommend" && <SizeRecommender />}
+            </div>
+
+            {/* Bottom close button for easy access */}
+            <div style={{ flexShrink: 0, padding: "12px 16px", borderTop: "1px solid #e7e5e4", backgroundColor: "#fff" }}>
+              <button
+                onClick={() => setIsOpen(false)}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  backgroundColor: "#1c1917",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+              >
+                Fermer
+              </button>
             </div>
           </div>
         </div>,
