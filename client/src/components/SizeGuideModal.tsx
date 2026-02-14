@@ -36,15 +36,15 @@ function findRecommendedSize(chest: number, waist: number, hips: number) {
 
 function SizeChartTable({ availableSizes }: { availableSizes?: string[] }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm md:text-base">
+    <div className="overflow-x-auto -mx-2 sm:mx-0">
+      <table className="w-full text-xs sm:text-sm md:text-base">
         <thead>
           <tr className="border-b-2 border-stone-200">
-            <th className="py-3 px-3 text-left text-xs tracking-[0.2em] uppercase text-stone-400 font-medium">Taille</th>
-            <th className="py-3 px-3 text-center text-xs tracking-[0.2em] uppercase text-stone-400 font-medium">Poitrine</th>
-            <th className="py-3 px-3 text-center text-xs tracking-[0.2em] uppercase text-stone-400 font-medium">Taille</th>
-            <th className="py-3 px-3 text-center text-xs tracking-[0.2em] uppercase text-stone-400 font-medium">Hanches</th>
-            <th className="py-3 px-3 text-center text-xs tracking-[0.2em] uppercase text-stone-400 font-medium hidden sm:table-cell">Épaules</th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-left text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium w-12 sm:w-auto"></th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-center text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium">Poitrine</th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-center text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium">Taille</th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-center text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium">Hanches</th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-center text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium hidden sm:table-cell">Épaules</th>
           </tr>
         </thead>
         <tbody>
@@ -57,8 +57,8 @@ function SizeChartTable({ availableSizes }: { availableSizes?: string[] }) {
                   isAvailable ? "hover:bg-amber-50/50" : "opacity-40"
                 }`}
               >
-                <td className="py-3.5 px-3">
-                  <span className={`inline-flex items-center justify-center w-10 h-10 rounded-sm font-medium text-base ${
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3">
+                  <span className={`inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-sm font-medium text-sm sm:text-base ${
                     isAvailable
                       ? "bg-stone-900 text-white"
                       : "bg-stone-200 text-stone-400"
@@ -66,15 +66,16 @@ function SizeChartTable({ availableSizes }: { availableSizes?: string[] }) {
                     {row.size}
                   </span>
                 </td>
-                <td className="py-3.5 px-3 text-center text-stone-700">{row.chest[0]}–{row.chest[1]} cm</td>
-                <td className="py-3.5 px-3 text-center text-stone-700">{row.waist[0]}–{row.waist[1]} cm</td>
-                <td className="py-3.5 px-3 text-center text-stone-700">{row.hips[0]}–{row.hips[1]} cm</td>
-                <td className="py-3.5 px-3 text-center text-stone-700 hidden sm:table-cell">{row.shoulders[0]}–{row.shoulders[1]} cm</td>
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-stone-700 whitespace-nowrap">{row.chest[0]}–{row.chest[1]}</td>
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-stone-700 whitespace-nowrap">{row.waist[0]}–{row.waist[1]}</td>
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-stone-700 whitespace-nowrap">{row.hips[0]}–{row.hips[1]}</td>
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-stone-700 whitespace-nowrap hidden sm:table-cell">{row.shoulders[0]}–{row.shoulders[1]}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      <p className="text-[10px] text-stone-400 mt-1.5 px-1.5 sm:px-0">Toutes les mesures sont en cm</p>
     </div>
   );
 }
@@ -277,13 +278,13 @@ export default function SizeGuideModal({
           />
 
           {/* Panel */}
-          <div className="relative bg-white w-full max-w-xl max-h-[85vh] overflow-hidden rounded-sm shadow-2xl animate-scaleIn flex flex-col">
+          <div className="relative bg-white w-full max-w-xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-sm shadow-2xl animate-scaleIn flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-stone-200">
-              <h2 className="text-xl md:text-2xl font-luxury text-stone-900">Guide de taille</h2>
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-stone-200">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-luxury text-stone-900">Guide de taille</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
               >
                 <svg className="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -292,12 +293,12 @@ export default function SizeGuideModal({
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-stone-200 px-6">
+            <div className="flex border-b border-stone-200 px-4 sm:px-6">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-4 py-3 text-sm font-medium transition-colors relative ${
+                  className={`flex-1 sm:flex-none px-2 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors relative ${
                     activeTab === tab.key
                       ? "text-stone-900"
                       : "text-stone-400 hover:text-stone-600"
@@ -312,11 +313,11 @@ export default function SizeGuideModal({
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-5">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5">
               {activeTab === "chart" && (
                 <div className="space-y-4">
-                  <p className="text-sm text-stone-500">
-                    Toutes les mesures sont en centimètres (cm). Comparez vos mensurations au tableau ci-dessous.
+                  <p className="text-xs sm:text-sm text-stone-500">
+                    Comparez vos mensurations au tableau ci-dessous.
                   </p>
                   <SizeChartTable availableSizes={availableSizes} />
                   {isCustomAvailable && (
