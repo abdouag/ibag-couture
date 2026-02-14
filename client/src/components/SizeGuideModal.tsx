@@ -292,33 +292,57 @@ export default function SizeGuideModal({
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 flex items-center justify-center p-4"
-          style={{ zIndex: 9999, isolation: "isolate" }}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100vw",
+            height: "100dvh",
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            isolation: "isolate",
+          }}
         >
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/50 animate-fadeInBackdrop"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.6)",
+            }}
+            className="animate-fadeInBackdrop"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Panel */}
-          <div className="relative bg-white w-full max-w-xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-sm shadow-2xl animate-scaleIn flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-stone-200">
+          {/* Panel — full screen on mobile, centered card on desktop */}
+          <div
+            className="animate-scaleIn"
+            style={{ position: "relative", width: "100%", height: "100%", maxWidth: "36rem", maxHeight: "85vh", display: "flex", flexDirection: "column", backgroundColor: "#fff", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0,0,0,.25)" }}
+          >
+            {/* Header with close button */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-stone-200" style={{ flexShrink: 0 }}>
               <h2 className="text-lg sm:text-xl md:text-2xl font-luxury text-stone-900">Guide de taille</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
+                className="flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
                 aria-label="Fermer"
+                style={{ width: 44, height: 44, minWidth: 44 }}
               >
-                <svg className="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <svg className="w-6 h-6 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-stone-200 px-4 sm:px-6">
+            <div className="flex border-b border-stone-200 px-4 sm:px-6" style={{ flexShrink: 0 }}>
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -337,8 +361,8 @@ export default function SizeGuideModal({
               ))}
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5">
+            {/* Content — scrollable */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "16px" }} className="sm:px-6 sm:py-5">
               {activeTab === "chart" && (
                 <div className="space-y-4">
                   <p className="text-xs sm:text-sm text-stone-500">
