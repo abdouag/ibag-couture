@@ -256,14 +256,23 @@ export default function SizeGuideModal({
     portalRef.current = document.body;
   }, []);
 
-  // Lock body scroll + close on Escape
+  // Lock body scroll, lower header/CTA z-index so modal is on top, close on Escape
   useEffect(() => {
     if (!isOpen) return;
     document.body.style.overflow = "hidden";
+
+    // Force the sticky header AND the fixed bottom CTA below the modal overlay
+    const stickyHeader = document.querySelector(".sticky.top-0") as HTMLElement | null;
+    const fixedBottomCTA = document.querySelector(".fixed.bottom-0") as HTMLElement | null;
+    if (stickyHeader) stickyHeader.style.zIndex = "0";
+    if (fixedBottomCTA) fixedBottomCTA.style.zIndex = "0";
+
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsOpen(false); };
     document.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
+      if (stickyHeader) stickyHeader.style.zIndex = "";
+      if (fixedBottomCTA) fixedBottomCTA.style.zIndex = "";
       document.removeEventListener("keydown", onKey);
     };
   }, [isOpen]);
