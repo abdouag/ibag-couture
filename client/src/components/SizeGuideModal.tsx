@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 // Size chart data (cm)
@@ -249,13 +249,23 @@ export default function SizeGuideModal({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("chart");
+  const portalRef = useRef<HTMLElement | null>(null);
 
-  // Lock body scroll when modal is open
+  // Ensure portal target exists on client only
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
-    }
+    portalRef.current = document.body;
+  }, []);
+
+  // Lock body scroll + close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKey);
+    };
   }, [isOpen]);
 
   const tabs: { key: Tab; label: string }[] = [
@@ -263,78 +273,6 @@ export default function SizeGuideModal({
     { key: "measure", label: "Comment mesurer" },
     { key: "recommend", label: "Ma taille" },
   ];
-
-  const modalContent = isOpen ? (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 animate-fadeInBackdrop"
-        onClick={() => setIsOpen(false)}
-      />
-
-      {/* Panel */}
-      <div className="relative bg-white w-full max-w-xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-sm shadow-2xl animate-scaleIn flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-stone-200">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-luxury text-stone-900">Guide de taille</h2>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
-          >
-            <svg className="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex border-b border-stone-200 px-4 sm:px-6">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 sm:flex-none px-2 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors relative ${
-                activeTab === tab.key
-                  ? "text-stone-900"
-                  : "text-stone-400 hover:text-stone-600"
-              }`}
-            >
-              {tab.label}
-              {activeTab === tab.key && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-700" />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5">
-          {activeTab === "chart" && (
-            <div className="space-y-4">
-              <p className="text-xs sm:text-sm text-stone-500">
-                Comparez vos mensurations au tableau ci-dessous.
-              </p>
-              <SizeChartTable availableSizes={availableSizes} />
-              {isCustomAvailable && (
-                <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-100 rounded-sm">
-                  <svg className="w-5 h-5 text-amber-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                  </svg>
-                  <p className="text-sm text-stone-700">
-                    Ce modèle est aussi disponible <strong>sur-mesure</strong> pour un ajustement parfait.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "measure" && <BodyDiagram />}
-
-          {activeTab === "recommend" && <SizeRecommender />}
-        </div>
-      </div>
-    </div>
-  ) : null;
 
   return (
     <>
@@ -349,8 +287,85 @@ export default function SizeGuideModal({
         <span className="group-hover:underline underline-offset-4">Guide de taille</span>
       </button>
 
-      {/* Portal: render modal at document.body to escape stacking context */}
-      {modalContent && createPortal(modalContent, document.body)}
+      {/* Portal: render modal at document.body to escape all stacking contexts */}
+      {isOpen && portalRef.current && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ zIndex: 9999, isolation: "isolate" }}
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 animate-fadeInBackdrop"
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Panel */}
+          <div className="relative bg-white w-full max-w-xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-sm shadow-2xl animate-scaleIn flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-stone-200">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-luxury text-stone-900">Guide de taille</h2>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
+                aria-label="Fermer"
+              >
+                <svg className="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex border-b border-stone-200 px-4 sm:px-6">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex-1 sm:flex-none px-2 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-medium transition-colors relative ${
+                    activeTab === tab.key
+                      ? "text-stone-900"
+                      : "text-stone-400 hover:text-stone-600"
+                  }`}
+                >
+                  {tab.label}
+                  {activeTab === tab.key && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-700" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5">
+              {activeTab === "chart" && (
+                <div className="space-y-4">
+                  <p className="text-xs sm:text-sm text-stone-500">
+                    Comparez vos mensurations au tableau ci-dessous.
+                  </p>
+                  <SizeChartTable availableSizes={availableSizes} />
+                  {isCustomAvailable && (
+                    <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-100 rounded-sm">
+                      <svg className="w-5 h-5 text-amber-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                      </svg>
+                      <p className="text-sm text-stone-700">
+                        Ce modèle est aussi disponible <strong>sur-mesure</strong> pour un ajustement parfait.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "measure" && <BodyDiagram />}
+
+              {activeTab === "recommend" && <SizeRecommender />}
+            </div>
+          </div>
+        </div>,
+        portalRef.current
+      )}
     </>
   );
 }
