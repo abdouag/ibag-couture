@@ -92,7 +92,7 @@ export default function SearchBar({ isMobile = false }: { isMobile?: boolean }) 
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setIsOpen(true)}
           placeholder="Qu'est-ce que vous cherchez ?"
-          className={`w-full bg-stone-100 border border-stone-200 text-stone-900 text-sm placeholder:text-stone-400 focus:outline-none focus:border-stone-400 focus:ring-1 focus:ring-stone-300 transition-colors ${
+          className={`w-full bg-stone-100 border border-stone-200 text-noir text-sm placeholder:text-stone-400 focus:outline-none focus:border-brand-gold/50 focus:ring-1 focus:ring-brand-gold/30 transition-colors ${
             isMobile ? "py-2.5 pl-10 pr-4 rounded" : "py-2 pl-10 pr-4 rounded-full"
           }`}
         />
@@ -178,7 +178,7 @@ export default function SearchBar({ isMobile = false }: { isMobile?: boolean }) 
                   setIsOpen(false);
                   setQuery("");
                 }}
-                className="block px-4 py-3 text-center text-sm text-amber-700 font-medium hover:bg-amber-50 transition-colors border-t border-stone-200"
+                className="block px-4 py-3 text-center text-sm text-brand-gold-dark font-medium hover:bg-brand-cream transition-colors border-t border-stone-200"
               >
                 Voir tous les resultats
               </Link>

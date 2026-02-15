@@ -1,17 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Playfair_Display, Cormorant_Garamond } from "next/font/google";
+import { DM_Sans, Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import ScrollRevealProvider from "@/components/ScrollRevealProvider";
+import CustomCursor from "@/components/CustomCursor";
+import ScrollProgress from "@/components/ScrollProgress";
 import { CartProvider } from "@/contexts/CartContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 // Luxury serif fonts for headings
@@ -132,10 +132,13 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${cormorant.variable} antialiased`}
+        className={`${dmSans.variable} ${playfair.variable} ${cormorant.variable} antialiased`}
       >
         <CartProvider>
+          <CustomCursor />
+          <ScrollProgress />
           <Header />
+          <ScrollRevealProvider />
           {children}
         </CartProvider>
       </body>
