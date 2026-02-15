@@ -37,7 +37,7 @@ export default function ProductCardActions({ product, isOutOfStock }: Props) {
       className={`w-full mt-2 sm:mt-3 flex items-center justify-center gap-1.5 py-2 sm:py-2.5 text-[11px] sm:text-xs tracking-wide uppercase font-medium transition-all duration-300 ${
         added
           ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-          : "bg-stone-900 text-white hover:bg-stone-800"
+          : "bg-noir text-white hover:bg-noir-light btn-luxury"
       }`}
     >
       {added ? (

@@ -1,26 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  /* Luxury color palette */
-  --gold-50: #fefce8;
-  --gold-100: #fef9c3;
-  --gold-200: #fef08a;
-  --gold-300: #fde047;
-  --gold-400: #facc15;
-  --gold-500: #eab308;
-  --gold-600: #ca8a04;
-  --gold-700: #a16207;
-  --gold-800: #854d0e;
-  --gold-900: #713f12;
+  --background: #FAFAF8;
+  --foreground: #1A1714;
+  /* Luxury color palette — Deep gold & warm tones */
+  --gold-50: #FBF7F0;
+  --gold-100: #F5ECD8;
+  --gold-200: #E8D5AE;
+  --gold-300: #D4B87A;
+  --gold-400: #C5A572;
+  --gold-500: #B8960B;
+  --gold-600: #9A7B2C;
+  --gold-700: #7D6321;
+  --gold-800: #5E4A19;
+  --gold-900: #3F3112;
+  /* Warm blacks */
+  --noir: #1A1714;
+  --noir-light: #2C2722;
+  --noir-soft: #3D3630;
+  /* Brand accent */
+  --brand-gold: #C5A572;
+  --brand-gold-dark: #9A7B2C;
+  --brand-cream: #FBF7F0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-dark: var(--brand-gold-dark);
+  --color-brand-cream: var(--brand-cream);
+  --color-noir: var(--noir);
+  --color-noir-light: var(--noir-light);
+  --color-noir-soft: var(--noir-soft);
+  --font-sans: var(--font-dm-sans);
   --font-serif: var(--font-playfair);
   --font-serif-alt: var(--font-cormorant);
   /* Custom breakpoint for extra small devices */
@@ -37,7 +50,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -61,7 +74,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-playfair), serif;
   font-weight: 400;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 /* Smooth scroll behavior */
@@ -72,6 +85,14 @@ html {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .animate-fadeInUp,
+  .animate-fadeIn,
+  .animate-scaleIn,
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5 {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -92,14 +113,14 @@ html {
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Fade In Up - Premium */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(32px);
   }
   to {
     opacity: 1;
@@ -108,8 +129,15 @@ html {
 }
 
 .animate-fadeInUp {
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+/* Staggered animation delays */
+.stagger-1 { animation-delay: 0ms; }
+.stagger-2 { animation-delay: 150ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 450ms; }
+.stagger-5 { animation-delay: 600ms; }
 
 /* Scale In - Subtle luxury effect */
 @keyframes scaleIn {
@@ -124,25 +152,40 @@ html {
 }
 
 .animate-scaleIn {
-  animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Luxury hover scale */
 .hover-scale {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hover-scale:hover {
-  transform: scale(1.02);
+  transform: scale(1.02) translateY(-4px);
+  box-shadow: 0 24px 48px -12px rgba(26, 23, 20, 0.12);
 }
 
 /* Premium shadow transition */
 .hover-shadow {
-  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hover-shadow:hover {
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 24px 48px -12px rgba(26, 23, 20, 0.15);
+}
+
+/* Card 3D tilt hover */
+.hover-tilt {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.hover-tilt:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-4px);
+  box-shadow: 8px 16px 40px -8px rgba(26, 23, 20, 0.15);
 }
 
 /* Hide scrollbar for filter section */
@@ -181,20 +224,30 @@ html {
 /* Scroll Reveal Animations */
 .sr-hidden {
   opacity: 0;
-  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.sr-from-up { transform: translateY(32px); }
-.sr-from-down { transform: translateY(-32px); }
-.sr-from-left { transform: translateX(-32px); }
-.sr-from-right { transform: translateX(32px); }
+.sr-from-up { transform: translateY(40px); }
+.sr-from-down { transform: translateY(-40px); }
+.sr-from-left { transform: translateX(-40px); }
+.sr-from-right { transform: translateX(40px); }
 .sr-from-none { transform: none; }
 
 .sr-visible {
   opacity: 1 !important;
   transform: translateY(0) translateX(0) !important;
 }
+
+/* Staggered scroll reveal children */
+.sr-stagger > .sr-hidden:nth-child(1) { transition-delay: 0ms; }
+.sr-stagger > .sr-hidden:nth-child(2) { transition-delay: 100ms; }
+.sr-stagger > .sr-hidden:nth-child(3) { transition-delay: 200ms; }
+.sr-stagger > .sr-hidden:nth-child(4) { transition-delay: 300ms; }
+.sr-stagger > .sr-hidden:nth-child(5) { transition-delay: 400ms; }
+.sr-stagger > .sr-hidden:nth-child(6) { transition-delay: 500ms; }
+.sr-stagger > .sr-hidden:nth-child(7) { transition-delay: 600ms; }
+.sr-stagger > .sr-hidden:nth-child(8) { transition-delay: 700ms; }
 
 /* Stock badge pulse */
 @keyframes stockPulse {
@@ -227,12 +280,226 @@ html {
 }
 
 /* ============================================
+   SHIMMER & GLOW EFFECTS
+   ============================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-gold {
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(197, 165, 114, 0.25) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Button ripple effect */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.btn-luxury {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-luxury::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  background: radial-gradient(circle, rgba(197, 165, 114, 0.4) 0%, transparent 70%);
+  transform: scale(0);
+  opacity: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.btn-luxury:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* ============================================
+   MARQUEE / TICKER
+   ============================================ */
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* ============================================
+   GRAIN TEXTURE & ATMOSPHERIC EFFECTS
+   ============================================ */
+
+.grain-texture::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.grain-texture-dark::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Decorative African-inspired geometric divider */
+.divider-gold {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--brand-gold) 20%,
+    var(--brand-gold) 50%,
+    var(--brand-gold) 80%,
+    transparent 100%
+  );
+  opacity: 0.4;
+}
+
+.divider-gold::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--brand-gold);
+  opacity: 0.6;
+}
+
+/* Geometric pattern for dark sections */
+.pattern-geo {
+  background-image:
+    linear-gradient(30deg, rgba(197, 165, 114, 0.03) 12%, transparent 12.5%, transparent 87%, rgba(197, 165, 114, 0.03) 87.5%),
+    linear-gradient(150deg, rgba(197, 165, 114, 0.03) 12%, transparent 12.5%, transparent 87%, rgba(197, 165, 114, 0.03) 87.5%),
+    linear-gradient(30deg, rgba(197, 165, 114, 0.03) 12%, transparent 12.5%, transparent 87%, rgba(197, 165, 114, 0.03) 87.5%),
+    linear-gradient(150deg, rgba(197, 165, 114, 0.03) 12%, transparent 12.5%, transparent 87%, rgba(197, 165, 114, 0.03) 87.5%);
+  background-size: 80px 140px;
+  background-position: 0 0, 0 0, 40px 70px, 40px 70px;
+}
+
+/* ============================================
+   SCROLL PROGRESS BAR
+   ============================================ */
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--brand-gold), var(--brand-gold-dark));
+  z-index: 9999;
+  transform-origin: left;
+  transition: transform 0.1s linear;
+}
+
+/* ============================================
+   CUSTOM CURSOR
+   ============================================ */
+
+@media (pointer: fine) {
+  .custom-cursor-area {
+    cursor: none;
+  }
+
+  .cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    background: var(--brand-gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: difference;
+  }
+
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid var(--brand-gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    opacity: 0.5;
+    transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+  }
+
+  .cursor-ring.cursor-hover {
+    width: 52px;
+    height: 52px;
+    opacity: 0.8;
+    border-color: var(--brand-gold);
+  }
+}
+
+/* ============================================
    LUXURY UTILITY CLASSES
    ============================================ */
 
 /* Premium text shadow for hero overlays */
 .text-shadow-luxury {
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Luxury gradient overlays */
@@ -253,6 +520,15 @@ html {
   );
 }
 
+/* Signature brand gradient */
+.gradient-brand {
+  background: linear-gradient(135deg, #1A1714 0%, #2C2722 40%, #3D3630 70%, #1A1714 100%);
+}
+
+.gradient-brand-gold {
+  background: linear-gradient(135deg, rgba(197, 165, 114, 0.08) 0%, transparent 40%, rgba(197, 165, 114, 0.05) 100%);
+}
+
 /* Premium backdrop blur */
 .backdrop-blur-luxury {
   backdrop-filter: blur(12px) saturate(180%);
@@ -264,9 +540,14 @@ html {
   border: 1px solid rgba(120, 113, 108, 0.2);
 }
 
+/* Gold luxury border */
+.border-gold {
+  border: 1px solid rgba(197, 165, 114, 0.3);
+}
+
 /* Premium focus states */
 .focus-luxury:focus {
-  outline: 2px solid rgba(202, 138, 4, 0.5);
+  outline: 2px solid rgba(197, 165, 114, 0.5);
   outline-offset: 2px;
 }
 
@@ -277,11 +558,17 @@ button, a, input, select, textarea {
 
 /* Premium selection color */
 ::selection {
-  background-color: rgba(202, 138, 4, 0.2);
+  background-color: rgba(197, 165, 114, 0.25);
   color: inherit;
 }
 
 ::-moz-selection {
-  background-color: rgba(202, 138, 4, 0.2);
+  background-color: rgba(197, 165, 114, 0.25);
   color: inherit;
 }
+
+/* Category color coding */
+.cat-homme { --cat-color: #78716C; --cat-bg: #F5F5F4; }
+.cat-femme { --cat-color: #9D174D; --cat-bg: #FDF2F8; }
+.cat-traditionnel { --cat-color: #92400E; --cat-bg: #FFFBEB; }
+.cat-moderne { --cat-color: #475569; --cat-bg: #F8FAFC; }

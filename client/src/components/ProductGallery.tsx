@@ -50,7 +50,7 @@ export default function ProductGallery({ mainImage, images, category, productNam
             <p className="text-sm text-stone-400 tracking-wide">Photo bientot disponible</p>
           </div>
           <div className="absolute top-4 left-4 md:top-6 md:left-6">
-            <span className="bg-stone-900 text-white text-[10px] md:text-xs tracking-[0.2em] uppercase px-3 py-1.5 md:px-4 md:py-2 font-medium">
+            <span className="bg-noir text-white text-[10px] md:text-xs tracking-[0.2em] uppercase px-3 py-1.5 md:px-4 md:py-2 font-medium">
               {category}
             </span>
           </div>
@@ -72,7 +72,7 @@ export default function ProductGallery({ mainImage, images, category, productNam
 
         {/* Category Badge */}
         <div className="absolute top-4 left-4 md:top-6 md:left-6">
-          <span className="bg-stone-900 text-white text-[10px] md:text-xs tracking-[0.2em] uppercase px-3 py-1.5 md:px-4 md:py-2 font-medium">
+          <span className="bg-noir text-white text-[10px] md:text-xs tracking-[0.2em] uppercase px-3 py-1.5 md:px-4 md:py-2 font-medium">
             {category}
           </span>
         </div>
@@ -114,7 +114,7 @@ export default function ProductGallery({ mainImage, images, category, productNam
               onClick={() => setSelectedIndex(index)}
               className={`aspect-square bg-stone-100 relative overflow-hidden rounded-sm cursor-pointer transition-all duration-300 ${
                 index === selectedIndex
-                  ? "ring-2 ring-stone-900 ring-offset-2"
+                  ? "ring-2 ring-brand-gold ring-offset-2"
                   : "hover:ring-1 hover:ring-stone-300 hover:ring-offset-1"
               }`}
             >
