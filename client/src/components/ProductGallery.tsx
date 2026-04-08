@@ -50,7 +50,7 @@ export default function ProductGallery({ mainImage, images, category, productNam
             <p className="text-sm text-stone-400 tracking-wide">Photo bientot disponible</p>
           </div>
           <div className="absolute top-4 left-4 md:top-6 md:left-6">
-            <span className="bg-stone-900 text-white text-[10px] md:text-xs tracking-[0.2em] uppercase px-3 py-1.5 md:px-4 md:py-2 font-medium">
+            <span className="bg-[#0D0D0D] text-[#C9A45C] text-[10px] md:text-xs tracking-[0.2em] uppercase px-3 py-1.5 md:px-4 md:py-2 font-medium">
               {category}
             </span>
           </div>
@@ -61,61 +61,97 @@ export default function ProductGallery({ mainImage, images, category, productNam
 
   return (
     <div className="space-y-4">
-      {/* Main Image */}
-      <div className="aspect-[4/5] bg-white relative overflow-hidden rounded-sm shadow-sm">
-        <img
-          src={getFullUrl(allImages[selectedIndex])}
-          alt={`${productName} - Photo ${selectedIndex + 1}`}
-          className="w-full h-full object-contain"
-          onError={handleImgError}
-        />
-
-        {/* Category Badge */}
-        <div className="absolute top-4 left-4 md:top-6 md:left-6">
-          <span className="bg-stone-900 text-white text-[10px] md:text-xs tracking-[0.2em] uppercase px-3 py-1.5 md:px-4 md:py-2 font-medium">
-            {category}
-          </span>
-        </div>
-
-        {/* Navigation arrows for multiple images */}
+      <div className="flex gap-3">
+        {/* Desktop vertical thumbnails */}
         {allImages.length > 1 && (
-          <>
-            <button
-              onClick={() => setSelectedIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors"
-            >
-              <svg className="w-5 h-5 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-            </button>
-            <button
-              onClick={() => setSelectedIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1))}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors"
-            >
-              <svg className="w-5 h-5 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
-            </button>
-
-            {/* Image counter */}
-            <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 text-xs text-stone-700 font-medium shadow-sm">
-              {selectedIndex + 1} / {allImages.length}
-            </div>
-          </>
+          <div className="hidden md:flex flex-col gap-2 w-[60px]">
+            {allImages.slice(0, 4).map((img, index) => (
+              <button
+                key={img + index}
+                onClick={() => setSelectedIndex(index)}
+                className={`aspect-square bg-stone-100 relative overflow-hidden rounded-sm cursor-pointer transition-all duration-300 ${
+                  index === selectedIndex
+                    ? "border-2 border-[#C9A45C]"
+                    : "border-2 border-transparent hover:border-[#E8E4E0]"
+                }`}
+              >
+                <img
+                  src={getFullUrl(img)}
+                  alt={`${productName} - Miniature ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={handleImgError}
+                />
+              </button>
+            ))}
+            {allImages.length > 4 && (
+              <button
+                onClick={() => setSelectedIndex(4)}
+                className="aspect-square bg-stone-200 relative overflow-hidden rounded-sm cursor-pointer flex items-center justify-center text-stone-600 font-medium hover:bg-stone-300 transition-colors"
+              >
+                +{allImages.length - 4}
+              </button>
+            )}
+          </div>
         )}
+
+        {/* Main image */}
+        <div className="flex-1">
+          <div className="aspect-[4/5] bg-white relative overflow-hidden rounded-sm shadow-sm">
+            <img
+              src={getFullUrl(allImages[selectedIndex])}
+              alt={`${productName} - Photo ${selectedIndex + 1}`}
+              className="w-full h-full object-contain"
+              onError={handleImgError}
+            />
+
+            {/* Category Badge */}
+            <div className="absolute top-4 left-4 md:top-6 md:left-6">
+              <span className="bg-[#0D0D0D] text-[#C9A45C] text-[10px] md:text-xs tracking-[0.2em] uppercase px-3 py-1.5 md:px-4 md:py-2 font-medium">
+                {category}
+              </span>
+            </div>
+
+            {/* Navigation arrows for multiple images */}
+            {allImages.length > 1 && (
+              <>
+                <button
+                  onClick={() => setSelectedIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-all duration-300"
+                >
+                  <svg className="w-5 h-5 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setSelectedIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1))}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-all duration-300"
+                >
+                  <svg className="w-5 h-5 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
+
+                {/* Image counter */}
+                <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 text-xs text-stone-700 font-medium shadow-sm">
+                  {selectedIndex + 1} / {allImages.length}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Thumbnails */}
+      {/* Mobile horizontal thumbnails */}
       {allImages.length > 1 && (
-        <div className="grid grid-cols-4 gap-2 md:gap-3">
+        <div className="md:hidden grid grid-cols-4 gap-2 mt-3">
           {allImages.slice(0, 4).map((img, index) => (
             <button
               key={img + index}
               onClick={() => setSelectedIndex(index)}
               className={`aspect-square bg-stone-100 relative overflow-hidden rounded-sm cursor-pointer transition-all duration-300 ${
                 index === selectedIndex
-                  ? "ring-2 ring-stone-900 ring-offset-2"
-                  : "hover:ring-1 hover:ring-stone-300 hover:ring-offset-1"
+                  ? "border-2 border-[#C9A45C]"
+                  : "border-2 border-transparent hover:border-[#E8E4E0]"
               }`}
             >
               <img

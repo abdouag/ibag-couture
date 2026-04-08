@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import CartToast from "@/components/CartToast";
+import PageLoader from "@/components/PageLoader";
 import { CartProvider } from "@/contexts/CartContext";
 
 const geistSans = Geist({
@@ -34,7 +36,7 @@ const cormorant = Cormorant_Garamond({
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ibagcouture.com";
 
 export const viewport: Viewport = {
-  themeColor: "#1c1917",
+  themeColor: "#0D0D0D",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -135,7 +137,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${cormorant.variable} antialiased`}
       >
         <CartProvider>
+          <PageLoader />
           <Header />
+          <CartToast />
           {children}
         </CartProvider>
       </body>

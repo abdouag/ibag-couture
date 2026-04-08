@@ -14,7 +14,6 @@ type User = {
   role: string;
 };
 
-const ANNOUNCEMENT_TEXT = "Commandez aujourd\u2019hui et faites-vous livrer sous 48h ouvrables";
 const ANNOUNCEMENT_STORAGE_KEY = "ibag-announcement-dismissed";
 
 export default function Header() {
@@ -83,18 +82,18 @@ export default function Header() {
   return (
     <>
       {/* Sticky wrapper — reste colle en haut lors du scroll, compatible iOS */}
-      <div className={`sticky top-0 z-50 ${isScrolled ? "shadow-md" : ""}`}>
+      <div className={`sticky top-0 z-50 ${isScrolled ? "shadow-[0_1px_3px_rgba(0,0,0,0.08)]" : ""}`}>
         {/* Announcement Bar */}
         {showAnnouncement && (
           <div
             role="banner"
             aria-label="Information livraison"
-            className="bg-stone-900 text-white"
+            className="bg-[#0D0D0D] text-white/80"
           >
             <div className="max-w-7xl mx-auto px-4 py-1.5 sm:py-2 flex items-center justify-center relative">
               <p className="text-[11px] sm:text-xs font-light tracking-wide text-center pr-6">
                 <span className="mr-1.5 opacity-70" aria-hidden="true">&#10024;</span>
-                {ANNOUNCEMENT_TEXT}
+                Commandez aujourd&rsquo;hui et faites-vous <span className="text-[#C9A45C]">livrer</span> sous 48h ouvrables
                 <span className="ml-1.5 opacity-70" aria-hidden="true">&#10024;</span>
               </p>
               <button
@@ -110,32 +109,32 @@ export default function Header() {
           </div>
         )}
 
-        <header className="bg-white border-b border-stone-200">
+        <header className="bg-white border-b border-black/[0.06]">
           {/* Desktop Nav Row */}
-          <div className="hidden lg:block border-b border-stone-100">
+          <div className="hidden lg:block border-b border-black/[0.06]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <nav className="flex items-center justify-center gap-8 h-10">
                 <Link
                   href="/collections"
-                  className="text-[13px] uppercase tracking-[0.12em] text-stone-500 hover:text-stone-900 transition-colors"
+                  className="text-[#666] text-[11px] uppercase tracking-[0.15em] hover:text-[#C9A45C] transition-colors duration-300"
                 >
                   Collections
                 </Link>
                 <Link
                   href="/collections?category=homme"
-                  className="text-[13px] uppercase tracking-[0.12em] text-stone-500 hover:text-stone-900 transition-colors"
+                  className="text-[#666] text-[11px] uppercase tracking-[0.15em] hover:text-[#C9A45C] transition-colors duration-300"
                 >
                   Homme
                 </Link>
                 <Link
                   href="/collections?category=femme"
-                  className="text-[13px] uppercase tracking-[0.12em] text-stone-500 hover:text-stone-900 transition-colors"
+                  className="text-[#666] text-[11px] uppercase tracking-[0.15em] hover:text-[#C9A45C] transition-colors duration-300"
                 >
                   Femme
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-[13px] uppercase tracking-[0.12em] text-stone-500 hover:text-stone-900 transition-colors"
+                  className="text-[#666] text-[11px] uppercase tracking-[0.15em] hover:text-[#C9A45C] transition-colors duration-300"
                 >
                   Contact
                 </Link>
@@ -145,13 +144,13 @@ export default function Header() {
 
           {/* Main header row — 3 columns: left | center logo | right */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-3 items-center h-20 md:h-24 lg:h-28">
+            <div className="grid grid-cols-3 items-center h-16 md:h-20">
               {/* Left: Burger (mobile) + Search (desktop) */}
               <div className="flex items-center">
                 {/* Mobile Burger */}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="md:hidden p-2.5 -ml-2 text-stone-600 hover:text-stone-900 transition-colors"
+                  className="md:hidden p-2.5 -ml-2 text-stone-600 hover:text-[#C9A45C] transition-colors duration-300"
                   aria-label="Menu"
                 >
                   {isMenuOpen ? (
@@ -189,7 +188,7 @@ export default function Header() {
                   {user ? (
                     <button
                       onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-                      className="p-2.5 text-stone-500 hover:text-stone-900 transition-all duration-300 relative group"
+                      className="p-2.5 text-stone-500 hover:text-[#C9A45C] transition-colors duration-300 relative group"
                       aria-label="Mon compte"
                     >
                       <svg className="w-6 h-6 lg:w-7 lg:h-7 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -199,7 +198,7 @@ export default function Header() {
                   ) : (
                     <Link
                       href="/login"
-                      className="p-2.5 text-stone-500 hover:text-stone-900 transition-all duration-300 group"
+                      className="p-2.5 text-stone-500 hover:text-[#C9A45C] transition-colors duration-300 group"
                       aria-label="Connexion"
                     >
                       <svg className="w-6 h-6 lg:w-7 lg:h-7 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -265,14 +264,14 @@ export default function Header() {
                 {/* Cart Icon - LUXURY */}
                 <button
                   onClick={() => setIsCartOpen(true)}
-                  className="p-2.5 text-stone-500 hover:text-stone-900 transition-all duration-300 relative group"
+                  className="p-2.5 text-stone-500 hover:text-[#C9A45C] transition-colors duration-300 relative group"
                   aria-label="Panier"
                 >
                   <svg className="w-6 h-6 lg:w-7 lg:h-7 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
                   {isHydrated && totalItems > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-stone-900 text-white text-[10px] font-semibold rounded-full flex items-center justify-center min-w-[20px] h-[20px] shadow-md">
+                    <span className="absolute -top-1 -right-1 bg-[#C9A45C] text-[#0D0D0D] text-[10px] font-semibold rounded-full flex items-center justify-center min-w-[20px] h-[20px] shadow-md">
                       {totalItems > 9 ? "9+" : totalItems}
                     </span>
                   )}
@@ -288,12 +287,12 @@ export default function Header() {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden border-t border-stone-200 py-6 animate-fadeIn bg-white">
+            <div className="md:hidden border-t border-black/[0.06] py-6 animate-fadeIn bg-white">
               <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <nav className="flex flex-col gap-1">
                   <Link
                     href="/collections"
-                    className="px-4 py-3.5 text-base font-medium text-stone-700 hover:text-stone-900 hover:bg-stone-50 transition-colors tracking-wide rounded"
+                    className="px-4 py-3 text-base font-medium text-[#0D0D0D] hover:text-[#C9A45C] hover:bg-stone-50 transition-colors duration-300 tracking-wide rounded"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Collections
@@ -317,7 +316,7 @@ export default function Header() {
                   </div>
                   <Link
                     href="/contact"
-                    className="px-4 py-3.5 text-base font-medium text-stone-700 hover:text-stone-900 hover:bg-stone-50 transition-colors tracking-wide rounded"
+                    className="px-4 py-3 text-base font-medium text-[#0D0D0D] hover:text-[#C9A45C] hover:bg-stone-50 transition-colors duration-300 tracking-wide rounded"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Contact
@@ -334,7 +333,7 @@ export default function Header() {
                       </div>
                       <Link
                         href="/account"
-                        className="flex items-center gap-3 px-4 py-3 text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors rounded"
+                        className="flex items-center gap-3 px-4 py-3 text-[#0D0D0D] hover:text-[#C9A45C] hover:bg-stone-50 transition-colors duration-300 rounded"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,7 +343,7 @@ export default function Header() {
                       </Link>
                       <Link
                         href="/account/orders"
-                        className="flex items-center gap-3 px-4 py-3 text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors rounded"
+                        className="flex items-center gap-3 px-4 py-3 text-[#0D0D0D] hover:text-[#C9A45C] hover:bg-stone-50 transition-colors duration-300 rounded"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -354,7 +353,7 @@ export default function Header() {
                       </Link>
                       <Link
                         href="/account/measures"
-                        className="flex items-center gap-3 px-4 py-3 text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors rounded"
+                        className="flex items-center gap-3 px-4 py-3 text-[#0D0D0D] hover:text-[#C9A45C] hover:bg-stone-50 transition-colors duration-300 rounded"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -376,14 +375,14 @@ export default function Header() {
                     <div className="flex flex-col gap-3 px-2">
                       <Link
                         href="/login"
-                        className="block text-center py-3 border border-stone-300 text-stone-700 hover:bg-stone-100 transition-colors rounded"
+                        className="block text-center py-3 border border-stone-300 text-[#0D0D0D] hover:bg-stone-100 transition-colors duration-300 rounded"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Connexion
                       </Link>
                       <Link
                         href="/register"
-                        className="block text-center py-3 bg-stone-900 text-white hover:bg-stone-800 transition-colors rounded"
+                        className="block text-center py-3 bg-[#0D0D0D] text-white hover:bg-[#C9A45C] hover:text-[#0D0D0D] transition-colors duration-300 rounded"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Creer un compte

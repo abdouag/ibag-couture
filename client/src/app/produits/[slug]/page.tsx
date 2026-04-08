@@ -147,28 +147,28 @@ export default async function ProductPage({ params }: Props) {
   };
 
   return (
-    <main className="min-h-screen bg-stone-50">
+    <main className="min-h-screen bg-[#F5F5F5]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {/* Breadcrumb - LUXURY */}
-      <div className="pt-6 md:pt-8 lg:pt-10 pb-4 md:pb-6 bg-white border-b border-stone-200">
+      <div className="pt-6 md:pt-8 lg:pt-10 pb-4 md:pb-6 bg-white border-b border-black/[0.06]">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <nav className="flex items-center gap-2 text-sm md:text-base text-stone-400">
-            <Link href="/" className="hover:text-stone-900 transition-colors duration-300">
+          <nav className="flex items-center gap-2 text-sm md:text-base text-[#999]">
+            <Link href="/" className="hover:text-[#C9A45C] transition-colors duration-300">
               Accueil
             </Link>
             <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
-            <Link href="/collections" className="hover:text-stone-900 transition-colors duration-300">
+            <Link href="/collections" className="hover:text-[#C9A45C] transition-colors duration-300">
               Collections
             </Link>
             <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
-            <span className="text-stone-900 font-medium truncate">{product.name}</span>
+            <span className="text-[#0D0D0D] font-medium truncate">{product.name}</span>
           </nav>
         </div>
       </div>
@@ -188,26 +188,26 @@ export default async function ProductPage({ params }: Props) {
 
             {/* Product Info - LUXURY */}
             <div className="lg:py-4">
-              <div className="sticky top-24 md:top-28 lg:top-32 space-y-6 md:space-y-8">
+              <div className="sticky top-20 md:top-24 space-y-6 md:space-y-8">
 
                 {/* Title Section - LUXURY */}
                 <div>
-                  <p className="text-amber-700 text-xs md:text-sm tracking-[0.35em] uppercase mb-3 md:mb-4 font-light">
+                  <p className="text-[#C9A45C] text-xs md:text-sm tracking-[0.35em] uppercase mb-3 md:mb-4 font-light">
                     Création sur mesure
                   </p>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury text-stone-900 leading-tight mb-3">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-luxury text-[#0D0D0D] leading-tight mb-3">
                     {product.name}
                   </h1>
-                  <p className="text-stone-500 text-sm md:text-base tracking-wide uppercase">{product.category}</p>
+                  <p className="text-[#999] text-sm md:text-base tracking-wide uppercase">{product.category}</p>
                 </div>
 
                 {/* Stock Badge - LUXURY */}
                 {product.hasStock && (
                   <div className="flex items-center gap-2">
                     {isOutOfStock ? (
-                      <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-stone-100 border border-stone-200 rounded-full">
-                        <span className="w-2.5 h-2.5 rounded-full bg-stone-400" />
-                        <span className="text-sm md:text-base text-stone-500 font-medium">Rupture de stock</span>
+                      <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-[#E8E4E0] border border-[#E8E4E0] rounded-full">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#999]" />
+                        <span className="text-sm md:text-base text-[#999] font-medium">Rupture de stock</span>
                       </div>
                     ) : (
                       <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-full shadow-sm">
@@ -222,42 +222,42 @@ export default async function ProductPage({ params }: Props) {
                 )}
 
                 {/* Price Section - LUXURY */}
-                <div className="bg-white rounded-sm p-6 md:p-8 border border-stone-200 shadow-lg">
+                <div className="bg-white rounded-sm p-6 md:p-8 border border-[#E8E4E0] shadow-lg">
                   {product.promoPrice != null && product.promoPrice < product.basePrice ? (
                     <>
                       <div className="flex items-center gap-3 mb-3">
                         <span className="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs md:text-sm font-semibold rounded tracking-wide uppercase">
                           -{Math.round((1 - product.promoPrice / product.basePrice) * 100)}%
                         </span>
-                        <span className="text-stone-400 text-sm md:text-base font-medium">Promotion</span>
+                        <span className="text-[#999] text-sm md:text-base font-medium">Promotion</span>
                       </div>
                       <div className="flex items-baseline gap-4 mb-2">
                         <p className="text-4xl md:text-5xl lg:text-6xl font-luxury text-red-700 tracking-tight">
                           {product.promoPrice.toLocaleString('fr-FR')}
                         </p>
-                        <span className="text-sm text-stone-400 tracking-wide uppercase">FCFA</span>
+                        <span className="text-sm text-[#999] tracking-wide uppercase">FCFA</span>
                       </div>
-                      <p className="text-stone-400 text-lg line-through">
+                      <p className="text-[#999] text-lg line-through">
                         {product.basePrice.toLocaleString('fr-FR')} FCFA
                       </p>
                     </>
                   ) : (
                     <>
                       <div className="flex items-baseline justify-between mb-2">
-                        <span className="text-stone-500 text-sm md:text-base">Prix</span>
-                        <span className="text-sm text-stone-400 tracking-wide uppercase">FCFA</span>
+                        <span className="text-[#999] text-sm md:text-base">Prix</span>
+                        <span className="text-sm text-[#999] tracking-wide uppercase">FCFA</span>
                       </div>
-                      <p className="text-4xl md:text-5xl lg:text-6xl font-luxury text-stone-900 tracking-tight">
+                      <p className="text-4xl md:text-5xl lg:text-6xl font-luxury text-[#0D0D0D] tracking-tight">
                         {product.basePrice.toLocaleString('fr-FR')}
                       </p>
                     </>
                   )}
 
                   {product.options && product.options.length > 0 && (
-                    <div className="mt-6 pt-6 border-t border-stone-200">
+                    <div className="mt-6 pt-6 border-t border-[#E8E4E0]">
                       <div className="flex items-baseline justify-between">
-                        <span className="text-stone-600 font-medium text-base md:text-lg">Total avec options</span>
-                        <span className="text-2xl md:text-3xl font-luxury text-amber-700 font-medium">
+                        <span className="text-[#666] font-medium text-base md:text-lg">Total avec options</span>
+                        <span className="text-2xl md:text-3xl font-luxury text-[#C9A45C] font-medium">
                           {totalWithOptions.toLocaleString('fr-FR')} <span className="text-base font-normal">FCFA</span>
                         </span>
                       </div>
@@ -268,10 +268,10 @@ export default async function ProductPage({ params }: Props) {
                 {/* Description - LUXURY */}
                 {product.description && (
                   <div>
-                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-stone-400 mb-4 font-light">
+                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-[#999] mb-4 font-light">
                       Description
                     </h2>
-                    <p className="text-stone-600 leading-relaxed text-base md:text-lg">
+                    <p className="text-[#666] leading-relaxed text-base md:text-lg">
                       {product.description}
                     </p>
                   </div>
@@ -280,24 +280,24 @@ export default async function ProductPage({ params }: Props) {
                 {/* Options - LUXURY */}
                 {product.options && product.options.length > 0 && (
                   <div>
-                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-stone-400 mb-5 font-light">
+                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-[#999] mb-5 font-light">
                       Options incluses
                     </h2>
                     <div className="space-y-3">
                       {product.options.map((option, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-4 md:p-5 bg-stone-50 rounded-sm border border-stone-100 hover:border-stone-300 hover:shadow-md transition-all duration-300"
+                          className="flex items-center justify-between p-4 md:p-5 bg-[#F5F5F5] rounded-sm border border-[#E8E4E0] hover:border-[#C9A45C]/40 hover:shadow-md transition-all duration-300"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-6 h-6 bg-amber-700 rounded-full flex items-center justify-center flex-shrink-0">
+                            <div className="w-6 h-6 bg-[#C9A45C] rounded-full flex items-center justify-center flex-shrink-0">
                               <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             </div>
-                            <span className="text-stone-800 text-base md:text-lg">{option.name}</span>
+                            <span className="text-[#0D0D0D] text-base md:text-lg">{option.name}</span>
                           </div>
-                          <span className="text-stone-600 text-sm md:text-base font-medium">
+                          <span className="text-[#666] text-sm md:text-base font-medium">
                             +{option.price.toLocaleString('fr-FR')} FCFA
                           </span>
                         </div>
@@ -309,20 +309,20 @@ export default async function ProductPage({ params }: Props) {
                 {/* Available Sizes - LUXURY */}
                 {product.availableSizes && product.availableSizes.length > 0 && (
                   <div>
-                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-stone-400 mb-4 font-light">
+                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-[#999] mb-4 font-light">
                       Tailles disponibles
                     </h2>
                     <div className="flex flex-wrap gap-3">
                       {product.availableSizes.map((size) => (
                         <span
                           key={size}
-                          className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center border-2 border-stone-200 text-stone-700 text-base md:text-lg font-medium rounded-sm hover:border-stone-400 hover:shadow-md transition-all duration-300 cursor-pointer"
+                          className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center border-2 border-[#E8E4E0] text-[#0D0D0D] text-base md:text-lg font-medium rounded-sm hover:border-[#C9A45C] hover:shadow-md transition-all duration-300 cursor-pointer"
                         >
                           {size}
                         </span>
                       ))}
                       {product.isCustomAvailable && (
-                        <span className="h-14 md:h-16 px-5 md:px-6 flex items-center justify-center border-2 border-amber-200 bg-amber-50 text-amber-700 text-sm md:text-base font-medium rounded-sm hover:bg-amber-100 transition-all duration-300">
+                        <span className="h-14 md:h-16 px-5 md:px-6 flex items-center justify-center border-2 border-[#C9A45C]/20 bg-[rgba(201,164,92,0.12)] text-[#C9A45C] text-sm md:text-base font-medium rounded-full hover:bg-[rgba(201,164,92,0.2)] transition-all duration-300">
                           Sur-mesure
                         </span>
                       )}
@@ -332,11 +332,11 @@ export default async function ProductPage({ params }: Props) {
 
                 {/* Sur-mesure only - LUXURY */}
                 {(!product.availableSizes || product.availableSizes.length === 0) && product.isCustomAvailable && (
-                  <div className="flex items-center gap-4 bg-amber-50 p-5 md:p-6 rounded-sm border border-amber-200 shadow-sm">
-                    <svg className="w-6 h-6 text-amber-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <div className="flex items-center gap-4 bg-[rgba(201,164,92,0.12)] p-5 md:p-6 rounded-sm border border-[#C9A45C]/20 shadow-sm">
+                    <svg className="w-6 h-6 text-[#C9A45C] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                     </svg>
-                    <span className="text-sm md:text-base text-stone-700">
+                    <span className="text-sm md:text-base text-[#0D0D0D]">
                       Ce modèle est disponible uniquement <strong>sur-mesure</strong>
                       {product.customPriceImpact && product.customPriceImpact > 0
                         ? ` (+${product.customPriceImpact.toLocaleString('fr-FR')} FCFA)`
@@ -359,7 +359,7 @@ export default async function ProductPage({ params }: Props) {
                   ) : (
                     <Link
                       href={`/commander/${product.slug || product._id}`}
-                      className="group relative block w-full bg-stone-900 text-white text-center py-5 md:py-6 lg:py-7 text-base md:text-lg tracking-[0.2em] uppercase font-medium overflow-hidden transition-all duration-500 hover:bg-stone-800 hover:shadow-2xl rounded-sm hover:scale-[1.02]"
+                      className="group relative block w-full bg-[#0D0D0D] text-white text-center py-5 md:py-6 lg:py-7 text-[11px] uppercase tracking-[0.15em] font-medium overflow-hidden transition-all duration-500 hover:bg-[#1a1a1a] hover:shadow-2xl rounded-sm hover:scale-[1.02]"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-3">
                         Commander ce modèle
@@ -383,7 +383,7 @@ export default async function ProductPage({ params }: Props) {
                   />}
 
                   {product.isCustomAvailable && (
-                    <p className="text-center text-sm md:text-base text-stone-500 leading-relaxed">
+                    <p className="text-center text-sm md:text-base text-[#999] leading-relaxed">
                       Vous serez guidé pour fournir vos mesures personnalisées
                     </p>
                   )}
@@ -392,30 +392,30 @@ export default async function ProductPage({ params }: Props) {
                 </div>
 
                 {/* Trust Badges - LUXURY */}
-                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-stone-200">
+                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[#E8E4E0]">
                   <div className="text-center p-3 group">
-                    <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mx-auto mb-3 bg-stone-100 rounded-full flex items-center justify-center group-hover:bg-stone-200 transition-all duration-300">
-                      <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mx-auto mb-3 bg-[rgba(201,164,92,0.12)] rounded-full flex items-center justify-center group-hover:bg-[rgba(201,164,92,0.2)] transition-all duration-300">
+                      <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-[#C9A45C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                       </svg>
                     </div>
-                    <p className="text-xs md:text-sm text-stone-500 leading-tight">Paiement<br/>sécurisé</p>
+                    <p className="text-xs md:text-sm text-[#666] leading-tight">Paiement<br/>sécurisé</p>
                   </div>
                   <div className="text-center p-3 group">
-                    <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mx-auto mb-3 bg-stone-100 rounded-full flex items-center justify-center group-hover:bg-stone-200 transition-all duration-300">
-                      <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mx-auto mb-3 bg-[rgba(201,164,92,0.12)] rounded-full flex items-center justify-center group-hover:bg-[rgba(201,164,92,0.2)] transition-all duration-300">
+                      <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-[#C9A45C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                       </svg>
                     </div>
-                    <p className="text-xs md:text-sm text-stone-500 leading-tight">Confection<br/>artisanale</p>
+                    <p className="text-xs md:text-sm text-[#666] leading-tight">Confection<br/>artisanale</p>
                   </div>
                   <div className="text-center p-3 group">
-                    <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mx-auto mb-3 bg-stone-100 rounded-full flex items-center justify-center group-hover:bg-stone-200 transition-all duration-300">
-                      <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mx-auto mb-3 bg-[rgba(201,164,92,0.12)] rounded-full flex items-center justify-center group-hover:bg-[rgba(201,164,92,0.2)] transition-all duration-300">
+                      <svg className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-[#C9A45C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                       </svg>
                     </div>
-                    <p className="text-xs md:text-sm text-stone-500 leading-tight">Livraison<br/>24–72h</p>
+                    <p className="text-xs md:text-sm text-[#666] leading-tight">Livraison<br/>24–72h</p>
                   </div>
                 </div>
 
@@ -423,11 +423,11 @@ export default async function ProductPage({ params }: Props) {
                 <ShareButtons productName={product.name} slug={product.slug} />
 
                 {/* Additional Info - LUXURY */}
-                <div className="flex items-center gap-3 text-stone-400 text-sm md:text-base">
+                <div className="flex items-center gap-3 text-[#999] text-sm md:text-base">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
                   </svg>
-                  <span>Des questions ? <Link href="/contact" className="text-amber-700 hover:underline transition-colors">Contactez-nous</Link> ou <a href="https://wa.me/221770470928" target="_blank" rel="noopener noreferrer" className="text-[#25D366] hover:underline transition-colors">WhatsApp</a></span>
+                  <span>Des questions ? <Link href="/contact" className="text-[#C9A45C] hover:underline transition-colors">Contactez-nous</Link> ou <a href="https://wa.me/221770470928" target="_blank" rel="noopener noreferrer" className="text-[#25D366] hover:underline transition-colors">WhatsApp</a></span>
                 </div>
               </div>
             </div>
@@ -439,20 +439,20 @@ export default async function ProductPage({ params }: Props) {
       <SimilarProducts category={product.category} currentProductId={product._id} />
 
       {/* Measurements Guide - LUXURY */}
-      {product.isCustomAvailable && <section className="py-14 md:py-18 lg:py-20 bg-stone-100">
+      {product.isCustomAvailable && <section className="py-14 md:py-18 lg:py-20 bg-[#E8E4E0]">
         <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="bg-white rounded-sm p-8 md:p-12 lg:p-16 shadow-xl">
             <div className="text-center mb-10 md:mb-12">
-              <h3 className="font-luxury text-3xl md:text-4xl lg:text-5xl text-stone-900 mb-4">Guide des mesures</h3>
-              <p className="text-stone-500 text-base md:text-lg">Chaque pièce est réalisée sur mesure. Vous aurez besoin de :</p>
+              <h3 className="font-luxury text-3xl md:text-4xl lg:text-5xl text-[#0D0D0D] mb-4">Guide des mesures</h3>
+              <p className="text-[#999] text-base md:text-lg">Chaque pièce est réalisée sur mesure. Vous aurez besoin de :</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 md:gap-6">
               {["Tour de poitrine", "Tour de taille", "Tour de hanches", "Largeur épaules", "Longueur souhaitée"].map((measure) => (
-                <div key={measure} className="flex items-center gap-3 p-4 bg-stone-50 rounded-sm border border-stone-200 hover:border-amber-200 hover:bg-amber-50 transition-all duration-300">
-                  <svg className="w-5 h-5 text-amber-700 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <div key={measure} className="flex items-center gap-3 p-4 bg-[#F5F5F5] rounded-sm border border-[#E8E4E0] hover:border-[#C9A45C]/20 hover:bg-[rgba(201,164,92,0.12)] transition-all duration-300">
+                  <svg className="w-5 h-5 text-[#C9A45C] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-sm md:text-base text-stone-700 font-medium">{measure}</span>
+                  <span className="text-sm md:text-base text-[#0D0D0D] font-medium">{measure}</span>
                 </div>
               ))}
             </div>
@@ -461,10 +461,10 @@ export default async function ProductPage({ params }: Props) {
       </section>}
 
       {/* Contact CTA - LUXURY */}
-      <section className="py-16 md:py-20 lg:py-24 bg-stone-900 text-white">
+      <section className="py-16 md:py-20 lg:py-24 bg-[#0D0D0D] text-white">
         <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-luxury mb-4 md:mb-6">Besoin d&apos;aide ?</h2>
-          <p className="text-stone-300 text-base md:text-lg lg:text-xl mb-8 md:mb-10 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-[#999] text-base md:text-lg lg:text-xl mb-8 md:mb-10 leading-relaxed max-w-2xl mx-auto">
             Notre équipe est disponible pour vous accompagner dans votre commande.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 md:gap-5 justify-center">
@@ -481,7 +481,7 @@ export default async function ProductPage({ params }: Props) {
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-3 border-2 border-white text-white px-10 md:px-12 py-4 md:py-5 text-sm md:text-base tracking-[0.2em] uppercase font-medium hover:bg-white hover:text-stone-900 transition-all duration-500 hover:scale-105"
+              className="inline-flex items-center justify-center gap-3 border-2 border-white text-white px-10 md:px-12 py-4 md:py-5 text-sm md:text-base tracking-[0.2em] uppercase font-medium hover:bg-white hover:text-[#0D0D0D] transition-all duration-500 hover:scale-105"
             >
               Nous contacter
             </Link>
@@ -492,7 +492,7 @@ export default async function ProductPage({ params }: Props) {
       <Footer />
 
       {/* Sticky Mobile CTA - LUXURY */}
-      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white border-t-2 border-stone-200 shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.1)] z-50 px-5 py-3.5 backdrop-blur-sm bg-white/95">
+      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white border-t-2 border-[#E8E4E0] shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.1)] z-50 px-5 py-3.5 backdrop-blur-sm bg-white/95">
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
             {product.promoPrice != null && product.promoPrice < product.basePrice ? (
@@ -501,15 +501,15 @@ export default async function ProductPage({ params }: Props) {
                   <p className="text-lg font-luxury text-red-700 font-medium">
                     {product.promoPrice.toLocaleString('fr-FR')}
                   </p>
-                  <span className="text-xs text-stone-500">FCFA</span>
+                  <span className="text-xs text-[#999]">FCFA</span>
                 </div>
-                <p className="text-xs text-stone-400 line-through">
+                <p className="text-xs text-[#999] line-through">
                   {product.basePrice.toLocaleString('fr-FR')} FCFA
                 </p>
               </div>
             ) : (
-              <p className="text-lg font-luxury text-stone-900 font-medium">
-                {product.basePrice.toLocaleString('fr-FR')} <span className="text-sm text-stone-500">FCFA</span>
+              <p className="text-lg font-luxury text-[#0D0D0D] font-medium">
+                {product.basePrice.toLocaleString('fr-FR')} <span className="text-sm text-[#999]">FCFA</span>
               </p>
             )}
           </div>
@@ -533,7 +533,7 @@ export default async function ProductPage({ params }: Props) {
               />
               <Link
                 href={`/commander/${product.slug || product._id}`}
-                className="bg-stone-900 text-white px-6 py-3 text-xs tracking-[0.15em] uppercase font-medium hover:bg-stone-800 transition-all duration-300 whitespace-nowrap rounded-sm shadow-lg"
+                className="bg-[#0D0D0D] text-white px-6 py-3 text-xs tracking-[0.15em] uppercase font-medium hover:bg-[#1a1a1a] transition-all duration-300 whitespace-nowrap rounded-sm shadow-lg"
               >
                 Commander
               </Link>
