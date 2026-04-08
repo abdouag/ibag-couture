@@ -90,10 +90,18 @@ export default async function CollectionsPage({ searchParams }: Props) {
     return result;
   };
 
+  // Sort: in-stock products first, out-of-stock at the end
+  const sortByStock = (items: Product[]): Product[] => {
+    const inStock = items.filter((p) => p.hasStock !== false && p.hasStock !== null);
+    const outOfStock = items.filter((p) => p.hasStock === false || p.hasStock === null);
+    return [...inStock, ...outOfStock];
+  };
+
   const activeCategory = category || "tous";
-  const products = activeCategory === "tous"
+  const filtered = activeCategory === "tous"
     ? diversify(allProducts)
     : allProducts.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
+  const products = sortByStock(filtered);
 
   const categories = ["tous", "homme", "femme", "traditionnel", "moderne"];
 
@@ -223,11 +231,11 @@ export default async function CollectionsPage({ searchParams }: Props) {
                           </span>
                         )}
                       </div>
-                      {!product.hasStock && (
+                      {product.hasStock === false && product.stockQuantity === 0 && (
                         <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center">
                           <span className="bg-[#0D0D0D] text-white text-xs px-4 py-2 tracking-wider uppercase">
                             Rupture de stock
-          </span>
+                          </span>
                         </div>
                       )}
                     </div>

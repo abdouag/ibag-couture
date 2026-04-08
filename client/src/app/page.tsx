@@ -79,7 +79,9 @@ export default async function Home() {
     return result;
   };
 
-  const featured = pickDiverse(products, 8);
+  // Prioritize in-stock products for the featured grid
+  const inStockProducts = products.filter((p) => p.hasStock !== false && p.hasStock !== null);
+  const featured = pickDiverse(inStockProducts.length >= 8 ? inStockProducts : products, 8);
 
   // Extract hero images from products with images (random selection)
   const heroImages = products
