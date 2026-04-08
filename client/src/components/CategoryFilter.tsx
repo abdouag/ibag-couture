@@ -38,10 +38,10 @@ function CategoryFilterInner({ categories, productCounts }: CategoryFilterProps)
           <button
             key={category}
             onClick={() => handleFilter(category)}
-            className={`px-6 py-2 text-sm tracking-wide whitespace-nowrap transition-all duration-300 ${
+            className={`whitespace-nowrap transition-all duration-300 ${
               isActive
-                ? "bg-stone-900 text-white"
-                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                ? "bg-[#0D0D0D] text-white rounded-full px-5 py-2 text-[10px] uppercase tracking-[0.1em] font-medium"
+                : "border border-[#E8E4E0] text-[#999] rounded-full px-5 py-2 text-[10px] uppercase tracking-[0.1em] hover:border-[#C9A45C] hover:text-[#C9A45C]"
             }`}
           >
             {category.charAt(0).toUpperCase() + category.slice(1)}
