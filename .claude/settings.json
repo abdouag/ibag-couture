@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/macbookpro/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/**)",
+      "Bash(/Users/macbookpro/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/scripts/start-server.sh --project-dir /Users/macbookpro/Desktop/ibag-couture-platform)",
+      "Read(//Users/macbookpro/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/**)",
+      "Bash(bash /Users/macbookpro/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir /Users/macbookpro/Desktop/ibag-couture-platform)",
+      "Bash(git pull:*)"
+    ]
+  }
+}

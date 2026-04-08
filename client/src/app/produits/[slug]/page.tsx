@@ -7,6 +7,8 @@ import DeliveryInfo from "@/components/DeliveryInfo";
 import ContactWhatsAppButton from "@/components/ContactWhatsAppButton";
 import ShareButtons from "@/components/ShareButtons";
 import SimilarProducts from "@/components/SimilarProducts";
+import ProductDescription from "@/components/ProductDescription";
+import SizeGuideModal from "@/components/SizeGuideModal";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -265,16 +267,9 @@ export default async function ProductPage({ params }: Props) {
                   )}
                 </div>
 
-                {/* Description - LUXURY */}
+                {/* Description - Collapsible */}
                 {product.description && (
-                  <div>
-                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-[#999] mb-4 font-light">
-                      Description
-                    </h2>
-                    <p className="text-[#666] leading-relaxed text-base md:text-lg">
-                      {product.description}
-                    </p>
-                  </div>
+                  <ProductDescription description={product.description} />
                 )}
 
                 {/* Options - LUXURY */}
@@ -309,9 +304,15 @@ export default async function ProductPage({ params }: Props) {
                 {/* Available Sizes - LUXURY */}
                 {product.availableSizes && product.availableSizes.length > 0 && (
                   <div>
-                    <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-[#999] mb-4 font-light">
-                      Tailles disponibles
-                    </h2>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xs md:text-sm tracking-[0.25em] uppercase text-[#999] font-light">
+                        Tailles disponibles
+                      </h2>
+                      <SizeGuideModal
+                        availableSizes={product.availableSizes}
+                        isCustomAvailable={product.isCustomAvailable}
+                      />
+                    </div>
                     <div className="flex flex-wrap gap-3">
                       {product.availableSizes.map((size) => (
                         <span
@@ -332,16 +333,19 @@ export default async function ProductPage({ params }: Props) {
 
                 {/* Sur-mesure only - LUXURY */}
                 {(!product.availableSizes || product.availableSizes.length === 0) && product.isCustomAvailable && (
-                  <div className="flex items-center gap-4 bg-[rgba(201,164,92,0.12)] p-5 md:p-6 rounded-sm border border-[#C9A45C]/20 shadow-sm">
-                    <svg className="w-6 h-6 text-[#C9A45C] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                    </svg>
-                    <span className="text-sm md:text-base text-[#0D0D0D]">
-                      Ce modèle est disponible uniquement <strong>sur-mesure</strong>
-                      {product.customPriceImpact && product.customPriceImpact > 0
-                        ? ` (+${product.customPriceImpact.toLocaleString('fr-FR')} FCFA)`
-                        : ""}
-                    </span>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-4 bg-[rgba(201,164,92,0.12)] p-5 md:p-6 rounded-sm border border-[#C9A45C]/20 shadow-sm">
+                      <svg className="w-6 h-6 text-[#C9A45C] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                      </svg>
+                      <span className="text-sm md:text-base text-[#0D0D0D]">
+                        Ce modèle est disponible uniquement <strong>sur-mesure</strong>
+                        {product.customPriceImpact && product.customPriceImpact > 0
+                          ? ` (+${product.customPriceImpact.toLocaleString('fr-FR')} FCFA)`
+                          : ""}
+                      </span>
+                    </div>
+                    <SizeGuideModal isCustomAvailable />
                   </div>
                 )}
 
@@ -444,17 +448,66 @@ export default async function ProductPage({ params }: Props) {
           <div className="bg-white rounded-sm p-8 md:p-12 lg:p-16 shadow-xl">
             <div className="text-center mb-10 md:mb-12">
               <h3 className="font-luxury text-3xl md:text-4xl lg:text-5xl text-[#0D0D0D] mb-4">Guide des mesures</h3>
-              <p className="text-[#999] text-base md:text-lg">Chaque pièce est réalisée sur mesure. Vous aurez besoin de :</p>
+              <p className="text-[#999] text-base md:text-lg mb-8">Chaque pièce est réalisée sur mesure. Vous aurez besoin de :</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 md:gap-6">
-              {["Tour de poitrine", "Tour de taille", "Tour de hanches", "Largeur épaules", "Longueur souhaitée"].map((measure) => (
-                <div key={measure} className="flex items-center gap-3 p-4 bg-[#F5F5F5] rounded-sm border border-[#E8E4E0] hover:border-[#C9A45C]/20 hover:bg-[rgba(201,164,92,0.12)] transition-all duration-300">
-                  <svg className="w-5 h-5 text-[#C9A45C] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+
+            {/* Measurement items grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-10">
+              {[
+                { label: "Tour de poitrine", desc: "Au niveau le plus fort" },
+                { label: "Tour de taille", desc: "Au creux naturel" },
+                { label: "Tour de hanches", desc: "Au niveau le plus large" },
+                { label: "Largeur épaules", desc: "D'une pointe à l'autre" },
+              ].map((measure) => (
+                <div key={measure.label} className="flex items-start gap-3 p-5 bg-[#F5F5F5] rounded-sm border border-[#E8E4E0] hover:border-[#C9A45C]/20 hover:bg-[rgba(201,164,92,0.12)] transition-all duration-300">
+                  <svg className="w-5 h-5 text-[#C9A45C] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-sm md:text-base text-[#0D0D0D] font-medium">{measure}</span>
+                  <div>
+                    <span className="text-sm md:text-base text-[#0D0D0D] font-medium block">{measure.label}</span>
+                    <span className="text-xs text-[#999]">{measure.desc}</span>
+                  </div>
                 </div>
               ))}
+            </div>
+
+            {/* Size chart table inline */}
+            <div className="border border-[#E8E4E0] rounded-sm overflow-hidden">
+              <div className="bg-[#F5F5F5] px-6 py-4 border-b border-[#E8E4E0]">
+                <h4 className="text-sm tracking-[0.2em] uppercase text-[#666] font-medium">Correspondance des tailles (cm)</h4>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm md:text-base">
+                  <thead>
+                    <tr className="border-b border-[#E8E4E0] bg-[#F5F5F5]/50">
+                      <th className="py-3 px-4 text-left text-xs tracking-[0.15em] uppercase text-[#999] font-medium">Taille</th>
+                      <th className="py-3 px-4 text-center text-xs tracking-[0.15em] uppercase text-[#999] font-medium">Poitrine</th>
+                      <th className="py-3 px-4 text-center text-xs tracking-[0.15em] uppercase text-[#999] font-medium">Taille</th>
+                      <th className="py-3 px-4 text-center text-xs tracking-[0.15em] uppercase text-[#999] font-medium">Hanches</th>
+                      <th className="py-3 px-4 text-center text-xs tracking-[0.15em] uppercase text-[#999] font-medium">Épaules</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { size: "S", chest: "82–88", waist: "64–70", hips: "88–94", shoulders: "38–40" },
+                      { size: "M", chest: "88–94", waist: "70–76", hips: "94–100", shoulders: "40–42" },
+                      { size: "L", chest: "94–100", waist: "76–82", hips: "100–106", shoulders: "42–44" },
+                      { size: "XL", chest: "100–108", waist: "82–90", hips: "106–114", shoulders: "44–46" },
+                      { size: "XXL", chest: "108–116", waist: "90–98", hips: "114–122", shoulders: "46–48" },
+                    ].map((row) => (
+                      <tr key={row.size} className="border-b border-[#E8E4E0] hover:bg-[rgba(201,164,92,0.12)] transition-colors">
+                        <td className="py-3 px-4">
+                          <span className="inline-flex items-center justify-center w-9 h-9 bg-[#0D0D0D] text-white text-sm font-medium rounded-sm">{row.size}</span>
+                        </td>
+                        <td className="py-3 px-4 text-center text-[#0D0D0D]">{row.chest}</td>
+                        <td className="py-3 px-4 text-center text-[#0D0D0D]">{row.waist}</td>
+                        <td className="py-3 px-4 text-center text-[#0D0D0D]">{row.hips}</td>
+                        <td className="py-3 px-4 text-center text-[#0D0D0D]">{row.shoulders}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

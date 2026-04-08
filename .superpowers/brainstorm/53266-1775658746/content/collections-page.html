@@ -1,0 +1,108 @@
+<h2>Page Collections — Layout grille produits</h2>
+<p class="subtitle">Comment organiser la page qui liste tous les produits ?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:360px;background:#F5F5F5;display:flex;flex-direction:column;overflow:hidden;">
+        <!-- Header -->
+        <div style="padding:20px 16px 12px;background:white;text-align:center;border-bottom:1px solid #eee;">
+          <p style="font-size:9px;color:#C9A45C;letter-spacing:3px;margin-bottom:4px;">IBAG COUTURE</p>
+          <p style="font-family:serif;font-size:20px;color:#0D0D0D;">Nos Collections</p>
+          <p style="font-size:10px;color:#888;margin-top:4px;">24 créations</p>
+        </div>
+        <!-- Filters -->
+        <div style="display:flex;gap:8px;padding:10px 16px;background:white;">
+          <div style="padding:5px 14px;background:#0D0D0D;color:white;font-size:9px;border-radius:20px;letter-spacing:1px;">TOUS</div>
+          <div style="padding:5px 14px;border:1px solid #ddd;font-size:9px;border-radius:20px;color:#666;letter-spacing:1px;">HOMME</div>
+          <div style="padding:5px 14px;border:1px solid #ddd;font-size:9px;border-radius:20px;color:#666;letter-spacing:1px;">FEMME</div>
+          <div style="padding:5px 14px;border:1px solid #ddd;font-size:9px;border-radius:20px;color:#666;letter-spacing:1px;">TRADITIONNEL</div>
+        </div>
+        <!-- Grid 4 cols -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px 16px;flex:1;">
+          <div style="display:flex;flex-direction:column;">
+            <div style="flex:1;background:#e8e4e0;border-radius:4px;position:relative;min-height:80px;">
+              <div style="position:absolute;top:4px;left:4px;background:#0D0D0D;color:#C9A45C;font-size:7px;padding:2px 6px;letter-spacing:1px;">NOUVEAU</div>
+            </div>
+            <p style="font-size:8px;color:#0D0D0D;margin-top:4px;font-family:serif;">Ensemble Horizon</p>
+            <p style="font-size:8px;font-weight:600;">45 000 F</p>
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <div style="flex:1;background:#d4cfc9;border-radius:4px;min-height:80px;"></div>
+            <p style="font-size:8px;color:#0D0D0D;margin-top:4px;font-family:serif;">Robe Élégance</p>
+            <p style="font-size:8px;font-weight:600;">38 000 F</p>
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <div style="flex:1;background:#e0dbd5;border-radius:4px;min-height:80px;position:relative;">
+              <div style="position:absolute;top:4px;left:4px;background:#C9A45C;color:white;font-size:7px;padding:2px 6px;letter-spacing:1px;">-20%</div>
+            </div>
+            <p style="font-size:8px;color:#0D0D0D;margin-top:4px;font-family:serif;">Costume Royal</p>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <p style="font-size:8px;font-weight:600;">52 000 F</p>
+              <p style="font-size:7px;color:#999;text-decoration:line-through;">65 000 F</p>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <div style="flex:1;background:#ccc7c0;border-radius:4px;min-height:80px;"></div>
+            <p style="font-size:8px;color:#0D0D0D;margin-top:4px;font-family:serif;">Boubou Prestige</p>
+            <p style="font-size:8px;font-weight:600;">60 000 F</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Titre centré + filtres pills (recommandé)</h3>
+      <p>En-tête épuré avec titre serif, compteur produits, filtres en pills arrondies. Grille 4 colonnes desktop / 2 mobile. Style Zara.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:360px;background:#F5F5F5;display:flex;flex-direction:column;overflow:hidden;">
+        <!-- Hero banner -->
+        <div style="height:100px;background:linear-gradient(135deg,#0D0D0D,#1a1a1a);display:flex;align-items:center;justify-content:center;position:relative;">
+          <div style="text-align:center;color:white;">
+            <p style="font-size:9px;color:#C9A45C;letter-spacing:3px;margin-bottom:4px;">COLLECTION 2026</p>
+            <p style="font-family:serif;font-size:18px;">Nos Créations</p>
+          </div>
+        </div>
+        <!-- Filters bar -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:white;border-bottom:1px solid #eee;">
+          <div style="display:flex;gap:8px;">
+            <div style="padding:5px 12px;border-bottom:2px solid #0D0D0D;font-size:9px;letter-spacing:1px;">TOUS</div>
+            <div style="padding:5px 12px;font-size:9px;color:#888;letter-spacing:1px;">HOMME</div>
+            <div style="padding:5px 12px;font-size:9px;color:#888;letter-spacing:1px;">FEMME</div>
+          </div>
+          <p style="font-size:9px;color:#888;">24 pièces</p>
+        </div>
+        <!-- Grid -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px 16px;flex:1;">
+          <div style="display:flex;flex-direction:column;">
+            <div style="flex:1;background:#e8e4e0;border-radius:4px;min-height:80px;"></div>
+            <p style="font-size:8px;margin-top:4px;font-family:serif;">Ensemble Horizon</p>
+            <p style="font-size:8px;font-weight:600;">45 000 F</p>
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <div style="flex:1;background:#d4cfc9;border-radius:4px;min-height:80px;"></div>
+            <p style="font-size:8px;margin-top:4px;font-family:serif;">Robe Élégance</p>
+            <p style="font-size:8px;font-weight:600;">38 000 F</p>
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <div style="flex:1;background:#e0dbd5;border-radius:4px;min-height:80px;"></div>
+            <p style="font-size:8px;margin-top:4px;font-family:serif;">Costume Royal</p>
+            <p style="font-size:8px;font-weight:600;">52 000 F</p>
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <div style="flex:1;background:#ccc7c0;border-radius:4px;min-height:80px;"></div>
+            <p style="font-size:8px;margin-top:4px;font-family:serif;">Boubou Prestige</p>
+            <p style="font-size:8px;font-weight:600;">60 000 F</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Bannière hero + tabs soulignés</h3>
+      <p>Mini-bannière noire en haut avec titre, puis filtres en onglets soulignés. Plus dramatique, donne un effet "collection premium".</p>
+    </div>
+  </div>
+</div>

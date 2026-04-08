@@ -1,0 +1,10 @@
+{"type":"server-started","port":58931,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:58931","screen_dir":"/Users/macbookpro/Desktop/ibag-couture-platform/.superpowers/brainstorm/53266-1775658746/content","state_dir":"/Users/macbookpro/Desktop/ibag-couture-platform/.superpowers/brainstorm/53266-1775658746/state"}
+{"type":"screen-added","file":"/Users/macbookpro/Desktop/ibag-couture-platform/.superpowers/brainstorm/53266-1775658746/content/color-direction.html"}
+{"type":"screen-added","file":"/Users/macbookpro/Desktop/ibag-couture-platform/.superpowers/brainstorm/53266-1775658746/content/hero-style.html"}
+{"source":"user-event","type":"click","text":"IBAG COUTURE — DAKAR\n          L'élégance africaine, redéfinie\n          \n            DÉCOUVRIR\n            SUR-MESURE\n          \n        \n      \n    \n    \n      C — Slideshow + texte bas (recommandé)\n      Garde votre slideshow actuel avec overlay dégradé bas. Texte en bas-gauche, 2 boutons CTA. Garde l'impact visuel + lisibilité.","choice":"c","id":null,"timestamp":1775658975217}
+{"source":"user-event","type":"click","text":"IBAG COUTURE — DAKAR\n          L'élégance africaine, redéfinie\n          \n            DÉCOUVRIR\n            SUR-MESURE\n          \n        \n      \n    \n    \n      C — Slideshow + texte bas (recommandé)\n      Garde votre slideshow actuel avec overlay dégradé bas. Texte en bas-gauche, 2 boutons CTA. Garde l'impact visuel + lisibilité.","choice":"c","id":null,"timestamp":1775658989531}
+{"type":"screen-added","file":"/Users/macbookpro/Desktop/ibag-couture-platform/.superpowers/brainstorm/53266-1775658746/content/product-cards.html"}
+{"type":"screen-added","file":"/Users/macbookpro/Desktop/ibag-couture-platform/.superpowers/brainstorm/53266-1775658746/content/product-page.html"}
+{"type":"screen-added","file":"/Users/macbookpro/Desktop/ibag-couture-platform/.superpowers/brainstorm/53266-1775658746/content/waiting.html"}
+{"type":"screen-added","file":"/Users/macbookpro/Desktop/ibag-couture-platform/.superpowers/brainstorm/53266-1775658746/content/collections-page.html"}
+{"type":"server-stopped","reason":"idle timeout"}

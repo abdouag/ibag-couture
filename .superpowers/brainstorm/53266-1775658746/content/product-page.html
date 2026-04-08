@@ -1,0 +1,82 @@
+<h2>Page produit — Layout</h2>
+<p class="subtitle">Comment organiser la page de détail produit ?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:300px;background:white;display:flex;padding:16px;gap:12px;">
+        <!-- Left: gallery -->
+        <div style="flex:1.2;display:flex;gap:8px;">
+          <div style="width:40px;display:flex;flex-direction:column;gap:6px;">
+            <div style="height:48px;background:#e8e4e0;border:2px solid #C9A45C;border-radius:4px;"></div>
+            <div style="height:48px;background:#e8e4e0;border-radius:4px;"></div>
+            <div style="height:48px;background:#e8e4e0;border-radius:4px;"></div>
+          </div>
+          <div style="flex:1;background:linear-gradient(135deg,#e8e4e0,#d4cfc9);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:80px;height:110px;background:#b8a898;border-radius:4px;opacity:0.5;"></div>
+          </div>
+        </div>
+        <!-- Right: details -->
+        <div style="flex:1;padding:8px;display:flex;flex-direction:column;gap:8px;">
+          <p style="font-size:9px;color:#999;letter-spacing:2px;">ACCUEIL / HOMME</p>
+          <p style="font-family:serif;font-size:18px;color:#0D0D0D;line-height:1.2;">Ensemble Horizon Tunique</p>
+          <p style="font-size:9px;color:#C9A45C;letter-spacing:1px;">CRÉATION SUR-MESURE</p>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-family:serif;font-size:16px;font-weight:600;">45 000 F</span>
+            <span style="font-size:10px;color:#999;text-decoration:line-through;">55 000 F</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;"></div>
+            <span style="font-size:9px;color:#666;">En stock (5)</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            <div style="padding:4px 10px;border:1px solid #ddd;font-size:9px;border-radius:3px;">S</div>
+            <div style="padding:4px 10px;background:#0D0D0D;color:white;font-size:9px;border-radius:3px;">M</div>
+            <div style="padding:4px 10px;border:1px solid #ddd;font-size:9px;border-radius:3px;">L</div>
+            <div style="padding:4px 10px;border:1px solid #ddd;font-size:9px;border-radius:3px;">XL</div>
+          </div>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:6px;">
+            <div style="padding:10px;background:#0D0D0D;color:white;text-align:center;font-size:10px;letter-spacing:2px;border-radius:4px;">COMMANDER MAINTENANT</div>
+            <div style="padding:10px;border:1px solid #0D0D0D;text-align:center;font-size:10px;letter-spacing:2px;border-radius:4px;">AJOUTER AU PANIER</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Classique 2 colonnes (recommandé)</h3>
+      <p>Galerie à gauche avec thumbnails verticaux + détails sticky à droite. Layout éprouvé Farfetch/SSENSE. Clean et efficace.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:300px;background:white;display:flex;flex-direction:column;">
+        <!-- Top: full width image -->
+        <div style="flex:1.5;background:linear-gradient(135deg,#e8e4e0,#d4cfc9);display:flex;align-items:center;justify-content:center;position:relative;">
+          <div style="width:100px;height:140px;background:#b8a898;border-radius:4px;opacity:0.5;"></div>
+          <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#C9A45C;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:#ccc;"></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:#ccc;"></div>
+          </div>
+        </div>
+        <!-- Bottom: details -->
+        <div style="flex:1;padding:12px;display:flex;flex-direction:column;gap:6px;">
+          <p style="font-family:serif;font-size:16px;color:#0D0D0D;">Ensemble Horizon Tunique</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-family:serif;font-size:15px;font-weight:600;">45 000 F</span>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <div style="width:6px;height:6px;border-radius:50%;background:#22c55e;"></div>
+              <span style="font-size:9px;color:#666;">En stock</span>
+            </div>
+          </div>
+          <div style="padding:10px;background:#0D0D0D;color:white;text-align:center;font-size:10px;letter-spacing:2px;border-radius:4px;margin-top:auto;">COMMANDER</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Image dominante (mobile-first)</h3>
+      <p>Image plein écran en haut, swipe horizontal, détails en dessous. Optimal pour mobile, moins impactant sur desktop.</p>
+    </div>
+  </div>
+</div>
