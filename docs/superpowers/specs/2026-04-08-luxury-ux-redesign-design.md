@@ -309,7 +309,44 @@ Used across homepage, collections, similar products.
 
 ---
 
-## 10. Files to Modify
+## 10. Additional UX Enhancements
+
+### 10.1 Enhanced Search Bar
+
+Upgrade the existing SearchBar dropdown to show product image thumbnails alongside text results. Each result row: product image (40x40, rounded) + name + price. Max 5 results with debounce (keep existing 300ms).
+
+### 10.2 "Added to Cart" Toast Notification
+
+When a product is added to cart, show an animated toast notification (slide in from top-right, auto-dismiss after 3s). Content: product thumbnail + name + "Ajouté au panier" + link to view cart. Replace the current button-only state change.
+
+### 10.3 "Dernières pièces" Badge
+
+On product cards, when `stock < 3 && stock > 0`, show an orange/amber badge: `DERNIÈRES PIÈCES`. Position: top-left, below "Nouveau" badge if both apply. Color: `#D97706` bg, white text.
+
+### 10.4 Branded 404 Page
+
+Create `client/src/app/not-found.tsx` with:
+- Black background (#0D0D0D)
+- Large "404" in Playfair Display, gold color
+- Text: "Cette page n'existe pas"
+- CTA button: "Retour aux collections" → /collections
+- Consistent with luxury brand identity
+
+### 10.5 Product Card Image Hover
+
+On desktop, when hovering a product card that has more than 1 image, crossfade to the second image. Use CSS transition (opacity 0.4s). Preload second image on card mount. No effect on mobile (no hover).
+
+### 10.6 Premium Page Loader
+
+Add a thin gold progress bar at the very top of the page during Next.js route transitions. Height: 2px, color: #C9A45C, animated left-to-right. Use Next.js `useRouter` events or a lightweight NProgress-style implementation.
+
+### 10.7 Favicon & Metadata Update
+
+Update favicon to match luxury identity (gold "I" on black background or similar). Ensure Open Graph default image reflects the new brand palette. Update `layout.tsx` metadata: description, theme-color (#0D0D0D).
+
+---
+
+## 11. Files to Modify
 
 | File | Changes |
 |------|---------|
@@ -329,6 +366,9 @@ Used across homepage, collections, similar products.
 | `client/src/components/SimilarProducts.tsx` | Updated card display |
 | `client/src/components/DeliveryInfo.tsx` | Styled to match palette |
 | `client/src/components/ScrollReveal.tsx` | No logic changes, maybe timing tweaks |
+| `client/src/components/CartToast.tsx` | **New** — toast notification on add-to-cart |
+| `client/src/app/not-found.tsx` | **New** — branded 404 page |
+| `client/src/app/layout.tsx` | Page loader, favicon, metadata update |
 
 ### Files NOT Modified
 
