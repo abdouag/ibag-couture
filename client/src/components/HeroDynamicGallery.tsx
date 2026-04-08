@@ -93,9 +93,8 @@ export default function HeroDynamicGallery({
           className="object-cover object-center"
           priority
         />
-        {/* Premium dark gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        {/* Dark gradient for text readability */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
       </div>
     );
   }
@@ -138,13 +137,8 @@ export default function HeroDynamicGallery({
         </div>
       </div>
 
-      {/* Premium dark gradient overlay for text readability */}
-      {/* Horizontal gradient: darker on left for text */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/35" />
-      {/* Vertical gradient: subtle vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/25" />
-      {/* Extra bottom fade for premium look */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
+      {/* Dark gradient for text readability */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
 
       {/* Subtle slide indicators */}
       {shuffledImages.length > 1 && (
@@ -163,8 +157,8 @@ export default function HeroDynamicGallery({
               }}
               className={`w-2 h-2 rounded-full transition-all duration-500 ${
                 idx === currentIndex
-                  ? "bg-white w-6"
-                  : "bg-white/40 hover:bg-white/60"
+                  ? "bg-[#C9A45C] w-6"
+                  : "bg-white/30 hover:bg-white/60"
               }`}
               aria-label={`Voir image ${idx + 1}`}
             />
