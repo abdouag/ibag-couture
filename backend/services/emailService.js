@@ -38,18 +38,28 @@ function getTransporter() {
  */
 async function sendEmail({ to, subject, html, text }) {
   if (process.env.EMAIL_ENABLED !== 'true') {
-    console.log(`[EMAIL] Desactive — email non envoye a ${to}`);
+    console.log(`[EMAIL] Desactive (EMAIL_ENABLED=${process.env.EMAIL_ENABLED}) — email non envoye a ${to}`);
     return null;
   }
 
   const t = getTransporter();
-  if (!t) return null;
+  if (!t) {
+    console.error(`[EMAIL] ERREUR: Transporter SMTP non disponible. Variables manquantes: SMTP_HOST=${process.env.SMTP_HOST ? 'OK' : 'ABSENT'}, SMTP_USER=${process.env.SMTP_USER ? 'OK' : 'ABSENT'}, SMTP_PASS=${process.env.SMTP_PASS ? 'OK' : 'ABSENT'}`);
+    return null;
+  }
 
   const from = process.env.EMAIL_FROM || process.env.SMTP_USER;
 
-  const info = await t.sendMail({ from, to, subject, html, text });
-  console.log(`[EMAIL] Envoye a ${to} — messageId: ${info.messageId}`);
-  return info;
+  try {
+    const info = await t.sendMail({ from, to, subject, html, text });
+    console.log(`[EMAIL] Envoye a ${to} — messageId: ${info.messageId}`);
+    return info;
+  } catch (err) {
+    console.error(`[EMAIL] ERREUR envoi a ${to}: ${err.message}`);
+    // Reset transporter in case of auth/connection failure so it reconnects next time
+    transporter = null;
+    throw err;
+  }
 }
 
 /**
