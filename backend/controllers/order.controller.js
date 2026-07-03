@@ -39,9 +39,30 @@ const createOrder = async (req, res, next) => {
     const optionsPrice = selectedOptions.reduce((sum, opt) => sum + (opt.price || 0), 0);
     const totalPrice = basePrice + optionsPrice;
 
+    // Extraire le user connecté si présent (commande authentifiée)
+    let userId = null;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      try {
+        const jwt = require('jsonwebtoken');
+        const config = require('../config');
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, config.jwtSecret);
+        userId = decoded.id;
+      } catch {
+        // Token invalide ou expiré — on continue sans lier le user
+      }
+    }
+
     // Préparer les données de commande
     const orderData = {
       product: productId,
+      productSnapshot: {
+        name: product.name,
+        slug: product.slug,
+        category: product.category,
+        mainImage: product.mainImage || (product.images && product.images[0]) || null,
+        basePrice: product.basePrice,
+      },
       selectedOptions,
       size,
       customer,
@@ -49,6 +70,7 @@ const createOrder = async (req, res, next) => {
       optionsPrice,
       totalPrice,
       notes: notes || undefined,
+      user: userId || undefined,
     };
 
     // Ajouter les mesures uniquement si sur-mesure
@@ -103,6 +125,46 @@ const createOrder = async (req, res, next) => {
 };
 
 /**
+ * @desc    Récupérer les commandes de l'utilisateur connecté
+ * @route   GET /api/orders/my-orders
+ */
+const getMyOrders = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const userEmail = req.user.email;
+
+    // Chercher par user ID ou par email du client
+    const orders = await Order.find({
+      $or: [
+        { user: userId },
+        { 'customer.email': userEmail },
+      ],
+    })
+      .populate('product', 'name slug category mainImage productionTime')
+      .sort('-createdAt')
+      .lean();
+
+    // Utiliser productSnapshot si produit supprimé
+    const enrichedOrders = orders.map((order) => {
+      const productInfo = order.product || order.productSnapshot || {
+        name: '[Produit supprimé]',
+        slug: null,
+        mainImage: null,
+      };
+      return { ...order, product: productInfo };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: enrichedOrders.length,
+      data: enrichedOrders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Récupérer toutes les commandes
  * @route   GET /api/orders
  */
@@ -140,7 +202,7 @@ const getAllOrders = async (req, res, next) => {
     // Exécution des requêtes en parallèle
     const [orders, total] = await Promise.all([
       Order.find(filter)
-        .populate('product', 'name slug category productionTime')
+        .populate('product', 'name slug category mainImage productionTime')
         .sort(sort)
         .skip(skip)
         .limit(limitNum)
@@ -148,14 +210,31 @@ const getAllOrders = async (req, res, next) => {
       Order.countDocuments(filter),
     ]);
 
+    // Enrichir les commandes : utiliser productSnapshot si produit supprimé
+    const enrichedOrders = orders.map((order) => {
+      const productDeleted = !order.product;
+      const productInfo = order.product || order.productSnapshot || {
+        name: '[Produit supprimé]',
+        slug: null,
+        category: null,
+        mainImage: null,
+      };
+
+      return {
+        ...order,
+        product: productInfo,
+        productDeleted,
+      };
+    });
+
     res.status(200).json({
       success: true,
       message: 'Commandes récupérées avec succès',
-      count: orders.length,
+      count: enrichedOrders.length,
       total,
       totalPages: Math.ceil(total / limitNum),
       currentPage: pageNum,
-      data: orders,
+      data: enrichedOrders,
     });
   } catch (error) {
     next(error);
@@ -414,34 +493,11 @@ const getWorkshopOrders = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Récupérer les commandes du client connecté (par email)
- * @route   GET /api/orders/my-orders
- */
-const getMyOrders = async (req, res, next) => {
-  try {
-    const userEmail = req.user.email;
-
-    const orders = await Order.find({ 'customer.email': userEmail })
-      .populate('product', 'name slug category images')
-      .sort('-createdAt')
-      .lean();
-
-    res.status(200).json({
-      success: true,
-      count: orders.length,
-      data: orders,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 module.exports = {
   createOrder,
+  getMyOrders,
   getAllOrders,
   getOrderById,
-  getMyOrders,
   updateOrderStatus,
   updateAdminNotes,
   updateWorkshopInfo,

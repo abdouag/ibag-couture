@@ -2,12 +2,13 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export async function api(path, options = {}) {
+  const { headers: customHeaders, ...restOptions } = options;
   const res = await fetch(`${API_URL}${path}`, {
+    ...restOptions,
     headers: {
       "Content-Type": "application/json",
-      ...options.headers,
+      ...customHeaders,
     },
-    ...options,
   });
 
   if (!res.ok) {

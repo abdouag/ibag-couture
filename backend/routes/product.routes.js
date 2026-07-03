@@ -4,11 +4,11 @@ const router = express.Router();
 
 const {
   createProduct,
-  getProducts,
+  getAllProducts,
   getProductBySlug,
   updateProduct,
   deleteProduct,
-} = require('../controllers/productController');
+} = require('../controllers/product.controller');
 const { validate } = require('../middleware');
 
 // Validation rules
@@ -147,7 +147,7 @@ const slugValidation = [
 router
   .route('/')
   .post(validate(productValidation), createProduct)
-  .get(getProducts);
+  .get(getAllProducts);
 
 router
   .route('/:slug')

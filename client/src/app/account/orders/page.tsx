@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { api } from "@/lib/api";
 
 type Order = {
   _id: string;
@@ -11,8 +10,10 @@ type Order = {
   product: {
     name: string;
     slug: string;
+    mainImage?: string;
     images?: string[];
   };
+  size: string;
   totalPrice: number;
   status: string;
   createdAt: string;
@@ -20,7 +21,6 @@ type Order = {
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: "En attente", color: "bg-yellow-100 text-yellow-800" },
-  confirmed: { label: "Confirmee", color: "bg-blue-100 text-blue-800" },
   in_production: { label: "En confection", color: "bg-purple-100 text-purple-800" },
   ready: { label: "Prete", color: "bg-emerald-100 text-emerald-800" },
   delivered: { label: "Livree", color: "bg-green-100 text-green-800" },
@@ -42,18 +42,15 @@ export default function OrdersPage() {
           return;
         }
 
-        const res = await fetch(`${API_URL}/api/orders/my-orders`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const data = await api("/api/orders/my-orders", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
-        if (!res.ok) {
-          throw new Error("Erreur lors de la recuperation des commandes");
-        }
-
-        const data = await res.json();
         setOrders(data.data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Erreur inconnue");
+      } catch {
+        setError("Impossible de charger vos commandes.");
       } finally {
         setLoading(false);
       }
@@ -69,8 +66,13 @@ export default function OrdersPage() {
           <h2 className="text-xl md:text-2xl font-serif text-stone-900">Mes commandes</h2>
           <p className="text-sm text-stone-500 mt-1">Chargement...</p>
         </div>
-        <div className="bg-white rounded-sm border border-stone-200 p-12 text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-stone-300 border-t-stone-800 rounded-full mx-auto"></div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-sm border border-stone-200 p-6 animate-pulse">
+              <div className="h-4 bg-stone-200 rounded w-1/4 mb-3"></div>
+              <div className="h-3 bg-stone-100 rounded w-1/2"></div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -82,8 +84,16 @@ export default function OrdersPage() {
         <div>
           <h2 className="text-xl md:text-2xl font-serif text-stone-900">Mes commandes</h2>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-sm p-6 text-center">
-          <p className="text-red-700">{error}</p>
+        <div className="bg-red-50 border border-red-100 rounded-sm p-6 text-center">
+          <p className="text-red-700 text-sm">{error}</p>
+          {error.includes("connecter") && (
+            <Link
+              href="/login"
+              className="inline-block mt-4 bg-stone-900 text-white px-6 py-2.5 text-sm hover:bg-stone-800 transition-colors"
+            >
+              Se connecter
+            </Link>
+          )}
         </div>
       </div>
     );
@@ -139,43 +149,63 @@ export default function OrdersPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {orders.map((order) => (
-            <div key={order._id} className="bg-white rounded-sm border border-stone-200 p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                {/* Product image */}
-                {order.product?.images?.[0] && (
-                  <div className="w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-stone-100">
+          {orders.map((order) => {
+            const productImage = order.product?.mainImage || order.product?.images?.[0];
+            return (
+              <div key={order._id} className="bg-white rounded-sm border border-stone-200 p-5">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    <p className="font-medium text-stone-900">#{order.orderNumber}</p>
+                    <p className="text-xs text-stone-500 mt-0.5">
+                      {new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                  <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
+                    statusLabels[order.status]?.color || 'bg-stone-100 text-stone-800'
+                  }`}>
+                    {statusLabels[order.status]?.label || order.status}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 mb-3">
+                  {productImage && (
                     <img
-                      src={order.product.images[0]}
-                      alt={order.product.name}
-                      className="w-full h-full object-cover"
+                      src={productImage}
+                      alt={order.product?.name}
+                      className="w-12 h-12 object-cover rounded-sm bg-stone-100"
                     />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-stone-900 truncate">{order.product?.name || "Produit"}</p>
+                    <p className="text-xs text-stone-500">
+                      Taille : {order.size === 'sur-mesure' ? 'Sur-mesure' : order.size}
+                    </p>
+                  </div>
+                  <p className="text-sm font-semibold text-stone-900 whitespace-nowrap">
+                    {order.totalPrice.toLocaleString('fr-FR')} FCFA
+                  </p>
+                </div>
+
+                {order.product?.slug && (
+                  <div className="flex justify-end pt-2 border-t border-stone-100">
+                    <Link
+                      href={`/produits/${order.product.slug}`}
+                      className="inline-flex items-center gap-1 text-xs text-amber-700 hover:text-amber-800 transition-colors"
+                    >
+                      Voir le produit
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </Link>
                   </div>
                 )}
-
-                {/* Order info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <p className="font-medium text-stone-900 truncate">
-                      {order.product?.name || "Produit"}
-                    </p>
-                    <span className={`inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full whitespace-nowrap ${
-                      statusLabels[order.status]?.color || "bg-stone-100 text-stone-800"
-                    }`}>
-                      {statusLabels[order.status]?.label || order.status}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-stone-500">
-                    <span>#{order.orderNumber}</span>
-                    <span>{new Date(order.createdAt).toLocaleDateString("fr-FR")}</span>
-                    <span className="font-medium text-stone-900">
-                      {order.totalPrice?.toLocaleString("fr-FR")} FCFA
-                    </span>
-                  </div>
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
