@@ -1,8 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F5F5F5;
+  --foreground: #0D0D0D;
+  /* Luxury color palette */
+  --gold-50: #fefce8;
+  --gold-100: #fef9c3;
+  --gold-200: #fef08a;
+  --gold-300: #fde047;
+  --gold-400: #facc15;
+  --gold-500: #eab308;
+  --gold-600: #C9A45C;
+  --gold-700: #A67C3D;
+  --gold-800: #854d0e;
+  --gold-900: #713f12;
+  /* New luxury design tokens */
+  --color-black: #0D0D0D;
+  --color-white: #F5F5F5;
+  --color-gold: #C9A45C;
+  --color-gold-light: rgba(201, 164, 92, 0.12);
+  --color-gold-dark: #A67C3D;
+  --color-gray-100: #E8E4E0;
+  --color-gray-200: #D4CFC9;
+  --color-gray-400: #999999;
+  --color-gray-600: #666666;
+  --color-success: #22C55E;
+  --color-promo: #DC2626;
 }
 
 @theme inline {
@@ -10,28 +33,69 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-playfair);
+  --font-serif-alt: var(--font-cormorant);
   /* Custom breakpoint for extra small devices */
   --breakpoint-xs: 480px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0D0D0D;
+    --foreground: #F5F5F5;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom Animations */
+/* Luxury Typography Utilities */
+.font-luxury {
+  font-family: var(--font-playfair), serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.font-luxury-alt {
+  font-family: var(--font-cormorant), serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Premium heading styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ============================================
+   LUXURY ANIMATIONS & TRANSITIONS
+   ============================================ */
+
+/* Fade In - Refined */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-12px);
   }
   to {
     opacity: 1;
@@ -40,7 +104,57 @@ body {
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fade In Up - Premium */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scale In - Subtle luxury effect */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Luxury hover scale */
+.hover-scale {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Premium shadow transition */
+.hover-shadow {
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
 }
 
 /* Hide scrollbar for filter section */
@@ -108,4 +222,219 @@ body {
 
 .animate-stock-pulse {
   animation: stockPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hero Dynamic Gallery - Premium Ken Burns zoom effect */
+@keyframes heroZoom {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+.animate-hero-zoom {
+  animation: heroZoom 8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================
+   LUXURY UTILITY CLASSES
+   ============================================ */
+
+/* Premium text shadow for hero overlays */
+.text-shadow-luxury {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Luxury gradient overlays */
+.gradient-overlay-dark {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+.gradient-overlay-hero {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+
+/* Premium backdrop blur */
+.backdrop-blur-luxury {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+/* Luxury border */
+.border-luxury {
+  border: 1px solid rgba(120, 113, 108, 0.2);
+}
+
+/* Premium focus states */
+.focus-luxury:focus {
+  outline: 2px solid rgba(202, 138, 4, 0.5);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, select, textarea {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Premium selection color */
+::selection {
+  background-color: rgba(202, 138, 4, 0.2);
+  color: inherit;
+}
+
+::-moz-selection {
+  background-color: rgba(202, 138, 4, 0.2);
+  color: inherit;
+}
+
+/* ============================================
+   NEW LUXURY DESIGN SYSTEM UTILITIES
+   ============================================ */
+
+/* Gold label */
+.label-gold {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+/* Luxury primary button */
+.btn-luxury-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  background: var(--color-black);
+  color: #ffffff;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-luxury-primary:hover {
+  background: #1a1a1a;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Luxury gold button */
+.btn-luxury-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  background: var(--color-gold);
+  color: var(--color-black);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-luxury-gold:hover {
+  background: var(--color-gold-dark);
+  box-shadow: 0 8px 24px rgba(201, 164, 92, 0.35);
+}
+
+/* Luxury outline button */
+.btn-luxury-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-luxury-outline:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Toast animations */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-toast-in {
+  animation: slideInFromRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-toast-out {
+  animation: slideOutToRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Page loader progress animation */
+@keyframes pageLoaderProgress {
+  0% { width: 0%; }
+  70% { width: 70%; }
+  100% { width: 100%; }
+}
+
+.animate-page-loader {
+  animation: pageLoaderProgress 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Card image hover — secondary image reveal */
+.card-image-hover .card-image-secondary {
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-image-hover:hover .card-image-secondary {
+  opacity: 1;
+}
+
+.card-image-hover .card-image-primary {
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-image-hover:hover .card-image-primary {
+  opacity: 0;
 }

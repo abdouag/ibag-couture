@@ -34,7 +34,7 @@ export default function AddToCartButton({ product, variant = "default" }: Props)
         className={`flex items-center justify-center w-10 h-10 border rounded transition-all duration-300 ${
           added
             ? "border-green-500 bg-green-50 text-green-700"
-            : "border-stone-300 text-stone-700 hover:bg-stone-100"
+            : "border-[#E8E4E0] hover:border-[#C9A45C] text-stone-700 hover:bg-stone-100"
         }`}
         aria-label="Ajouter au panier"
       >
@@ -57,7 +57,7 @@ export default function AddToCartButton({ product, variant = "default" }: Props)
       className={`w-full flex items-center justify-center gap-2 border py-4 text-sm tracking-wide transition-all duration-300 ${
         added
           ? "border-green-500 bg-green-50 text-green-700"
-          : "border-stone-300 text-stone-700 hover:bg-stone-100"
+          : "border-[#0D0D0D] text-stone-700 hover:bg-stone-100"
       }`}
     >
       {added ? (

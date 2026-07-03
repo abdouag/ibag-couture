@@ -24,6 +24,7 @@ type CartContextType = {
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
   isHydrated: boolean;
+  lastAddedItem: CartItem | null;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -34,6 +35,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -67,6 +69,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...item, quantity: 1 }];
     });
+    // Construct the item for toast display
+    const toastItem: CartItem = {
+      productId: item.productId,
+      slug: item.slug,
+      name: item.name,
+      category: item.category,
+      basePrice: item.basePrice,
+      promoPrice: item.promoPrice,
+      mainImage: item.mainImage,
+      quantity: 1,
+    };
+    setLastAddedItem(toastItem);
+    setTimeout(() => setLastAddedItem(null), 3500);
   }, []);
 
   const removeItem = useCallback((productId: string) => {
@@ -110,6 +125,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         isCartOpen,
         setIsCartOpen,
         isHydrated,
+        lastAddedItem,
       }}
     >
       {children}

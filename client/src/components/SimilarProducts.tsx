@@ -27,7 +27,7 @@ export default async function SimilarProducts({ category, currentProductId }: Pr
   let products: Product[] = [];
 
   try {
-    const res = await fetch(`${API_URL}/api/products?category=${encodeURIComponent(category)}`, {
+    const res = await fetch(`${API_URL}/api/products?category=${encodeURIComponent(category)}&limit=20`, {
       cache: "no-store",
     });
     if (res.ok) {
@@ -43,13 +43,13 @@ export default async function SimilarProducts({ category, currentProductId }: Pr
   if (products.length === 0) return null;
 
   return (
-    <section className="py-12 md:py-16 bg-white border-t border-stone-200">
+    <section className="py-12 md:py-16 bg-white border-t border-[#E8E4E0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8 md:mb-10">
-          <p className="text-amber-700 text-xs tracking-[0.3em] uppercase mb-2 font-medium">
+          <p className="text-[#C9A45C] text-xs tracking-[0.3em] uppercase mb-2 font-medium">
             Vous aimerez aussi
           </p>
-          <h2 className="text-2xl md:text-3xl font-serif text-stone-900">
+          <h2 className="text-2xl md:text-3xl font-serif text-[#0D0D0D]">
             Produits similaires
           </h2>
         </div>
@@ -91,16 +91,16 @@ export default async function SimilarProducts({ category, currentProductId }: Pr
                     </div>
                   )}
 
-                  <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/20 transition-all duration-500 flex items-center justify-center">
-                    <span className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 bg-white text-stone-900 px-5 py-2 text-sm tracking-wide">
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 flex items-center justify-center">
+                    <span className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 bg-white text-[#0D0D0D] px-5 py-2 text-sm tracking-wide">
                       Voir le mod&egrave;le
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-xs text-amber-700 uppercase tracking-wider mb-1">{product.category}</p>
-                  <h3 className="font-serif text-sm sm:text-base text-stone-900 group-hover:text-amber-700 transition-colors line-clamp-1 mb-1">
+                  <p className="text-xs text-[#C9A45C] uppercase tracking-wider mb-1">{product.category}</p>
+                  <h3 className="font-serif text-sm sm:text-base text-[#0D0D0D] group-hover:text-[#C9A45C] transition-colors line-clamp-1 mb-1">
                     {product.name}
                   </h3>
                   {hasPromo ? (
@@ -110,7 +110,7 @@ export default async function SimilarProducts({ category, currentProductId }: Pr
                       <span className="ml-1.5 text-stone-400 line-through text-xs">{product.basePrice.toLocaleString("fr-FR")}</span>
                     </p>
                   ) : (
-                    <p className="text-sm text-stone-900">
+                    <p className="text-sm text-[#0D0D0D]">
                       <span className="font-medium">{product.basePrice.toLocaleString("fr-FR")}</span>
                       <span className="text-xs text-stone-500"> FCFA</span>
                     </p>

@@ -400,18 +400,24 @@ export default function AIProductModal({
     addMessage("user", "Oui, genere les images");
     addMessage(
       "assistant",
-      "Generation des images secondaires en cours...\nCela peut prendre 30 a 60 secondes."
+      "Generation des images secondaires en cours...\nCela peut prendre 2 a 4 minutes. Veuillez patienter sans quitter cette page."
     );
     setStep("generating-images");
 
     try {
       const token = localStorage.getItem("token");
+
+      // 5-minute timeout to allow Gemini image generation to complete
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
+
       const res = await fetch(`${API_URL}/api/admin/ai/generate-product`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        signal: controller.signal,
         body: JSON.stringify({
           name: productName || generatedText?.name,
           category,
@@ -422,6 +428,8 @@ export default function AIProductModal({
           imageAnalysis: analysis || undefined,
         }),
       });
+
+      clearTimeout(timeoutId);
 
       const data = await res.json();
 
@@ -444,10 +452,14 @@ export default function AIProductModal({
       setTimeout(() => {
         goToCreateStep();
       }, 500);
-    } catch {
+    } catch (err) {
+      console.error("[AI] Erreur generation images:", err);
+      const isTimeout = err instanceof DOMException && err.name === "AbortError";
       addMessage(
         "assistant",
-        "Erreur lors de la generation d'images. On continue sans images supplementaires."
+        isTimeout
+          ? "La generation a pris trop de temps (timeout). On continue sans images supplementaires."
+          : "Erreur lors de la generation d'images. On continue sans images supplementaires."
       );
       goToCreateStep();
     }

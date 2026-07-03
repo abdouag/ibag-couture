@@ -58,7 +58,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-stone-50 flex flex-col pt-16 md:pt-20">
+    <main className="min-h-screen bg-stone-50 flex flex-col pt-4 md:pt-6">
       {/* Login Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">

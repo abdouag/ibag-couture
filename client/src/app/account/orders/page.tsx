@@ -11,6 +11,7 @@ type Order = {
     name: string;
     slug: string;
     mainImage?: string;
+    images?: string[];
   };
   size: string;
   totalPrice: number;
@@ -21,8 +22,8 @@ type Order = {
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: "En attente", color: "bg-yellow-100 text-yellow-800" },
   in_production: { label: "En confection", color: "bg-purple-100 text-purple-800" },
-  ready: { label: "Prete", color: "bg-green-100 text-green-800" },
-  delivered: { label: "Livree", color: "bg-stone-100 text-stone-800" },
+  ready: { label: "Prete", color: "bg-emerald-100 text-emerald-800" },
+  delivered: { label: "Livree", color: "bg-green-100 text-green-800" },
   cancelled: { label: "Annulee", color: "bg-red-100 text-red-800" },
 };
 
@@ -105,7 +106,9 @@ export default function OrdersPage() {
         <div>
           <h2 className="text-xl md:text-2xl font-serif text-stone-900">Mes commandes</h2>
           <p className="text-sm text-stone-500 mt-1">
-            Suivez l&apos;avancement de vos creations sur mesure
+            {orders.length > 0
+              ? `${orders.length} commande${orders.length > 1 ? "s" : ""}`
+              : "Suivez l'avancement de vos creations sur mesure"}
           </p>
         </div>
         <Link
@@ -146,58 +149,63 @@ export default function OrdersPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {orders.map((order) => (
-            <div key={order._id} className="bg-white rounded-sm border border-stone-200 p-5">
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <div>
-                  <p className="font-medium text-stone-900">#{order.orderNumber}</p>
-                  <p className="text-xs text-stone-500 mt-0.5">
-                    {new Date(order.createdAt).toLocaleDateString('fr-FR', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
+          {orders.map((order) => {
+            const productImage = order.product?.mainImage || order.product?.images?.[0];
+            return (
+              <div key={order._id} className="bg-white rounded-sm border border-stone-200 p-5">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    <p className="font-medium text-stone-900">#{order.orderNumber}</p>
+                    <p className="text-xs text-stone-500 mt-0.5">
+                      {new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                  <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
+                    statusLabels[order.status]?.color || 'bg-stone-100 text-stone-800'
+                  }`}>
+                    {statusLabels[order.status]?.label || order.status}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 mb-3">
+                  {productImage && (
+                    <img
+                      src={productImage}
+                      alt={order.product?.name}
+                      className="w-12 h-12 object-cover rounded-sm bg-stone-100"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-stone-900 truncate">{order.product?.name || "Produit"}</p>
+                    <p className="text-xs text-stone-500">
+                      Taille : {order.size === 'sur-mesure' ? 'Sur-mesure' : order.size}
+                    </p>
+                  </div>
+                  <p className="text-sm font-semibold text-stone-900 whitespace-nowrap">
+                    {order.totalPrice.toLocaleString('fr-FR')} FCFA
                   </p>
                 </div>
-                <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
-                  statusLabels[order.status]?.color || 'bg-stone-100 text-stone-800'
-                }`}>
-                  {statusLabels[order.status]?.label || order.status}
-                </span>
-              </div>
 
-              <div className="flex items-center gap-3 mb-3">
-                {order.product?.mainImage && (
-                  <img
-                    src={order.product.mainImage}
-                    alt={order.product?.name}
-                    className="w-12 h-12 object-cover rounded-sm bg-stone-100"
-                  />
+                {order.product?.slug && (
+                  <div className="flex justify-end pt-2 border-t border-stone-100">
+                    <Link
+                      href={`/produits/${order.product.slug}`}
+                      className="inline-flex items-center gap-1 text-xs text-amber-700 hover:text-amber-800 transition-colors"
+                    >
+                      Voir le produit
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </Link>
+                  </div>
                 )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-stone-900 truncate">{order.product?.name || "Produit"}</p>
-                  <p className="text-xs text-stone-500">
-                    Taille : {order.size === 'sur-mesure' ? 'Sur-mesure' : order.size}
-                  </p>
-                </div>
-                <p className="text-sm font-semibold text-stone-900 whitespace-nowrap">
-                  {order.totalPrice.toLocaleString('fr-FR')} FCFA
-                </p>
               </div>
-
-              <div className="flex justify-end pt-2 border-t border-stone-100">
-                <Link
-                  href={`/produits/${order.product?.slug}`}
-                  className="inline-flex items-center gap-1 text-xs text-amber-700 hover:text-amber-800 transition-colors"
-                >
-                  Voir le produit
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

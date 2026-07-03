@@ -34,10 +34,10 @@ export default function ProductCardActions({ product, isOutOfStock }: Props) {
   return (
     <button
       onClick={handleAdd}
-      className={`w-full mt-2 sm:mt-3 flex items-center justify-center gap-1.5 py-2 sm:py-2.5 text-[11px] sm:text-xs tracking-wide uppercase font-medium transition-all duration-300 ${
+      className={`w-full mt-2 sm:mt-3 flex items-center justify-center gap-1.5 py-2 sm:py-2.5 font-medium transition-all duration-300 ${
         added
           ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-          : "bg-stone-900 text-white hover:bg-stone-800"
+          : "bg-[#0D0D0D] text-white hover:bg-[#1a1a1a] text-[11px] uppercase tracking-[0.1em] rounded-sm"
       }`}
     >
       {added ? (
