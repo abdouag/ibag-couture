@@ -48,7 +48,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
   const { category } = await searchParams;
   let allProducts: Product[] = [];
   try {
-    const res = await fetch(`${API_URL}/api/products`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/products?limit=100`, { cache: "no-store" });
     if (res.ok) {
       const data: ApiResponse = await res.json();
       allProducts = data?.data || [];
@@ -60,7 +60,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
   const activeCategory = category || "tous";
   const products = activeCategory === "tous"
     ? allProducts
-    : allProducts.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
+    : allProducts.filter((p) => (p.category ?? "").toLowerCase() === activeCategory.toLowerCase());
 
   const categories = ["tous", "homme", "femme", "traditionnel", "moderne"];
 
@@ -69,7 +69,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
   for (const cat of categories) {
     productCounts[cat] = cat === "tous"
       ? allProducts.length
-      : allProducts.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
+      : allProducts.filter((p) => (p.category ?? "").toLowerCase() === cat.toLowerCase()).length;
   }
 
   return (

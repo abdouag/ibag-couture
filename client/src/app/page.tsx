@@ -43,7 +43,7 @@ type ApiResponse = {
 export default async function Home() {
   let products: Product[] = [];
   try {
-    const res = await fetch(`${API_URL}/api/products`, {
+    const res = await fetch(`${API_URL}/api/products?limit=100`, {
       cache: "no-store",
     });
     if (res.ok) {
@@ -65,7 +65,7 @@ export default async function Home() {
   ];
 
   const categories = allCategories.map((cat) => {
-    const catProducts = products.filter((p) => p.category.toLowerCase() === cat.slug);
+    const catProducts = products.filter((p) => (p.category ?? "").toLowerCase() === cat.slug);
     const firstWithImage = catProducts.find((p) => p.mainImage || (p.images && p.images.length > 0));
     const img = firstWithImage
       ? firstWithImage.mainImage || (firstWithImage.images && firstWithImage.images[0])
