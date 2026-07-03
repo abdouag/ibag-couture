@@ -59,9 +59,11 @@ export default async function CollectionsPage({ searchParams }: Props) {
       const data: ApiResponse = await res.json();
       allProducts = data?.data || [];
       total = data?.total ?? allProducts.length;
+    } else {
+      console.error(`[Collections] API responded ${res.status} at ${API_URL}/api/products`);
     }
-  } catch {
-    // API not available
+  } catch (err) {
+    console.error(`[Collections] API fetch failed at ${API_URL}/api/products:`, err);
   }
 
   // Diversifier l'affichage : alterner les catégories pour un mélange visuel
@@ -100,7 +102,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
   const activeCategory = category || "tous";
   const filtered = activeCategory === "tous"
     ? diversify(allProducts)
-    : allProducts.filter((p) => p.category.toLowerCase() === activeCategory.toLowerCase());
+    : allProducts.filter((p) => (p.category ?? "").toLowerCase() === activeCategory.toLowerCase());
   const products = sortByStock(filtered);
 
   const categories = ["tous", "homme", "femme", "traditionnel", "moderne"];
@@ -110,7 +112,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
   for (const cat of categories) {
     productCounts[cat] = cat === "tous"
       ? allProducts.length
-      : allProducts.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
+      : allProducts.filter((p) => (p.category ?? "").toLowerCase() === cat.toLowerCase()).length;
   }
 
   return (

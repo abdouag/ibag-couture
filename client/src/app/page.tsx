@@ -48,9 +48,11 @@ export default async function Home() {
     if (res.ok) {
       const data: ApiResponse = await res.json();
       products = data?.data || [];
+    } else {
+      console.error(`[Home] API responded ${res.status} at ${API_URL}/api/products`);
     }
-  } catch {
-    // API not available
+  } catch (err) {
+    console.error(`[Home] API fetch failed at ${API_URL}/api/products:`, err);
   }
 
   // Selection intelligente : on prend les 8 premiers produits du tri intelligent backend,
@@ -66,14 +68,15 @@ export default async function Home() {
       let bestIdx = 0;
       let bestCount = Infinity;
       for (let i = 0; i < pool.length; i++) {
-        const cc = catCount[pool[i].category] || 0;
+        const cc = catCount[pool[i].category ?? ""] || 0;
         if (cc < bestCount) {
           bestCount = cc;
           bestIdx = i;
         }
       }
       const picked = pool.splice(bestIdx, 1)[0];
-      catCount[picked.category] = (catCount[picked.category] || 0) + 1;
+      const pickedCat = picked.category ?? "";
+      catCount[pickedCat] = (catCount[pickedCat] || 0) + 1;
       result.push(picked);
     }
     return result;
@@ -101,7 +104,7 @@ export default async function Home() {
   ];
 
   const categories = allCategories.map((cat) => {
-    const catProducts = products.filter((p) => p.category.toLowerCase() === cat.slug);
+    const catProducts = products.filter((p) => (p.category ?? "").toLowerCase() === cat.slug);
     const firstWithImage = catProducts.find((p) => p.mainImage || (p.images && p.images.length > 0));
     const img = firstWithImage
       ? firstWithImage.mainImage || (firstWithImage.images && firstWithImage.images[0])
