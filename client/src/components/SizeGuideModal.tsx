@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 // Size chart data (cm)
 const SIZE_CHART = [
@@ -36,15 +37,15 @@ function findRecommendedSize(chest: number, waist: number, hips: number) {
 
 function SizeChartTable({ availableSizes }: { availableSizes?: string[] }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm md:text-base">
+    <div className="overflow-x-auto -mx-2 sm:mx-0">
+      <table className="w-full text-xs sm:text-sm md:text-base">
         <thead>
           <tr className="border-b-2 border-stone-200">
-            <th className="py-3 px-3 text-left text-xs tracking-[0.2em] uppercase text-stone-400 font-medium">Taille</th>
-            <th className="py-3 px-3 text-center text-xs tracking-[0.2em] uppercase text-stone-400 font-medium">Poitrine</th>
-            <th className="py-3 px-3 text-center text-xs tracking-[0.2em] uppercase text-stone-400 font-medium">Taille</th>
-            <th className="py-3 px-3 text-center text-xs tracking-[0.2em] uppercase text-stone-400 font-medium">Hanches</th>
-            <th className="py-3 px-3 text-center text-xs tracking-[0.2em] uppercase text-stone-400 font-medium hidden sm:table-cell">Épaules</th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-left text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium w-12 sm:w-auto"></th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-center text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium">Poitrine</th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-center text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium">Taille</th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-center text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium">Hanches</th>
+            <th className="py-2.5 px-1.5 sm:px-3 text-center text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] uppercase text-stone-400 font-medium hidden sm:table-cell">Épaules</th>
           </tr>
         </thead>
         <tbody>
@@ -57,8 +58,8 @@ function SizeChartTable({ availableSizes }: { availableSizes?: string[] }) {
                   isAvailable ? "hover:bg-amber-50/50" : "opacity-40"
                 }`}
               >
-                <td className="py-3.5 px-3">
-                  <span className={`inline-flex items-center justify-center w-10 h-10 rounded-sm font-medium text-base ${
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3">
+                  <span className={`inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-sm font-medium text-sm sm:text-base ${
                     isAvailable
                       ? "bg-stone-900 text-white"
                       : "bg-stone-200 text-stone-400"
@@ -66,15 +67,16 @@ function SizeChartTable({ availableSizes }: { availableSizes?: string[] }) {
                     {row.size}
                   </span>
                 </td>
-                <td className="py-3.5 px-3 text-center text-stone-700">{row.chest[0]}–{row.chest[1]} cm</td>
-                <td className="py-3.5 px-3 text-center text-stone-700">{row.waist[0]}–{row.waist[1]} cm</td>
-                <td className="py-3.5 px-3 text-center text-stone-700">{row.hips[0]}–{row.hips[1]} cm</td>
-                <td className="py-3.5 px-3 text-center text-stone-700 hidden sm:table-cell">{row.shoulders[0]}–{row.shoulders[1]} cm</td>
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-stone-700 whitespace-nowrap">{row.chest[0]}–{row.chest[1]}</td>
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-stone-700 whitespace-nowrap">{row.waist[0]}–{row.waist[1]}</td>
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-stone-700 whitespace-nowrap">{row.hips[0]}–{row.hips[1]}</td>
+                <td className="py-2.5 sm:py-3.5 px-1.5 sm:px-3 text-center text-stone-700 whitespace-nowrap hidden sm:table-cell">{row.shoulders[0]}–{row.shoulders[1]}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      <p className="text-[10px] text-stone-400 mt-1.5 px-1.5 sm:px-0">Toutes les mesures sont en cm</p>
     </div>
   );
 }
@@ -247,6 +249,33 @@ export default function SizeGuideModal({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("chart");
+  const portalRef = useRef<HTMLElement | null>(null);
+
+  // Ensure portal target exists on client only
+  useEffect(() => {
+    portalRef.current = document.body;
+  }, []);
+
+  // Lock body scroll, lower header/CTA z-index so modal is on top, close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.style.overflow = "hidden";
+
+    // Force the sticky header AND the fixed bottom CTA below the modal overlay
+    const stickyHeader = document.querySelector(".sticky.top-0") as HTMLElement | null;
+    const fixedBottomCTA = document.querySelector(".fixed.bottom-0") as HTMLElement | null;
+    if (stickyHeader) stickyHeader.style.zIndex = "0";
+    if (fixedBottomCTA) fixedBottomCTA.style.zIndex = "0";
+
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      if (stickyHeader) stickyHeader.style.zIndex = "";
+      if (fixedBottomCTA) fixedBottomCTA.style.zIndex = "";
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [isOpen]);
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "chart", label: "Tableau" },
@@ -267,37 +296,80 @@ export default function SizeGuideModal({
         <span className="group-hover:underline underline-offset-4">Guide de taille</span>
       </button>
 
-      {/* Modal */}
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* Backdrop */}
+      {/* Portal: render modal at document.body to escape all stacking contexts */}
+      {isOpen && portalRef.current && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          id="size-guide-overlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 2147483647,
+            isolation: "isolate",
+          }}
+        >
+          {/* Panel — takes the ENTIRE screen, nothing can cover it */}
           <div
-            className="absolute inset-0 bg-black/50 animate-fadeInBackdrop"
-            onClick={() => setIsOpen(false)}
-          />
-
-          {/* Panel */}
-          <div className="relative bg-white w-full max-w-xl max-h-[85vh] overflow-hidden rounded-sm shadow-2xl animate-scaleIn flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-stone-200">
-              <h2 className="text-xl md:text-2xl font-luxury text-stone-900">Guide de taille</h2>
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "#fff",
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+            }}
+          >
+            {/* Header with prominent close button */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "12px 16px",
+                borderBottom: "1px solid #e7e5e4",
+                flexShrink: 0,
+                backgroundColor: "#fff",
+              }}
+            >
+              <h2 className="text-lg font-luxury text-stone-900">Guide de taille</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
+                aria-label="Fermer"
+                style={{
+                  width: 40,
+                  height: 40,
+                  minWidth: 40,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%",
+                  backgroundColor: "#f5f5f4",
+                  border: "none",
+                  cursor: "pointer",
+                }}
               >
-                <svg className="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#57534e" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-stone-200 px-6">
+            <div className="flex border-b border-stone-200" style={{ flexShrink: 0, padding: "0 16px" }}>
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-4 py-3 text-sm font-medium transition-colors relative ${
+                  className={`flex-1 py-2.5 text-xs font-medium transition-colors relative ${
                     activeTab === tab.key
                       ? "text-stone-900"
                       : "text-stone-400 hover:text-stone-600"
@@ -311,12 +383,12 @@ export default function SizeGuideModal({
               ))}
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-5">
+            {/* Content — scrollable, takes remaining space */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "16px", WebkitOverflowScrolling: "touch" }}>
               {activeTab === "chart" && (
                 <div className="space-y-4">
-                  <p className="text-sm text-stone-500">
-                    Toutes les mesures sont en centimètres (cm). Comparez vos mensurations au tableau ci-dessous.
+                  <p className="text-xs text-stone-500">
+                    Comparez vos mensurations au tableau ci-dessous.
                   </p>
                   <SizeChartTable availableSizes={availableSizes} />
                   {isCustomAvailable && (
@@ -336,8 +408,29 @@ export default function SizeGuideModal({
 
               {activeTab === "recommend" && <SizeRecommender />}
             </div>
+
+            {/* Bottom close button for easy access */}
+            <div style={{ flexShrink: 0, padding: "12px 16px", borderTop: "1px solid #e7e5e4", backgroundColor: "#fff" }}>
+              <button
+                onClick={() => setIsOpen(false)}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  backgroundColor: "#1c1917",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+              >
+                Fermer
+              </button>
+            </div>
           </div>
-        </div>
+        </div>,
+        portalRef.current
       )}
     </>
   );
