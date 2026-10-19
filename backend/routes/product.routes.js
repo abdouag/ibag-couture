@@ -9,6 +9,7 @@ const {
   updateProduct,
   deleteProduct,
 } = require('../controllers/product.controller');
+const { protect, adminOnly } = require('../middleware/auth');
 const { validate } = require('../middleware');
 
 // Validation rules
@@ -144,9 +145,10 @@ const slugValidation = [
 ];
 
 // Routes
+// Lecture publique (boutique), mutations reservees a l'admin.
 router
   .route('/')
-  .post(validate(productValidation), createProduct)
+  .post(protect, adminOnly, validate(productValidation), createProduct)
   .get(getAllProducts);
 
 router
@@ -155,7 +157,7 @@ router
 
 router
   .route('/:id')
-  .put(validate([...mongoIdValidation, ...updateValidation]), updateProduct)
-  .delete(validate(mongoIdValidation), deleteProduct);
+  .put(protect, adminOnly, validate([...mongoIdValidation, ...updateValidation]), updateProduct)
+  .delete(protect, adminOnly, validate(mongoIdValidation), deleteProduct);
 
 module.exports = router;
