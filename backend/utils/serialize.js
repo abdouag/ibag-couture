@@ -67,6 +67,7 @@ const serializeOrder = (order) => {
     id,
     basePrice,
     optionsPrice,
+    customSurcharge,
     totalPrice,
     product,
     user,
@@ -80,6 +81,7 @@ const serializeOrder = (order) => {
     ...rest,
     basePrice: toNumber(basePrice),
     optionsPrice: toNumber(optionsPrice),
+    customSurcharge: toNumber(customSurcharge),
     totalPrice: toNumber(totalPrice),
   };
 
