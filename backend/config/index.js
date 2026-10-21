@@ -5,8 +5,6 @@ module.exports = {
   port: process.env.PORT || 5000,
   nodeEnv: process.env.NODE_ENV || 'development',
 
-  // Database
-  mongodbUri: process.env.MONGODB_URI,
 
   // JWT
   jwtSecret: process.env.JWT_SECRET,

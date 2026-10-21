@@ -2,14 +2,14 @@ require('dotenv').config();
 
 const app = require('./app');
 const config = require('./config');
-const { connectDB, disconnectDB } = require('./config/database');
+const { prisma, disconnectPrisma } = require('./config/prisma');
 
 const startServer = async () => {
   try {
-    // Connect to MongoDB
-    await connectDB();
+    // Verifier la connexion a PostgreSQL avant d'ouvrir le serveur
+    await prisma.$connect();
+    console.log('PostgreSQL connecté');
 
-    // Start server
     const server = app.listen(config.port, () => {
       console.log(`
 ========================================
@@ -30,7 +30,7 @@ const startServer = async () => {
 
       server.close(async () => {
         console.log('HTTP server closed');
-        await disconnectDB();
+        await disconnectPrisma();
         process.exit(0);
       });
 
@@ -61,7 +61,7 @@ const startServer = async () => {
     });
 
   } catch (error) {
-    console.error('Failed to start server:', error);
+    console.error('Failed to start server:', error.message);
     process.exit(1);
   }
 };

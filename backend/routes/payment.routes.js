@@ -7,17 +7,17 @@ const {
   getAllPayments,
   getPaymentById,
   deletePayment,
-} = require('../controllers/payment.controller');
+} = require('../controllers/prisma/payment.controller');
 const { protect, adminOnly } = require('../middleware/auth');
 const { validate } = require('../middleware');
 
 const paymentValidation = [
   body('order')
     .notEmpty().withMessage('La commande est requise')
-    .isMongoId().withMessage('ID de commande invalide'),
+    .isString().trim().notEmpty().withMessage('ID de commande invalide'),
   body('client')
     .optional()
-    .isMongoId().withMessage('ID de client invalide'),
+    .isString().trim().notEmpty().withMessage('ID de client invalide'),
   body('amount')
     .notEmpty().withMessage('Le montant est requis')
     .isFloat({ min: 1 }).withMessage('Le montant doit être supérieur à 0'),
@@ -34,7 +34,7 @@ const paymentValidation = [
 ];
 
 const mongoIdValidation = [
-  param('id').isMongoId().withMessage('ID invalide'),
+  param('id').trim().notEmpty().withMessage('ID invalide'),
 ];
 
 // Toutes les routes sont protégées (admin only)

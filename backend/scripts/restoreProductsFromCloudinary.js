@@ -23,10 +23,9 @@
  */
 
 require('dotenv').config();
-const mongoose = require('mongoose');
 const cloudinary = require('../config/cloudinary');
-const Product = require('../models/Product');
-const config = require('../config');
+const { prisma, disconnectPrisma } = require('../config/prisma');
+const { slugify } = require('../utils/slug');
 
 // Dossiers Cloudinary utilises par l'application (uploads admin + images generees par l'IA)
 const CLOUDINARY_PREFIXES = ['ibag-couture/products', 'ibag/products/ai'];
@@ -121,7 +120,7 @@ function groupImagesByUploadTime(images, windowSeconds) {
  */
 function checkEnv() {
   const missing = [
-    'MONGODB_URI',
+    'DATABASE_URL',
     'CLOUDINARY_CLOUD_NAME',
     'CLOUDINARY_API_KEY',
     'CLOUDINARY_API_SECRET',
@@ -162,7 +161,9 @@ async function listImages(prefix) {
  * pour rendre le script rejouable sans creer de doublons.
  */
 async function getKnownImageUrls() {
-  const products = await Product.find({}, 'mainImage images').lean();
+  const products = await prisma.product.findMany({
+    select: { mainImage: true, images: true },
+  });
   const known = new Set();
 
   for (const product of products) {
@@ -177,8 +178,8 @@ async function restore() {
   const args = parseArgs(process.argv.slice(2));
   checkEnv();
 
-  await mongoose.connect(config.mongodbUri);
-  console.log('Connecte a MongoDB');
+  await prisma.$connect();
+  console.log('Connecte a PostgreSQL');
 
   // 1. Lister les images disponibles sur Cloudinary
   const collected = [];
@@ -190,7 +191,7 @@ async function restore() {
 
   if (collected.length === 0) {
     console.log('\nAucune image trouvee sur Cloudinary. Rien a restaurer.');
-    await mongoose.disconnect();
+    await disconnectPrisma();
     return;
   }
 
@@ -207,7 +208,7 @@ async function restore() {
 
   if (orphans.length === 0) {
     console.log('Toutes les images sont deja utilisees. Rien a restaurer.');
-    await mongoose.disconnect();
+    await disconnectPrisma();
     return;
   }
 
@@ -222,9 +223,10 @@ async function restore() {
     console.log('Utilisez --no-group pour creer une fiche par image, ou --group-window=<secondes> pour ajuster.');
   }
 
-  const existingCount = await Product.countDocuments();
+  const existingCount = await prisma.product.count();
   const drafts = groups.map((group, index) => ({
     name: `Produit a completer ${existingCount + index + 1}`,
+    slug: slugify(`Produit a completer ${existingCount + index + 1}`),
     category: args.category,
     basePrice: args.price,
     mainImage: group[0].secure_url,
@@ -249,7 +251,7 @@ async function restore() {
       '\n[SIMULATION] Aucune ecriture effectuee.' +
       '\nRelancez avec --apply pour creer reellement les produits.'
     );
-    await mongoose.disconnect();
+    await disconnectPrisma();
     return;
   }
 
@@ -259,7 +261,7 @@ async function restore() {
 
   for (const draft of drafts) {
     try {
-      await Product.create(draft);
+      await prisma.product.create({ data: draft });
       created += 1;
     } catch (error) {
       failures.push({ name: draft.name, message: error.message });
@@ -280,11 +282,11 @@ async function restore() {
     '\ncategorie et description, puis activez les fiches a publier.'
   );
 
-  await mongoose.disconnect();
+  await disconnectPrisma();
 }
 
 restore().catch(async (error) => {
   console.error(`\nErreur : ${error.message}`);
-  await mongoose.disconnect().catch(() => {});
+  await disconnectPrisma().catch(() => {});
   process.exit(1);
 });

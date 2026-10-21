@@ -8,7 +8,7 @@ const {
   getProductBySlug,
   updateProduct,
   deleteProduct,
-} = require('../controllers/product.controller');
+} = require('../controllers/prisma/product.controller');
 const { protect, adminOnly } = require('../middleware/auth');
 const { validate } = require('../middleware');
 
@@ -135,7 +135,7 @@ const updateValidation = [
 
 const mongoIdValidation = [
   param('id')
-    .isMongoId().withMessage('ID invalide'),
+    .trim().notEmpty().withMessage('ID invalide'),
 ];
 
 const slugValidation = [
