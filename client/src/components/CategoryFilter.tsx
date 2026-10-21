@@ -29,23 +29,29 @@ function CategoryFilterInner({ categories, productCounts }: CategoryFilterProps)
     }
   };
 
+  // Onglets soulignes plutot que pastilles arrondies : le meme vocabulaire
+  // que le reste de la boutique (angles vifs, typographie espacee).
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 -mb-2 scrollbar-hide">
+    <div className="flex items-center gap-6 md:gap-8 overflow-x-auto scrollbar-hide" role="tablist">
       {categories.map((category) => {
         const count = productCounts[category] ?? 0;
         const isActive = activeCategory === category;
         return (
           <button
             key={category}
+            role="tab"
+            aria-selected={isActive}
             onClick={() => handleFilter(category)}
-            className={`whitespace-nowrap transition-all duration-300 ${
+            className={`whitespace-nowrap py-4 text-[11px] uppercase tracking-[0.2em] border-b-2 -mb-px transition-colors duration-300 ${
               isActive
-                ? "bg-[#0D0D0D] text-white rounded-full px-5 py-2 text-[10px] uppercase tracking-[0.1em] font-medium"
-                : "border border-[#E8E4E0] text-[#999] rounded-full px-5 py-2 text-[10px] uppercase tracking-[0.1em] hover:border-[#C9A45C] hover:text-[#C9A45C]"
+                ? "border-[#0D0D0D] text-[#0D0D0D]"
+                : "border-transparent text-[#999] hover:text-[#0D0D0D]"
             }`}
           >
             {category.charAt(0).toUpperCase() + category.slice(1)}
-            {category !== "tous" && ` (${count})`}
+            {category !== "tous" && count > 0 && (
+              <span className="ml-1.5 text-[#C9A45C] tabular-nums">{count}</span>
+            )}
           </button>
         );
       })}

@@ -19,6 +19,7 @@ const ANNOUNCEMENT_STORAGE_KEY = "ibag-announcement-dismissed";
 export default function Header() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -182,7 +183,20 @@ export default function Header() {
               </div>
 
               {/* Right: Icons - LUXURY SPACING */}
-              <div className="flex items-center justify-end gap-2 sm:gap-3 lg:gap-4">
+              <div className="flex items-center justify-end gap-1 sm:gap-3 lg:gap-4">
+                {/* Recherche mobile : une icone plutot qu'un champ pleine largeur,
+                    qui repoussait le contenu d'un tiers d'ecran sous le pli */}
+                <button
+                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                  className="md:hidden p-2.5 text-stone-500 hover:text-[#C9A45C] transition-colors duration-300"
+                  aria-label="Rechercher"
+                  aria-expanded={isSearchOpen}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
+                </button>
+
                 {/* Account Icon - LUXURY */}
                 <div className="relative" ref={accountMenuRef}>
                   {user ? (
@@ -279,10 +293,12 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Mobile Search Row - LUXURY */}
-            <div className="md:hidden pb-3 pt-1">
-              <SearchBar isMobile />
-            </div>
+            {/* Mobile Search Row — affichee a la demande */}
+            {isSearchOpen && (
+              <div className="md:hidden pb-3 pt-1 animate-fadeIn">
+                <SearchBar isMobile />
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu */}

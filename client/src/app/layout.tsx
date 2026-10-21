@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import CartToast from "@/components/CartToast";
 import PageLoader from "@/components/PageLoader";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
 import { CartProvider } from "@/contexts/CartContext";
 
 const geistSans = Geist({
@@ -140,6 +141,7 @@ export default function RootLayout({
           <PageLoader />
           <Header />
           <CartToast />
+          <WhatsAppFloat />
           {children}
         </CartProvider>
       </body>

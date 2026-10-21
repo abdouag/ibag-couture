@@ -10,9 +10,11 @@ type Props = {
 export default function ShareButtons({ productName, slug }: Props) {
   const [copied, setCopied] = useState(false);
 
-  const siteUrl = typeof window !== "undefined"
-    ? window.location.origin
-    : "https://ibagcouture.com";
+  // Meme valeur au rendu serveur et cote navigateur : lire window.location
+  // ici produisait un HTML different de celui que React recalculait au
+  // chargement (origine locale ou « www. » en production), d'ou une erreur
+  // d'hydratation a chaque fiche produit.
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ibagcouture.com";
   const productUrl = `${siteUrl}/produits/${slug}`;
   const shareText = `${productName} — Ibag Couture, haute couture africaine sur mesure`;
 

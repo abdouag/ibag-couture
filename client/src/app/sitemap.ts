@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all products for dynamic pages
   let productPages: MetadataRoute.Sitemap = [];
   try {
-    const res = await fetch(`${API_URL}/api/products`, {
+    const res = await fetch(`${API_URL}/api/products?limit=200&isActive=true`, {
       cache: "no-store",
     });
     if (res.ok) {

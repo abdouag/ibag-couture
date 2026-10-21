@@ -29,16 +29,12 @@ export default function HeroDynamicGallery({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState<Set<number>>(new Set([0]));
 
-  // Shuffle images once on mount for random display
-  const shuffledImages = useMemo(() => {
-    if (images.length === 0) return [];
-    const shuffled = [...images];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }, [images]);
+  // L'ordre est celui fourni par la page, deja trie cote API (meilleures
+  // ventes, promotions, nouveautes). Un melange aleatoire ici produisait un
+  // ordre different entre le rendu serveur et le navigateur, donc une erreur
+  // d'hydratation et une premiere photo tiree au sort — parfois la moins
+  // flatteuse du catalogue.
+  const shuffledImages = useMemo(() => images, [images]);
 
   // Get full URL for image
   const getImageUrl = useCallback((url: string) => {
@@ -94,7 +90,7 @@ export default function HeroDynamicGallery({
           priority
         />
         {/* Dark gradient for text readability */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/30 to-black/10 lg:from-black/30 lg:via-transparent lg:to-transparent" />
       </div>
     );
   }
