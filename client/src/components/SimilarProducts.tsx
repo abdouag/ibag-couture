@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cloudinaryUrl } from "@/lib/cloudinary";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -57,9 +58,8 @@ export default async function SimilarProducts({ category, currentProductId }: Pr
         <div className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
           {products.map((product) => {
             const imgUrl = product.mainImage || (product.images && product.images.length > 0 ? product.images[0] : null);
-            const imgSrc = imgUrl
-              ? imgUrl.startsWith("http") ? imgUrl : `${API_URL}${imgUrl}`
-              : null;
+            // Vignette de carte : inutile de charger la photo en pleine resolution
+            const imgSrc = imgUrl ? cloudinaryUrl(imgUrl, { w: 600 }) : null;
             const hasPromo = product.promoPrice != null && product.promoPrice < product.basePrice;
 
             return (
@@ -73,7 +73,8 @@ export default async function SimilarProducts({ category, currentProductId }: Pr
                     <img
                       src={imgSrc}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover object-[center_12%] group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-stone-400">
