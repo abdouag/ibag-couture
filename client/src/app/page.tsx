@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import HeroDynamicGallery from "@/components/HeroDynamicGallery";
+import ProductCard, { type ProductCardData } from "@/components/ProductCard";
 import { cloudinaryUrl } from "@/lib/cloudinary";
 import type { Metadata } from "next";
 
@@ -24,20 +25,7 @@ const WHATSAPP_ORDER_URL =
   "https://wa.me/221770470928?text=" +
   encodeURIComponent("Bonjour Ibag Couture, je souhaite commander sur mesure.");
 
-type Product = {
-  _id: string;
-  name: string;
-  slug: string;
-  basePrice: number;
-  category: string;
-  description?: string;
-  mainImage?: string;
-  images?: string[];
-  hasStock?: boolean;
-  stockQuantity?: number | null;
-  promoPrice?: number | null;
-  createdAt?: string;
-};
+type Product = ProductCardData;
 
 type ApiResponse = {
   success: boolean;
@@ -50,14 +38,6 @@ const CATEGORIES = [
   { slug: "traditionnel", label: "Traditionnel" },
   { slug: "moderne", label: "Moderne" },
 ];
-
-const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(
-  CATEGORIES.map((c) => [c.slug, c.label])
-);
-
-const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
-
-const formatPrice = (value: number) => value.toLocaleString("fr-FR");
 
 const firstImage = (product: Product) =>
   product.mainImage || (product.images && product.images.length > 0 ? product.images[0] : undefined);
@@ -120,7 +100,6 @@ export default async function Home() {
     return { ...cat, count: inCategory.length, image: withImage ? firstImage(withImage) : undefined };
   });
 
-  const now = Date.now();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ibagcouture.com";
 
   const jsonLd = {
@@ -200,85 +179,9 @@ export default async function Home() {
             <p className="text-center text-[#999] py-16 md:py-20">Nos collections arrivent bientôt…</p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 lg:gap-x-8">
-              {featured.map((product) => {
-                const main = firstImage(product);
-                const second = product.images && product.images.length > 1 ? product.images[1] : undefined;
-                const hasPromo = product.promoPrice != null && product.promoPrice < product.basePrice;
-                const isOutOfStock =
-                  product.hasStock === true && (product.stockQuantity == null || product.stockQuantity <= 0);
-                const isLowStock =
-                  product.stockQuantity != null && product.stockQuantity > 0 && product.stockQuantity < 3;
-                const isNew = product.createdAt ? now - new Date(product.createdAt).getTime() < THIRTY_DAYS : false;
-
-                return (
-                  <Link key={product._id} href={`/produits/${product.slug || product._id}`} className="group block">
-                    <div className="relative aspect-[3/4] overflow-hidden bg-[#EFEDEA] mb-3">
-                      {main ? (
-                        <>
-                          <img
-                            src={cloudinaryUrl(main, { w: 600 })}
-                            alt={product.name}
-                            className="w-full h-full object-cover object-[center_12%] transition-transform duration-700 group-hover:scale-[1.03]"
-                            loading="lazy"
-                          />
-                          {second && (
-                            <img
-                              src={cloudinaryUrl(second, { w: 600 })}
-                              alt=""
-                              className="absolute inset-0 w-full h-full object-cover object-[center_12%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden md:block"
-                              loading="lazy"
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-[#B5AFA8] text-xs tracking-[0.2em] uppercase">
-                          Photo à venir
-                        </div>
-                      )}
-
-                      {(isNew || hasPromo || isLowStock) && (
-                        <div className="absolute top-3 left-3 flex flex-col gap-1">
-                          {hasPromo && (
-                            <span className="bg-[#0D0D0D] text-white text-[10px] tracking-[0.15em] uppercase px-2 py-1">
-                              −{Math.round((1 - product.promoPrice! / product.basePrice) * 100)} %
-                            </span>
-                          )}
-                          {isNew && !hasPromo && (
-                            <span className="bg-white text-[#0D0D0D] text-[10px] tracking-[0.15em] uppercase px-2 py-1">
-                              Nouveau
-                            </span>
-                          )}
-                          {isLowStock && (
-                            <span className="bg-[#C9A45C] text-[#0D0D0D] text-[10px] tracking-[0.15em] uppercase px-2 py-1">
-                              Dernières pièces
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {isOutOfStock && (
-                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-                          <span className="text-[11px] tracking-[0.2em] uppercase text-[#0D0D0D]">Épuisé</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-[10px] tracking-[0.2em] uppercase text-[#999] mb-1">
-                      {CATEGORY_LABELS[product.category] || product.category}
-                    </p>
-                    <h3 className="font-luxury text-[15px] md:text-base text-[#0D0D0D] leading-snug line-clamp-2 mb-1.5 group-hover:text-[#C9A45C] transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-sm text-[#0D0D0D] tabular-nums">
-                      {formatPrice(hasPromo ? product.promoPrice! : product.basePrice)}
-                      <span className="text-xs text-[#999]"> FCFA</span>
-                      {hasPromo && (
-                        <span className="ml-2 text-xs text-[#999] line-through">{formatPrice(product.basePrice)}</span>
-                      )}
-                    </p>
-                  </Link>
-                );
-              })}
+              {featured.map((product, index) => (
+                <ProductCard key={product._id} product={product} eager={index < 2} />
+              ))}
             </div>
           )}
 
