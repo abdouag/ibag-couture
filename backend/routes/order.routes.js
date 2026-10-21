@@ -10,7 +10,7 @@ const {
   updateAdminNotes,
   updateWorkshopInfo,
   getWorkshopOrders,
-} = require('../controllers/order.controller');
+} = require('../controllers/prisma/order.controller');
 const { protect, adminOnly } = require('../middleware/auth');
 
 // POST /api/orders - Créer une commande (public)

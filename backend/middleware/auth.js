@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+
+const { prisma } = require('../config/prisma');
 const { AppError } = require('./errorHandler');
 const config = require('../config');
 
@@ -31,13 +32,17 @@ const protect = async (req, res, next) => {
       return next(new AppError('Token invalide', 401));
     }
 
-    // Vérifier que l'utilisateur existe toujours
-    const user = await User.findById(decoded.id);
+    // Vérifier que l'utilisateur existe toujours. Le mot de passe n'est pas
+    // selectionne : rien en aval n'en a besoin.
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: { id: true, email: true, role: true, fullName: true, isActive: true },
+    });
+
     if (!user) {
       return next(new AppError('Utilisateur non trouvé', 401));
     }
 
-    // Vérifier si le compte est actif
     if (!user.isActive) {
       return next(new AppError('Ce compte a été désactivé', 401));
     }

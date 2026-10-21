@@ -7,7 +7,7 @@ const {
   exportOrders,
   exportPayments,
   exportFinances,
-} = require('../controllers/export.controller');
+} = require('../controllers/prisma/export.controller');
 const { protect, adminOnly } = require('../middleware/auth');
 
 router.use(protect, adminOnly);

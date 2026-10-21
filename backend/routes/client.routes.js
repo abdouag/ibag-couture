@@ -9,7 +9,7 @@ const {
   updateClient,
   deleteClient,
   getClientOrders,
-} = require('../controllers/client.controller');
+} = require('../controllers/prisma/client.controller');
 const { protect, adminOnly } = require('../middleware/auth');
 const { validate } = require('../middleware');
 
@@ -60,7 +60,7 @@ const clientValidation = [
 ];
 
 const mongoIdValidation = [
-  param('id').isMongoId().withMessage('ID invalide'),
+  param('id').trim().notEmpty().withMessage('ID invalide'),
 ];
 
 // Toutes les routes sont protégées (admin only)

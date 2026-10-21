@@ -6,7 +6,7 @@ const {
   getRevenue,
   getByMethod,
   getOutstanding,
-} = require('../controllers/finance.controller');
+} = require('../controllers/prisma/finance.controller');
 const { protect, adminOnly } = require('../middleware/auth');
 
 router.use(protect, adminOnly);
