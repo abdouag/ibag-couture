@@ -107,7 +107,9 @@ export default async function ProductPage({ params }: Props) {
     // API unreachable
   }
 
-  if (!product) {
+  // Un produit desactive ne doit pas etre accessible par lien direct : il
+  // s'agit soit d'un brouillon, soit d'un article retire de la vente.
+  if (!product || product.isActive === false) {
     notFound();
   }
 

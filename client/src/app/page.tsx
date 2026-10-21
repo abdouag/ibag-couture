@@ -42,7 +42,7 @@ type ApiResponse = {
 export default async function Home() {
   let products: Product[] = [];
   try {
-    const res = await fetch(`${API_URL}/api/products?limit=200`, {
+    const res = await fetch(`${API_URL}/api/products?limit=200&isActive=true`, {
       cache: "no-store",
     });
     if (res.ok) {

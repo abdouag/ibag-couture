@@ -54,7 +54,7 @@ export default async function CollectionsPage({ searchParams }: Props) {
   let allProducts: Product[] = [];
   let total = 0;
   try {
-    const res = await fetch(`${API_URL}/api/products?limit=200`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/products?limit=200&isActive=true`, { cache: "no-store" });
     if (res.ok) {
       const data: ApiResponse = await res.json();
       allProducts = data?.data || [];
